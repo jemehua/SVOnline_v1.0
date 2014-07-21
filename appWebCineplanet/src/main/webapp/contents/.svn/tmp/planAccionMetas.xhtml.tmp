@@ -1,0 +1,117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+	<h:outputStylesheet name="css/cssContent.css" />
+</h:head>
+<h:body>
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datos2" header="Registro de Plan de Acción de Metas">
+		<p:focus context="datos2" />
+		<p:panelGrid styleClass="panelGrid">
+			<p:row>
+				<p:column width="30">#{messages.lblCampania}
+				</p:column>
+				<p:column width="70">
+					<h:outputLabel
+						value="#{planMetasController.inscripcion.campania.denominacion}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblGerentePublico}
+				</p:column>
+				<p:column>
+					<h:outputLabel
+						value="#{planMetasController.inscripcion.asignacionGerenteV.nombres} #{planMetasController.inscripcion.asignacionGerenteV.ap_paterno} #{planMetasController.inscripcion.asignacionGerenteV.ap_materno}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblPuesto}
+				</p:column>
+				<p:column>
+					<h:outputText
+						value="#{planMetasController.inscripcion.puestoTipoV.dsc_puesto_tipo}" />
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+		<p:spacer height="10" />
+		<p:dataTable var="meta" value="#{planMetasController.listaMetas}"
+			id="dtMetas2" rows="6"
+			emptyMessage="No hay resultados para el criterio de busqueda"
+			selectionMode="single" rowKey="#{meta}">
+			<p:ajax event="rowSelect"
+				listener="#{planMetasController.onRowSelect}"
+				update=":frm:pnlPlanAccionMetas,:frm:planTxt" process="dtMetas2" />
+
+			<f:facet name="header">  
+            Lista de Metas
+            </f:facet>
+
+			<p:column headerText="#{messages.lblCodigo}" style="width:10%">
+				<h:outputText value="#{meta.id.idMeta}" />
+			</p:column>
+			<p:column headerText="Tipo Meta" style="width:15%">
+				<h:outputText value="#{meta.tipo}" />
+			</p:column>
+			<p:column headerText="Meta" style="width:30%">
+				<h:outputText value="#{meta.denominacion}" />
+			</p:column>
+			<p:column headerText="Relación POI" style="width:25%">
+				<h:outputText value="#{meta.relacionPOI}" />
+			</p:column>
+			<p:column headerText="Peso (%)" style="width:10%">
+				<h:outputText value="#{meta.peso}" />
+			</p:column>
+<<<<<<< .mine
+
+			<f:facet name="footer">
+				<div style="text-align: left; color: blue;">Por favor,
+					seleccione un registro e ingrese Plan de Acción</div>
+			</f:facet>
+
+=======
+			
+			<f:facet name="footer" >  
+			<div style="text-align: left; color: blue;">
+            Por favor, seleccione una meta e ingrese Plan de Acción.</div>
+            </f:facet>
+			
+>>>>>>> .r683
+		</p:dataTable>
+		<p:spacer height="10" />
+		<p:panelGrid id="pnlPlanAccionMetas" styleClass="panelGrid">
+
+			<p:row>
+				<p:column>Plan de Acción<h:outputText value="*"
+						styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<p:inputText id="planTxt"
+						value="#{planMetasController.planMetas.descripcionPlan}"
+						tabindex="4" maxlength="300" styleClass="txt" style="width:510px;" />
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+		<p:separator id="s1" />
+
+		<table style="width: 100%">
+			<tr>
+				<td align="left"><p:commandButton value="Guardar"
+						action="#{planMetasController.guardar}" update="datos2,messages"
+						icon="ui-icon-document" tabindex="11" /></td>
+				<td align="right"><p:commandButton value="Continuar"
+						update="datos,messages" action="#{planMetasController.atenderFlujo}"
+						icon="ui-icon-circle-arrow-e" tabindex="12" /></td>
+			</tr>
+
+		</table>
+	</p:panel>
+
+
+</h:body>
+</html>

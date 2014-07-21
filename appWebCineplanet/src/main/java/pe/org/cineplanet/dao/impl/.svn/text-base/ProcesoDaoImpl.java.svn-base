@@ -1,0 +1,91 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.ProcesoDao;
+import gob.servir.desempenio.model.Proceso;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.faces.model.SelectItem;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Repository
+public class ProcesoDaoImpl implements ProcesoDao {
+	@PersistenceContext
+	private EntityManager em;
+
+	public Proceso find(Long id) {
+		try {
+			return em.find(Proceso.class, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Proceso save(Proceso obj) {
+		try {
+			em.persist(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Proceso edit(Proceso obj) {
+		try {
+			return em.merge(obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<Proceso> getListaProceso() {
+
+		TypedQuery<Proceso> tq = em.createNamedQuery(
+				"Proceso.getAllListaProceso", Proceso.class);
+
+		try {
+			return tq.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<SelectItem> getComboProceso() {
+
+		List<SelectItem> listaCombo = new ArrayList<SelectItem>();
+		List<Proceso> lista = new ArrayList<Proceso>();
+		try {
+			lista = getListaProceso();
+		} catch (Exception as) {
+			as.printStackTrace();
+			SelectItem fila = new SelectItem(0L, "Seleccione proceso");
+			listaCombo.add(fila);
+			return listaCombo;
+		}
+		SelectItem fila = new SelectItem(0L, "Seleccione proceso");
+		listaCombo.add(fila);
+
+		for (Proceso row : lista) {
+			fila = new SelectItem(row.getIdProceso(), row.getDenominacion());
+			listaCombo.add(fila);
+		}
+		return listaCombo;
+	}
+
+}

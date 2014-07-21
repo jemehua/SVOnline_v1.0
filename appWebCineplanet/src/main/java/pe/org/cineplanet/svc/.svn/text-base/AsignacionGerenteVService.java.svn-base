@@ -1,0 +1,19 @@
+package gob.servir.desempenio.service;
+
+import gob.servir.desempenio.model.AsignacionGerenteV;
+
+import java.util.List;
+
+/**
+ * 
+ * @author Hever Pumallihua García
+ */
+public interface AsignacionGerenteVService {
+
+	public abstract AsignacionGerenteV find(String codGerente);
+
+	public abstract List<AsignacionGerenteV> getListaAsignacionGerente();
+	
+	public abstract List<AsignacionGerenteV> getListaAsignacionGerente(String codGerente);
+
+}

@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+	<h:outputStylesheet name="css/cssContent.css" />
+</h:head>
+<h:body>
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datos" header="Reporte">
+		<p:focus context="datos" />
+		<table cellpadding="2" cellspacing="4">
+			<tr>
+				<td>#{messages.lblCampania}</td>
+				<td><p:selectOneMenu id="comboCampania"
+						value="#{reporteResultadosController.campaniaSelec}"
+						style="width:250px;" tabindex="1">
+						<f:selectItems
+							value="#{reporteResultadosController.comboCampania}" />
+						<p:ajax update="dtList,sample" event="change" />
+					</p:selectOneMenu></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>Puesto Tipo</td>
+				<td><p:selectOneMenu id="comboPuestoTipo"
+						value="#{reporteResultadosController.puestoTipoSelec}"
+						style="width:250px;" tabindex="2">
+						<f:selectItems
+							value="#{reporteResultadosController.comboPuestoTipo}" />
+						<p:ajax update="dtList,sample" event="change" />
+					</p:selectOneMenu></td>
+				<td>Entidad Destino</td>
+				<td><p:selectOneMenu id="comboEntidad"
+						value="#{reporteResultadosController.entidadSelec}"
+						style="width:250px;" tabindex="3">
+						<f:selectItems value="#{reporteResultadosController.comboEntidad}" />
+						<p:ajax update="dtList,sample" event="change" />
+					</p:selectOneMenu></td>
+			</tr>
+		</table>
+
+		<p:dataTable var="ins"
+			value="#{reporteResultadosController.listInscripcion}" id="dtList"
+			scrollable="true" scrollHeight="250" paginator="true" rows="10"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			emptyMessage="#{messages.msgEmptyMessage}">
+
+			<f:facet name="header">    
+            	Lista de Gerentes Públicos 
+            	</f:facet>
+			<p:column headerText="Codigo" style="width:7%">
+				<h:outputText value="#{ins.asignacionGerenteV.cod_gerente}" />
+			</p:column>
+			<p:column headerText="Gerente Público" style="width:25%">
+				<h:outputText value="#{ins.asignacionGerenteV}" />
+			</p:column>
+			<!--  <p:column headerText="Dni" style="width:10%">
+				<h:outputText value="#{ins.asignacionGerenteV.dni}" />
+			</p:column>-->
+			<p:column headerText="Puesto Tipo" style="width:15%">
+				<h:outputText value="#{ins.puestoTipoV}" />
+			</p:column>
+			<p:column headerText="Campaña" style="width:12%">
+				<h:outputText value="#{ins.campania}" />
+			</p:column>
+			<p:column headerText="Metas" style="width:7%">
+				<h:outputText value="#{ins.promedioMetas}" /> 
+			</p:column>
+			<p:column headerText="Competencias" style="width:12%">
+				<h:outputText value="#{ins.promedioComp}" />
+			</p:column>
+			<p:column headerText="Eva.Final" style="width:7%">
+				<h:outputText value="#{ins.promedioFinal}" />
+			</p:column>
+			<p:column headerText="Descripción" style="width:15%">
+				<h:outputText value="#{ins.interpretacion}" />
+			</p:column>
+
+		</p:dataTable>
+
+		<table>
+			<tr>
+				<td align="left"><p:pieChart id="sample"
+						value="#{reporteResultadosController.pieModel}" legendPosition="w"
+						title="Gráfico de Sectores" style="width:400px;height:300px"
+						showDataLabels="true" /></td>
+				<td align="right"><p:commandButton value="PDF" id="pdf"
+						update="@this" icon="ui-icon-disk" /> <p:commandButton
+						value="EXCEL" id="xls" update="@this" icon="ui-icon-disk" /></td>
+			</tr>
+		</table>
+
+
+
+
+
+	</p:panel>
+</h:body>
+<p:ajaxStatus
+	style="width:64px;height:64px;position:fixed;right:5px;bottom:5px"
+	id="ajaxStatusPanel">
+	<f:facet name="start">
+		<p:graphicImage value="./images/loading.gif" />
+	</f:facet>
+
+	<f:facet name="complete">
+		<h:outputText value="" />
+	</f:facet>
+</p:ajaxStatus>
+</html>

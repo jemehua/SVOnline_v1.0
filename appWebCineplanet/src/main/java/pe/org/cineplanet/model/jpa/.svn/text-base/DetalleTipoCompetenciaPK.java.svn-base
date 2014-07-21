@@ -1,0 +1,94 @@
+package gob.servir.desempenio.model;
+
+import java.io.Serializable;
+
+import javax.persistence.*;
+
+/**
+ * 
+ * @author Cristhian Munguia Martinez
+ */
+@Embeddable
+public class DetalleTipoCompetenciaPK implements Serializable {
+	private static final long serialVersionUID = 1L;
+
+	@Basic(optional = false)
+	@Column(name = "idDetalle")
+	private Long idDetalle;
+	@Basic(optional = false)
+	@Column(name = "idTipoCompetencia")
+	private Long idTipoCompetencia;
+
+	public DetalleTipoCompetenciaPK() {
+		super();
+	}
+
+	public DetalleTipoCompetenciaPK(Long idDetalle, Long idTipoCompetencia) {
+		super();
+		this.idDetalle = idDetalle;
+		this.idTipoCompetencia = idTipoCompetencia;
+	}
+
+	public Long getIdDetalle() {
+		return idDetalle;
+	}
+
+	public void setIdDetalle(Long idDetalle) {
+		this.idDetalle = idDetalle;
+	}
+
+	public Long getIdTipoCompetencia() {
+		return idTipoCompetencia;
+	}
+
+	public void setIdTipoCompetencia(Long idTipoCompetencia) {
+		this.idTipoCompetencia = idTipoCompetencia;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((idDetalle == null) ? 0 : idDetalle.hashCode());
+		result = prime
+				* result
+				+ ((idTipoCompetencia == null) ? 0 : idTipoCompetencia
+						.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DetalleTipoCompetenciaPK other = (DetalleTipoCompetenciaPK) obj;
+		if (idDetalle == null) {
+			if (other.idDetalle != null)
+				return false;
+		} else if (!idDetalle.equals(other.idDetalle))
+			return false;
+		if (idTipoCompetencia == null) {
+			if (other.idTipoCompetencia != null)
+				return false;
+		} else if (!idTipoCompetencia.equals(other.idTipoCompetencia))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("DetalleTipoCompetenciaPK [idDetalle=");
+		builder.append(idDetalle);
+		builder.append(", idTipoCompetencia=");
+		builder.append(idTipoCompetencia);
+		builder.append("]");
+		return builder.toString();
+	}
+
+}

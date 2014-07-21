@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/repservir/!svn/ver/1569/desempenio/branches/desempenio/src/main/resources
+END
+db.properties
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/repservir/!svn/ver/1297/desempenio/branches/desempenio/src/main/resources/db.properties
+END
+sqlCero.sql
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/repservir/!svn/ver/1663/desempenio/branches/desempenio/src/main/resources/sqlCero.sql
+END
+sqlView.sql
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/repservir/!svn/ver/1246/desempenio/branches/desempenio/src/main/resources/sqlView.sql
+END
+MessageResources.properties
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/repservir/!svn/ver/1663/desempenio/branches/desempenio/src/main/resources/MessageResources.properties
+END
+log4j.xml
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/repservir/!svn/ver/248/desempenio/branches/desempenio/src/main/resources/log4j.xml
+END

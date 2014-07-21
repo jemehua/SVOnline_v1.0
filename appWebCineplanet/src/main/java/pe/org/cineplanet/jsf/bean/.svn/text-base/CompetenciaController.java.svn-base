@@ -1,0 +1,223 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.model.Competencia;
+import gob.servir.desempenio.model.CompetenciaPK;
+import gob.servir.desempenio.model.TipoCompetencia;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.CompetenciaService;
+import gob.servir.desempenio.service.PuestoTipoVService;
+import gob.servir.desempenio.service.TipoCompetenciaService;
+import gob.servir.desempenio.service.UsuarioService;
+import gob.servir.desempenio.util.Message;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.event.ValueChangeEvent;
+import javax.faces.model.SelectItem;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+@Component("competenciaController")
+@Scope("session")
+public class CompetenciaController {
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(CompetenciaController.class);
+
+	private Message message = new Message();
+
+	@Autowired
+	private LoginController loginController;
+	@Autowired
+	private PuestoTipoVService puestoTipoVService;
+	@Autowired
+	private UsuarioService usuarioService;
+	@Autowired
+	private TipoCompetenciaService tipoCompetenciaService;
+	@Autowired
+	private CompetenciaService competenciaService;
+
+	private Usuario userSesion = null;
+	private Long puestoSelec = 0L;
+	private Integer nivelDeseado = 0;
+
+	private List<Competencia> listaCompetencia = new ArrayList<Competencia>();
+	private List<SelectItem> comboPuestoTipo = new ArrayList<SelectItem>();
+	private boolean botonConfirmar = true;
+	private boolean botonGurdarP = false;
+
+	public CompetenciaController() {
+		super();
+	}
+
+	public boolean isBotonConfirmar() {
+		return botonConfirmar;
+	}
+
+	public void setBotonConfirmar(boolean botonConfirmar) {
+		this.botonConfirmar = botonConfirmar;
+	}	
+
+	public boolean isBotonGurdarP() {
+		return botonGurdarP;
+	}
+
+	public void setBotonGurdarP(boolean botonGurdarP) {
+		this.botonGurdarP = botonGurdarP;
+	}
+
+	public Long getPuestoSelec() {
+		return puestoSelec;
+	}
+
+	public void setPuestoSelec(Long puestoSelec) {
+		this.puestoSelec = puestoSelec;
+	}
+
+	public List<TipoCompetencia> getListaTipoCompetencia() {
+		return tipoCompetenciaService.getListaCompetencia();
+	}
+
+	public List<SelectItem> getComboPuestoTipo() {
+		return puestoTipoVService.getComboPuestoTipo();
+	}
+
+	public void setComboPuestoTipo(List<SelectItem> comboPuestoTipo) {
+		this.comboPuestoTipo = comboPuestoTipo;
+	}
+
+	public List<Competencia> getListaCompetencia() {
+		listaCompetencia.clear();
+		if(puestoSelec != 0)
+			listaCompetencia = competenciaService.getListaPerfil(puestoSelec);
+		return listaCompetencia;
+	}
+
+	public void setListaCompetencia(List<Competencia> listaCompetencia) {
+		this.listaCompetencia = listaCompetencia;
+	}
+
+	public void guardar() {
+
+		if(puestoSelec == 0)
+			return;
+		
+		Integer contador = competenciaService.getCountNivelDeseado(puestoSelec);
+		if (contador > 0) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Ingrese el Nivel Deseado para cada Competencia"));
+		} else {
+			botonConfirmar = false;
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+							"Se registro correctamente "));
+		}
+	}
+
+	public void limpiar() {
+		puestoSelec = 0L;
+		botonConfirmar = true;
+		botonGurdarP = true;
+
+	}
+
+	public void validarSesion() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		
+		userSesion = (Usuario) context.getExternalContext().getSessionMap()
+				.get(loginController.getUsername());
+
+		if (userSesion == null) {
+			String ctxPath = context.getExternalContext()
+					.getRequestContextPath();
+			try {
+				context.getExternalContext().redirect(ctxPath + "/login.jsf");
+			} catch (Exception e) {
+				//e.printStackTrace();
+			}
+		}
+	}
+
+	public void finalizarPerfiles() {
+
+		List<Competencia> listaCompetencia = competenciaService
+				.getListaPerfil(puestoSelec);
+		for (Competencia competencia : listaCompetencia) {
+			competencia.setEstadoPerfil("C");
+			competenciaService.edit(competencia);
+
+		}
+
+		FacesContext.getCurrentInstance().addMessage(
+				null,
+				new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+						"Confirmación de registro de Competencia"));
+		limpiar();
+
+	}
+
+	public void selecionarPuestoTipo() {
+		botonGurdarP = false;
+		botonConfirmar = true;
+		List<TipoCompetencia> listaTipoComptencia = tipoCompetenciaService
+				.getListaCompetencia();
+		for (TipoCompetencia tipoCompetencia : listaTipoComptencia) {
+			CompetenciaPK competenciaPK = new CompetenciaPK(
+					tipoCompetencia.getIdCompetencia(), puestoSelec);
+			Competencia competencia = competenciaService.find(competenciaPK);
+			if (competencia == null) {
+				Competencia competencia2 = new Competencia();
+				competencia2.setId(competenciaPK);
+				competencia2.setEstado("A");
+				competenciaService.save(competencia2);
+			}			
+				
+		}
+		
+		if (puestoSelec != 0) {
+			Integer contador = competenciaService.getCountNivelDeseadoConfirmado(puestoSelec);
+			if (contador == 7)
+				botonGurdarP = true;
+		}
+
+	}
+
+	public void asignarNivelDeseado(ValueChangeEvent evet) {
+		try {
+
+			nivelDeseado = (Integer) evet.getNewValue();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void asignarDias(Competencia competencia) {
+		validarSesion();
+		try {
+			if (competencia != null) {
+				competencia.setNivelDeseado(nivelDeseado);
+				competencia.setEstadoPerfil("P");
+				competencia.setUsuarioRegistra(userSesion.getUsuario());
+				competencia.setFechaCreacion(new Date());
+				competenciaService.edit(competencia);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+}

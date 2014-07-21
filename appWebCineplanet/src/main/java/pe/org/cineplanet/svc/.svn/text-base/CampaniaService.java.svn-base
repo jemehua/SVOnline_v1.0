@@ -1,0 +1,38 @@
+package gob.servir.desempenio.service;
+
+import gob.servir.desempenio.model.Campania;
+
+import java.util.List;
+
+import javax.faces.model.SelectItem;
+
+import org.springframework.stereotype.Service;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Service
+public interface CampaniaService {
+
+	public abstract Campania find(Long id);
+
+	public abstract Campania save(Campania obj);
+	
+	public abstract Campania saveTotal(Campania obj);
+
+	public abstract Campania edit(Campania obj);
+
+	public abstract List<Campania> getListaCampania();	
+	
+	public abstract List<Campania> findCampaniaByPostAnio(String denominacion,String anio,String postAnio);
+
+	public abstract Long getIdMax();
+	
+	public abstract List<SelectItem> getComboCampania();
+	
+	public abstract List<SelectItem> getComboCampaniaCreada();
+	
+	public abstract List<Campania> getListaEstadoCampania(String estado);
+
+}

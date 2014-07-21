@@ -1,0 +1,41 @@
+package gob.servir.desempenio.dao;
+
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.PlanDesarrollo;
+import gob.servir.desempenio.model.PlanDesarrolloPK;
+
+import java.util.List;
+
+/**
+ * 
+ * @author Hever Pumallihua García
+ */
+public interface PlanDesarrolloDao {
+
+	public abstract PlanDesarrollo find(PlanDesarrolloPK id);
+
+	public abstract PlanDesarrollo save(PlanDesarrollo obj);
+
+	public abstract PlanDesarrollo edit(PlanDesarrollo obj);
+
+	public abstract List<PlanDesarrollo> getListaPlanDesarrollo();
+
+	public abstract Long getMaxId(Long idCompetencia, Long idCampania,
+			String CodGerente, Long idPuesto);
+
+	public abstract Integer getCantidadPlanesDesaprobados(Long idCampania,
+			String codGerente, Long idPuesto);
+
+	public abstract List<PlanDesarrollo> getListaPlanDesarrollo(
+			Long idCompetencia, Long idCampania, String CodGerente,
+			Long idPuesto);
+
+	public abstract List<PlanDesarrollo> getListaPlanDesarrollo(
+			Long idCampania, String CodGerente, Long idPuesto);
+
+	public abstract List<PlanDesarrollo> getListaPlanDesarrollo(InscripcionPK id);
+
+	public abstract List<PlanDesarrollo> getListaPlanDesarrollo(
+			InscripcionPK id, boolean aprobacion);
+
+}

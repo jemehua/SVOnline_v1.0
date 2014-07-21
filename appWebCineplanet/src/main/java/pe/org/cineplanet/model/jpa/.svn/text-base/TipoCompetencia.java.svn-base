@@ -1,0 +1,205 @@
+package gob.servir.desempenio.model;
+
+import java.io.Serializable;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+/**
+ * 
+ * @author Cristhian Munguia Martinez
+ */
+@Entity
+@NamedQueries({ @NamedQuery(name = "TipoCompetencia.getAllListaCompetencia", query = "SELECT p FROM TipoCompetencia p WHERE p.estado =:estado") })
+public class TipoCompetencia implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	private Long idCompetencia;
+	@Column
+	private String denominacion;
+	@Column
+	private String estado;
+	@Column
+	private String usuarioRegistra;
+	@Column
+	private String usuarioModifica;
+	@Column
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date fechaCreacion;
+	@Column
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date fechaModificacion;
+	
+
+	public TipoCompetencia() {
+		super();
+	}
+
+	public TipoCompetencia(Long idCompetencia, String denominacion, String estado,
+			String usuarioRegistra, String usuarioModifica, Date fechaCreacion,
+			Date fechaModificacion) {
+		super();
+		this.idCompetencia = idCompetencia;
+		this.denominacion = denominacion;
+		this.estado = estado;
+		this.usuarioRegistra = usuarioRegistra;
+		this.usuarioModifica = usuarioModifica;
+		this.fechaCreacion = fechaCreacion;
+		this.fechaModificacion = fechaModificacion;
+	}
+
+	public Long getIdCompetencia() {
+		return idCompetencia;
+	}
+
+	public void setIdCompetencia(Long idCompetencia) {
+		this.idCompetencia = idCompetencia;
+	}
+
+	public String getDenominacion() {
+		return denominacion;
+	}
+
+	public void setDenominacion(String denominacion) {
+		this.denominacion = denominacion;
+	}
+
+	public String getEstado() {
+		return estado;
+	}
+
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
+
+	public String getUsuarioRegistra() {
+		return usuarioRegistra;
+	}
+
+	public void setUsuarioRegistra(String usuarioRegistra) {
+		this.usuarioRegistra = usuarioRegistra;
+	}
+
+	public String getUsuarioModifica() {
+		return usuarioModifica;
+	}
+
+	public void setUsuarioModifica(String usuarioModifica) {
+		this.usuarioModifica = usuarioModifica;
+	}
+
+	public Date getFechaCreacion() {
+		return fechaCreacion;
+	}
+
+	public void setFechaCreacion(Date fechaCreacion) {
+		this.fechaCreacion = fechaCreacion;
+	}
+
+	public Date getFechaModificacion() {
+		return fechaModificacion;
+	}
+
+	public void setFechaModificacion(Date fechaModificacion) {
+		this.fechaModificacion = fechaModificacion;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((denominacion == null) ? 0 : denominacion.hashCode());
+		result = prime * result + ((estado == null) ? 0 : estado.hashCode());
+		result = prime * result
+				+ ((fechaCreacion == null) ? 0 : fechaCreacion.hashCode());
+		result = prime
+				* result
+				+ ((fechaModificacion == null) ? 0 : fechaModificacion
+						.hashCode());
+		result = prime * result
+				+ ((idCompetencia == null) ? 0 : idCompetencia.hashCode());
+		result = prime * result
+				+ ((usuarioModifica == null) ? 0 : usuarioModifica.hashCode());
+		result = prime * result
+				+ ((usuarioRegistra == null) ? 0 : usuarioRegistra.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TipoCompetencia other = (TipoCompetencia) obj;
+		if (denominacion == null) {
+			if (other.denominacion != null)
+				return false;
+		} else if (!denominacion.equals(other.denominacion))
+			return false;
+		if (estado == null) {
+			if (other.estado != null)
+				return false;
+		} else if (!estado.equals(other.estado))
+			return false;
+		if (fechaCreacion == null) {
+			if (other.fechaCreacion != null)
+				return false;
+		} else if (!fechaCreacion.equals(other.fechaCreacion))
+			return false;
+		if (fechaModificacion == null) {
+			if (other.fechaModificacion != null)
+				return false;
+		} else if (!fechaModificacion.equals(other.fechaModificacion))
+			return false;
+		if (idCompetencia == null) {
+			if (other.idCompetencia != null)
+				return false;
+		} else if (!idCompetencia.equals(other.idCompetencia))
+			return false;
+		if (usuarioModifica == null) {
+			if (other.usuarioModifica != null)
+				return false;
+		} else if (!usuarioModifica.equals(other.usuarioModifica))
+			return false;
+		if (usuarioRegistra == null) {
+			if (other.usuarioRegistra != null)
+				return false;
+		} else if (!usuarioRegistra.equals(other.usuarioRegistra))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Competencia [idCompetencia=");
+		builder.append(idCompetencia);
+		builder.append(", denominacion=");
+		builder.append(denominacion);
+		builder.append(", estado=");
+		builder.append(estado);
+		builder.append(", usuarioRegistra=");
+		builder.append(usuarioRegistra);
+		builder.append(", usuarioModifica=");
+		builder.append(usuarioModifica);
+		builder.append(", fechaCreacion=");
+		builder.append(fechaCreacion);
+		builder.append(", fechaModificacion=");
+		builder.append(fechaModificacion);
+		builder.append("]");
+		return builder.toString();
+	}
+
+}

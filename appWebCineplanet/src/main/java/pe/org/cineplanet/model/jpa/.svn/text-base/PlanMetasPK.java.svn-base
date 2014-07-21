@@ -1,0 +1,121 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package gob.servir.desempenio.model;
+
+import java.io.Serializable;
+
+import javax.persistence.*;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Embeddable
+public class PlanMetasPK implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	// @Basic(optional = false)
+	// @Column(name = "idPlanMeta")
+	// private Long idPlanMeta;
+	@Basic(optional = false)
+	@Column(name = "idMeta")
+	private Long idMeta;
+	@Basic(optional = false)
+	@Column(name = "idCampania")
+	private Long idCampania;
+	@Basic(optional = false)
+	@Column(name = "idGerentePublico")
+	private String idGerentePublico;
+
+	public PlanMetasPK() {
+		super();
+	}
+
+	public Long getIdMeta() {
+		return idMeta;
+	}
+
+	public PlanMetasPK(Long idMeta, Long idCampania, String idGerentePublico) {
+		super();
+		this.idMeta = idMeta;
+		this.idCampania = idCampania;
+		this.idGerentePublico = idGerentePublico;
+	}
+
+	public void setIdMeta(Long idMeta) {
+		this.idMeta = idMeta;
+	}
+
+	public Long getIdCampania() {
+		return idCampania;
+	}
+
+	public void setIdCampania(Long idCampania) {
+		this.idCampania = idCampania;
+	}
+
+	public String getIdGerentePublico() {
+		return idGerentePublico;
+	}
+
+	public void setIdGerentePublico(String idGerentePublico) {
+		this.idGerentePublico = idGerentePublico;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((idCampania == null) ? 0 : idCampania.hashCode());
+		result = prime
+				* result
+				+ ((idGerentePublico == null) ? 0 : idGerentePublico.hashCode());
+		result = prime * result + ((idMeta == null) ? 0 : idMeta.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PlanMetasPK other = (PlanMetasPK) obj;
+		if (idCampania == null) {
+			if (other.idCampania != null)
+				return false;
+		} else if (!idCampania.equals(other.idCampania))
+			return false;
+		if (idGerentePublico == null) {
+			if (other.idGerentePublico != null)
+				return false;
+		} else if (!idGerentePublico.equals(other.idGerentePublico))
+			return false;
+		if (idMeta == null) {
+			if (other.idMeta != null)
+				return false;
+		} else if (!idMeta.equals(other.idMeta))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("PlanMetasPK [idMeta=");
+		builder.append(idMeta);
+		builder.append(", idCampania=");
+		builder.append(idCampania);
+		builder.append(", idGerentePublico=");
+		builder.append(idGerentePublico);
+		builder.append("]");
+		return builder.toString();
+	}
+
+}

@@ -1,0 +1,36 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.GerentePublicoVDao;
+import gob.servir.desempenio.model.GerentePublicoV;
+import gob.servir.desempenio.service.GerentePublicoVService;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua García
+ */
+@Service
+public class GerentePublicoVServiceImpl implements GerentePublicoVService {
+
+	@Autowired
+	private GerentePublicoVDao gerentePublicoVDao;
+
+	public GerentePublicoV find(String id) {
+		return gerentePublicoVDao.find(id);
+	}
+	
+	@Transactional
+	public GerentePublicoV save(GerentePublicoV obj) {
+		return gerentePublicoVDao.save(obj);
+	}
+
+	public List<GerentePublicoV> getListaGerentePublico() {
+		return gerentePublicoVDao.getListaGerentePublico();
+	}
+
+}

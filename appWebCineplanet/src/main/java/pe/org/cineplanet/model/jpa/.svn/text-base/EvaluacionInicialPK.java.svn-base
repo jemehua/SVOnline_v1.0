@@ -1,0 +1,140 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package gob.servir.desempenio.model;
+
+import java.io.Serializable;
+
+import javax.persistence.*;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Embeddable
+public class EvaluacionInicialPK implements Serializable {
+	private static final long serialVersionUID = 1L;
+
+	@Basic(optional = false)
+	@Column(name = "idCompetencia")
+	private Long idCompetencia;
+	@Basic(optional = false)
+	@Column(name = "idCampania")
+	private Long idCampania;
+	@Basic(optional = false)
+	@Column(name = "idGerentePublico")
+	private String idGerentePublico;
+	@Basic(optional = false)
+	@Column(name = "idPuesto")
+	private Long idPuesto;
+
+	public EvaluacionInicialPK() {
+		super();
+	}
+
+	public EvaluacionInicialPK(Long idCompetencia, Long idCampania,
+			String idGerentePublico, Long idPuesto) {
+		super();
+		this.idCompetencia = idCompetencia;
+		this.idCampania = idCampania;
+		this.idGerentePublico = idGerentePublico;
+		this.idPuesto = idPuesto;
+	}
+
+	public Long getIdCompetencia() {
+		return idCompetencia;
+	}
+
+	public void setIdCompetencia(Long idCompetencia) {
+		this.idCompetencia = idCompetencia;
+	}
+
+	public Long getIdCampania() {
+		return idCampania;
+	}
+
+	public void setIdCampania(Long idCampania) {
+		this.idCampania = idCampania;
+	}
+
+	public String getIdGerentePublico() {
+		return idGerentePublico;
+	}
+
+	public void setIdGerentePublico(String idGerentePublico) {
+		this.idGerentePublico = idGerentePublico;
+	}
+
+	public Long getIdPuesto() {
+		return idPuesto;
+	}
+
+	public void setIdPuesto(Long idPuesto) {
+		this.idPuesto = idPuesto;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((idCampania == null) ? 0 : idCampania.hashCode());
+		result = prime * result
+				+ ((idCompetencia == null) ? 0 : idCompetencia.hashCode());
+		result = prime
+				* result
+				+ ((idGerentePublico == null) ? 0 : idGerentePublico.hashCode());
+		result = prime * result
+				+ ((idPuesto == null) ? 0 : idPuesto.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		EvaluacionInicialPK other = (EvaluacionInicialPK) obj;
+		if (idCampania == null) {
+			if (other.idCampania != null)
+				return false;
+		} else if (!idCampania.equals(other.idCampania))
+			return false;
+		if (idCompetencia == null) {
+			if (other.idCompetencia != null)
+				return false;
+		} else if (!idCompetencia.equals(other.idCompetencia))
+			return false;
+		if (idGerentePublico == null) {
+			if (other.idGerentePublico != null)
+				return false;
+		} else if (!idGerentePublico.equals(other.idGerentePublico))
+			return false;
+		if (idPuesto == null) {
+			if (other.idPuesto != null)
+				return false;
+		} else if (!idPuesto.equals(other.idPuesto))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("EvaluacionInicialPK [idCompetencia=");
+		builder.append(idCompetencia);
+		builder.append(", idCampania=");
+		builder.append(idCampania);
+		builder.append(", idGerentePublico=");
+		builder.append(idGerentePublico);
+		builder.append(", idPuesto=");
+		builder.append(idPuesto);
+		builder.append("]");
+		return builder.toString();
+	}
+
+}

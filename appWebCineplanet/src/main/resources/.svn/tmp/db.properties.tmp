@@ -1,0 +1,66 @@
+#local
+#db.username=BDDESEMPENIO
+#db.password=123456
+#db.driver=oracle.jdbc.driver.OracleDriver
+#db.url=jdbc:oracle:thin:@localhost:1521/XE
+#db.dialect=org.hibernate.dialect.OracleDialect
+#db.dialect=org.hibernate.dialect.Oracle10gDialect
+
+<<<<<<< .mine
+#desarrollo
+#db.username=desempeno2
+#db.password=d353MP3n02GP 
+#db.driver=oracle.jdbc.driver.OracleDriver
+#db.url=jdbc:oracle:thin:@172.16.19.33:1521/bdtest1
+#db.dialect=org.hibernate.dialect.Oracle10gDialect
+
+#desarrollo_2
+db.username=desempeno3
+db.password=d353MP3n03
+=======
+##desarrollo
+#db.username=desempeno2
+#db.password=d353MP3n02GP
+#db.driver=oracle.jdbc.driver.OracleDriver
+#db.url=jdbc:oracle:thin:@172.16.19.33:1521/bdtest1
+#db.dialect=org.hibernate.dialect.Oracle10gDialect
+
+#desarrollo 3
+db.username=desempeno3
+db.password=d353MP3n03
+>>>>>>> .r1238
+db.driver=oracle.jdbc.driver.OracleDriver
+db.url=jdbc:oracle:thin:@172.16.19.33:1521/bdtest1
+db.dialect=org.hibernate.dialect.Oracle10gDialect
+
+#ambiente de pruebas
+#db.username=desempeno
+#db.password=desempeno123
+#db.driver=oracle.jdbc.driver.OracleDriver
+##db.url=jdbc:oracle:thin:@172.16.19.33:1521/bdprueba2
+#db.url=jdbc:oracle:thin:@172.16.19.33:1521/bdtest1
+##db.dialect=org.hibernate.dialect.OracleDialect
+#db.dialect=org.hibernate.dialect.Oracle10gDialect
+
+#HSQL Options
+#db.username=sa
+#db.password=
+#db.driver=org.hsqldb.jdbcDriver
+#db.url=jdbc:hsqldb:mem:app-db
+#db.dialect=org.hibernate.dialect.HSQLDialect
+
+#MySQL Options
+#db.password=password
+#db.username=username
+#db.url=jdbc:mysql://localhost/dbname
+#db.dialect=org.hibernate.dialect.MySQL5Dialect
+#db.driver=com.mysql.jdbc.Driver
+
+#java mail Options
+mail.host=smtp.gmail.com
+#mail.host=aspmx.l.google.com
+mail.port=25  
+mail.username=programador2@servir.gob.pe
+mail.password=hpumall1hua
+ 
+

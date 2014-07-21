@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+	<h:outputStylesheet name="css/cssContent.css" />
+</h:head>
+<h:body>
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datos2" header="Plan de Acción de Metas">
+		<p:spacer height="10" />
+		<p:panelGrid id="pgDatos" styleClass="panelGrid">
+			<p:row>
+				<p:column width="30">#{messages.lblCampania}
+				</p:column>
+				<p:column width="70">
+					<h:outputLabel
+						value="#{planMetasController.inscripcionSelc.campania}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblGerentePublico}
+				</p:column>
+				<p:column>
+					<h:outputLabel
+						value="#{planMetasController.inscripcionSelc.asignacionGerenteV}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblPuesto}
+				</p:column>
+				<p:column>
+					<h:outputText
+						value="#{planMetasController.inscripcionSelc.puestoTipoV}" />
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+		<p:spacer height="10" />
+		<p:dataTable var="meta" value="#{planMetasController.listaMetas}"
+			id="dtMetas2" rows="7" selection="#{planMetasController.metaSelec}"
+			emptyMessage="#{messages.msgEmptyMessage}" selectionMode="single"
+			rowKey="#{meta.id.idMeta}">
+
+			<!-- <p:ajax event="rowSelect" update=":frm:pnlPlanAccionMetas"
+				immediate="true" /> -->
+
+			<p:ajax event="rowSelect"
+				listener="#{planMetasController.onRowSelect}"
+				update=":frm:pnlPlanAccionMetas" />
+
+			<f:facet name="header">  
+            Lista de Metas
+            </f:facet>
+
+			<p:column headerText="#{messages.lblCodigo}" style="width:10%">
+				<h:outputText value="#{meta.id.idMeta}" />
+			</p:column>
+			<p:column headerText="Tipo Meta" style="width:12%;">
+
+				<h:outputText value="#{meta.tipo}" />
+			</p:column>
+			<p:column headerText="Meta"
+				style="width:30%;white-space: normal;text-align: justify;">
+				<h:outputText value="#{meta.denominacion}"/>
+			</p:column>
+			<p:column headerText="Relación POI"
+				style="width:30%; white-space: normal ;
+	            text-align: justify;">
+				<h:outputText value="#{meta.relacionPOI}" />
+			</p:column>
+			<p:column headerText="Peso (%)" style="width:8%">
+				<h:outputText value="#{meta.peso}" />
+			</p:column>
+			<f:facet name="footer">
+				<div class="mensaje">Seleccione un registro e ingrese Plan de
+					Acción de Metas</div>
+			</f:facet>
+		</p:dataTable>
+		<p:spacer height="10" />
+		<p:panelGrid id="pnlPlanAccionMetas" styleClass="panelGrid">
+			<p:focus context="pnlPlanAccionMetas" />
+			<p:row>
+				<p:column>Meta
+				</p:column>
+				<p:column>
+					<h:outputText
+						value="#{planMetasController.metaSelec.denominacion}" />
+				</p:column>
+			</p:row>			
+			<p:row>
+				<p:column>Fecha de culminación
+				</p:column>
+				<p:column>
+					<h:outputText value="#{planMetasController.metaSelec.fechaFinMeta}">
+						<f:convertDateTime pattern="dd/MM/yyyy" /> 
+					</h:outputText>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>Plan de Acción<h:outputText value="*"
+						styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<p:inputText id="planTxt"
+						value="#{planMetasController.planMetas.descripcionPlan}"
+						tabindex="1" maxlength="500" styleClass="txt" style="width:580px;" />
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+
+		<p:separator />
+
+		<table style="width: 100%">
+			<tr>
+				<td align="left"><p:commandButton value="Guardar"
+						action="#{planMetasController.guardar}" id="btnGuardar"
+						disabled="#{planMetasController.swFlujo}"
+						update="pgDatos,pnlPlanAccionMetas,dtMetas2,messages"
+						icon="ui-icon-disk" tabindex="2" /> <p:spacer width="10" /> <p:commandButton
+						value="#{messages.btnCancelar}" update="datos2"
+						action="#{planMetasController.limpiar}" icon="ui-icon-close"
+						tabindex="3" /></td>
+				<td align="right"><p:commandButton value="Continuar"
+						onclick="confirmacion.show()" id="btnFlujo"						
+						icon="ui-icon-circle-arrow-e" tabindex="4"
+						disabled="#{planMetasController.swFlujo}" /></td>
+			</tr>
+		</table>
+	</p:panel>
+
+	<p:confirmDialog message="¿Estás seguro de continuar?"
+		showEffect="fade" hideEffect="fade" header="Plan de Acción de Metas"
+		widgetVar="confirmacion">
+		<table style="width: 100%">
+			<tr>
+				<td align="center"><p:commandButton value="Si"
+						style="width:50px" styleClass="ui-confirmdialog-yes"
+						icon="ui-icon-check" oncomplete="confirmacion.hide()"
+						update="btnGuardar,btnFlujo,messages"
+						action="#{planMetasController.atenderFlujo}">
+					</p:commandButton> <p:spacer width="10" /> <p:commandButton value="No"
+						style="width:50px" styleClass="ui-confirmdialog-no"
+						icon="ui-icon-close" onclick="confirmacion.hide()" /></td>
+			</tr>
+		</table>
+	</p:confirmDialog>
+</h:body>
+<p:ajaxStatus style="width:64px;height:64px;position:fixed;right:5px;bottom:5px" id="ajaxStatusPanel">  
+    <f:facet name="start">  
+        <p:graphicImage value="./images/loading.gif" /> 
+    </f:facet>  
+      
+    <f:facet name="complete">  
+        <h:outputText value="" />  
+    </f:facet>  
+</p:ajaxStatus> 
+</html>

@@ -1,0 +1,30 @@
+package gob.servir.desempenio.service;
+
+import gob.servir.desempenio.model.Temporizador;
+import gob.servir.desempenio.model.TemporizadorPK;
+
+import java.util.List;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+public interface TemporizadorService {
+	
+	public abstract Temporizador find(TemporizadorPK id);
+	
+	public abstract Temporizador save(Temporizador obj);
+	
+	public abstract Temporizador edit(Temporizador obj);
+	
+	public abstract List<Temporizador> getListaTemporizador();
+	
+	public abstract List<Temporizador> getListaTemporizador(Long idCampania);
+	
+	public abstract List<Temporizador> getListaTempByProcesoCampania(Long idCampania, Long idProceso);
+	
+	public abstract List<Temporizador> getListaTemporizador(Long idCampania, Long idProceso);
+	
+	public abstract List<Temporizador> getListaTemporizador(Long idCampania, Long idProceso, Long idCronograma);
+
+}

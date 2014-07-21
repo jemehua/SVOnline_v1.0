@@ -1,0 +1,219 @@
+package gob.servir.desempenio.model;
+
+import java.io.Serializable;
+import java.util.Calendar;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Entity
+@NamedQueries({
+		@NamedQuery(name = "Campania.getAllListaCampania", query = "SELECT c.idCampania, c.denominacion, c.anio, c.postAnio, c.fechaInicio, c.fechaFin, "
+				+ "c.estadoCampania, c.estado "
+				+ "FROM Campania c "
+				+ "WHERE c.estado =:estado ORDER BY c.anio DESC, c.postAnio DESC "),
+		@NamedQuery(name = "Campania.getListaEstadoCampania", query = "SELECT c.idCampania, c.denominacion, c.anio, c.postAnio "
+				+ "FROM Campania c "
+				+ "WHERE c.estadoCampania =:estado ORDER BY c.anio DESC, c.postAnio DESC "),
+		@NamedQuery(name = "Campania.findCampaniaByPostAnio", query = "SELECT c.idCampania, c.denominacion, c.anio, c.postAnio  "
+				+ "FROM Campania c WHERE c.anio =:anio ") })
+public class Campania implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Id
+	private Long idCampania;
+	@Column(length = 500)
+	private String denominacion;
+	@Column
+	private String estadoCampania;
+	@Column
+	private String estado;
+	@Column
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date fechaInicio;
+	@Column
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date fechaFin;
+	@Column
+	private String usuarioRegistra;
+	@Column
+	private String usuarioModifica;
+	@Column
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date fechaCreacion;
+	@Column
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date fechaModificacion;
+	@Column
+	private String anio;
+	@Column
+	private String postAnio;
+
+	public Campania() {
+		super();
+	}
+
+	public Long getIdCampania() {
+		return idCampania;
+	}
+
+	public void setIdCampania(Long idCampania) {
+		this.idCampania = idCampania;
+	}
+
+	public String getDenominacion() {
+		return denominacion;
+	}
+
+	public void setDenominacion(String denominacion) {
+		this.denominacion = denominacion;
+	}
+
+	public String getEstado() {
+		return estado;
+	}
+
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
+
+	public Date getFechaInicio() {
+		return fechaInicio;
+	}
+
+	public void setFechaInicio(Date fechaInicio) {
+		this.fechaInicio = fechaInicio;
+	}
+
+	public Date getFechaFin() {
+		return fechaFin;
+	}
+
+	public void setFechaFin(Date fechaFin) {
+		this.fechaFin = fechaFin;
+	}
+
+	public String getUsuarioRegistra() {
+		return usuarioRegistra;
+	}
+
+	public void setUsuarioRegistra(String usuarioRegistra) {
+		this.usuarioRegistra = usuarioRegistra;
+	}
+
+	public String getUsuarioModifica() {
+		return usuarioModifica;
+	}
+
+	public void setUsuarioModifica(String usuarioModifica) {
+		this.usuarioModifica = usuarioModifica;
+	}
+
+	public Date getFechaCreacion() {
+		return fechaCreacion;
+	}
+
+	public void setFechaCreacion(Date fechaCreacion) {
+		this.fechaCreacion = fechaCreacion;
+	}
+
+	public Date getFechaModificacion() {
+		return fechaModificacion;
+	}
+
+	public void setFechaModificacion(Date fechaModificacion) {
+		this.fechaModificacion = fechaModificacion;
+	}
+
+	public String getEstadoCampania() {
+		return estadoCampania;
+	}
+
+	public void setEstadoCampania(String estadoCampania) {
+		this.estadoCampania = estadoCampania;
+	}
+
+	public String getAnio() {
+		return anio;
+	}
+
+	public void setAnio(String anio) {
+		this.anio = anio;
+	}
+
+	public String getPostAnio() {
+		return postAnio;
+	}
+
+	public void setPostAnio(String postAnio) {
+		this.postAnio = postAnio;
+	}
+
+	@PrePersist
+	private void putFechaCreacion() {
+		setFechaCreacion(new Date(Calendar.getInstance().getTime().getTime()));
+	}
+
+	@PreUpdate
+	private void putFechaModificacion() {
+		setFechaModificacion(new Date(Calendar.getInstance().getTime()
+				.getTime()));
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((idCampania == null) ? 0 : idCampania.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Campania other = (Campania) obj;
+		if (idCampania == null) {
+			if (other.idCampania != null)
+				return false;
+		} else if (!idCampania.equals(other.idCampania))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(denominacion);
+		builder.append(" ");
+		builder.append(anio);
+		builder.append(" ");
+		builder.append(postAnio);
+		return builder.toString();
+	}
+
+	public String toString2() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(anio);
+		builder.append(postAnio);
+		return builder.toString();
+	}
+
+}

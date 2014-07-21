@@ -1,0 +1,342 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.model.Campania;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.CampaniaService;
+import gob.servir.desempenio.util.Constantes;
+import gob.servir.desempenio.util.Message;
+import gob.servir.desempenio.util.NumRomano;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Component("campaniaController")
+@Scope("session")
+public class CampaniaController {
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(CampaniaController.class);
+
+	@Autowired
+	private LoginController loginController;
+	@Autowired
+	private CampaniaService campaniaService;
+
+	private Usuario userSesion = null;
+	private Message message = new Message();
+
+	private Campania nuevoCampania = new Campania();
+	private Campania modificaCampania = new Campania();
+
+	private List<Campania> listaCampania = new ArrayList<Campania>();
+	private List<SelectItem> comboEstado = new ArrayList<SelectItem>();
+
+	public CampaniaController() {
+		super();
+	}
+
+	@PostConstruct
+	public void cargar() {
+		nuevoCampania.setAnio(getAnioActual());
+	}
+
+	public String getAnioActual() {
+		Calendar hoy = Calendar.getInstance();
+		return Integer.toString(hoy.get(Calendar.YEAR));
+	}
+
+	public List<SelectItem> getComboEstado() {
+		comboEstado = new ArrayList<SelectItem>();
+		SelectItem item = null;
+		item = new SelectItem("A", "Activo");
+		comboEstado.add(item);
+		item = new SelectItem("I", "Inactivo");
+		comboEstado.add(item);
+
+		return comboEstado;
+	}
+
+	public void setComboEstado(List<SelectItem> comboEstado) {
+		this.comboEstado = comboEstado;
+	}
+
+	public List<Campania> getListaCampania() {
+		listaCampania = campaniaService.getListaCampania();
+		return listaCampania;
+	}
+
+	public void setListaCampania(List<Campania> listaCampania) {
+		this.listaCampania = listaCampania;
+	}
+
+	public Campania getNuevoCampania() {
+		return nuevoCampania;
+	}
+
+	public void setNuevoCampania(Campania nuevoCampania) {
+		this.nuevoCampania = nuevoCampania;
+	}
+
+	public Campania getModificaCampania() {
+		return modificaCampania;
+	}
+
+	public void setModificaCampania(Campania modificaCampania) {
+		this.modificaCampania = modificaCampania;
+	}
+
+	public void validarSesion() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		
+		userSesion = (Usuario) context.getExternalContext().getSessionMap()
+				.get(loginController.getUsername());
+
+		if (userSesion == null) {
+			String ctxPath = context.getExternalContext()
+					.getRequestContextPath();
+			try {
+				context.getExternalContext().redirect(ctxPath + "/login.jsf");
+			} catch (Exception e) {
+				//e.printStackTrace();
+			}
+		}
+	}
+
+	public void guardar() throws ParseException {
+
+		validarSesion();
+
+		if (!validarDatos())
+			return;
+
+		try {
+			nuevoCampania.setDenominacion(nuevoCampania.getDenominacion().toUpperCase());
+			nuevoCampania.setIdCampania(campaniaService.getIdMax());
+			nuevoCampania.setEstadoCampania(Constantes.CAMPAÑA_CREADO);
+			nuevoCampania.setEstado(Constantes.ACTIVO);
+			//nuevoCampania.setFechaCreacion(new Date());
+			nuevoCampania.setUsuarioRegistra(userSesion.getUsuario());
+			// Insertar Nombre Modificado de la campaña
+			nuevoCampania.setPostAnio(InsertPostAnioNuevo());
+
+			campaniaService.saveTotal(nuevoCampania);
+
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+							message.getMessage("msgRegistrar")));
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+							message.getMessage("msgRegistrarError")));
+		}
+		limpiar();
+	}
+
+	private String InsertPostAnioNuevo() {
+
+		String denoCampania = nuevoCampania.getDenominacion(), postAnio = nuevoCampania
+				.getPostAnio(), anio = nuevoCampania.getAnio();
+
+		postAnio = NumRomano.Romanos(validarPostAnio(denoCampania, anio,
+				postAnio) + 1);
+		return postAnio;
+	}
+
+	public void modificar() {
+
+		validarSesion();
+
+		if (!validarModificar())
+			return;
+
+		try {
+
+			//modificaCampania.setFechaModificacion(new Date());
+			modificaCampania.setUsuarioModifica(userSesion.getUsuario());
+
+			campaniaService.edit(modificaCampania);
+
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+							message.getMessage("msgModificar")));
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+							message.getMessage("msgModificarError")));
+		}
+
+	}
+
+	public boolean validarDatos() throws ParseException {
+
+		if (nuevoCampania.getDenominacion().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							message.getMessage("msgTxtObligatorio")));
+			return false;
+		}
+
+		if (nuevoCampania.getAnio().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							message.getMessage("msgTxtObligatorio")));
+			return false;
+		}
+
+		if (nuevoCampania.getFechaInicio() == null) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							message.getMessage("msgTxtObligatorio")));
+			return false;
+		}
+
+		if (nuevoCampania.getFechaFin() == null) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							message.getMessage("msgTxtObligatorio")));
+			return false;
+		}
+
+		if (nuevoCampania.getFechaInicio().after(nuevoCampania.getFechaFin())) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							message.getMessage("msgValidarFecha")));
+			return false;
+		}
+
+		if (nuevoCampania.getFechaInicio() != null) {
+
+			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+			Calendar c = Calendar.getInstance();
+			c.setTime(nuevoCampania.getFechaInicio());
+			c.add(Calendar.DATE, 1);
+			String fecha = formatter.format(c.getTime());
+			String anioF = fecha.substring(6, 10);
+
+			int anio = new Integer(nuevoCampania.getAnio());
+			int year = new Integer(anioF);
+			if (year < anio) {
+				FacesContext
+						.getCurrentInstance()
+						.addMessage(
+								null,
+								new FacesMessage(FacesMessage.SEVERITY_WARN,
+										"ADVERTENCIA",
+										"La fecha Inicio no debe ser menor al año de la campaña."));
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	public boolean validarModificar() {
+
+		if (modificaCampania.getDenominacion().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							message.getMessage("msgModificarVacio")));
+			return false;
+		}
+
+		if (modificaCampania.getFechaInicio() == null) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							message.getMessage("msgModificarVacio")));
+			return false;
+		}
+
+		if (modificaCampania.getFechaFin() == null) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							message.getMessage("msgModificarVacio")));
+			return false;
+		}
+
+		if (modificaCampania.getFechaInicio().after(
+				modificaCampania.getFechaFin())) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							message.getMessage("msgValidarFecha")));
+			return false;
+		}
+
+		if (modificaCampania.getFechaInicio() != null) {
+
+			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+			Calendar c = Calendar.getInstance();
+			c.setTime(modificaCampania.getFechaInicio());
+			c.add(Calendar.DATE, 1);
+			String fecha = formatter.format(c.getTime());
+			String anioF = fecha.substring(6, 10);
+
+			int anio = new Integer(modificaCampania.getAnio());
+			int year = new Integer(anioF);
+			if (year < anio) {
+				FacesContext
+						.getCurrentInstance()
+						.addMessage(
+								null,
+								new FacesMessage(FacesMessage.SEVERITY_WARN,
+										"ADVERTENCIA",
+										"La fecha Inicio no debe ser menor al año de la campaña."));
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public Integer validarPostAnio(String denominacion, String anio,
+			String postAnio) {
+
+		return campaniaService.findCampaniaByPostAnio(denominacion, anio,
+				postAnio) != null ? campaniaService.findCampaniaByPostAnio(
+				denominacion, anio, postAnio).size() : 0;
+
+	}
+
+	public void limpiar() {
+		nuevoCampania = new Campania();
+		modificaCampania = new Campania();
+		listaCampania = new ArrayList<Campania>();
+		nuevoCampania.setAnio(getAnioActual());
+
+	}
+
+}

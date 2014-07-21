@@ -1,0 +1,323 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+
+</h:head>
+<h:body>
+	<h:outputStylesheet name="css/cssContent.css" />
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datos" header="Notificación">
+		<p:focus context="datos" />
+		<p:panelGrid styleClass="panelGrid">
+			<p:row>
+				<p:column width="30">#{messages.lblCampania}<h:outputText
+						value="*" styleClass="obligatorio" />
+				</p:column>
+				<p:column width="70">
+					<p:selectOneMenu id="comboCampania"
+						value="#{notificacionController.campaniaSelec}"
+						style="width:280px;" tabindex="1">
+						<f:selectItems value="#{notificacionController.comboCampania}" />
+						<p:ajax update="datos" event="change"
+							listener="#{notificacionController.limpiar}" />
+					</p:selectOneMenu>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblGerentePublico}<h:outputText
+						value="*" styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<p:inputText id="gp" tabindex="2"
+						value="#{notificacionController.inscripcionSelec.asignacionGerenteV}"
+						style=" width : 270px;" readonly="true" />
+					<p:spacer width="5" />
+					<p:commandButton id="btnBuscar" value="Buscar"
+						action="#{notificacionController.buscarGerenteInscrito}"
+						icon="ui-icon-search" update="dtGerente"
+						disabled="#{notificacionController.swBtnBuscar}"
+						oncomplete="dlgBuscarGP.show()" tabindex="3">
+					</p:commandButton>
+					<p:spacer width="5" />
+					<p:commandButton value="#{messages.btnCancelar}" update="datos"
+						action="#{notificacionController.limpiar}" icon="ui-icon-close"
+						tabindex="12" />
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+
+		<p:separator id="s1" />
+
+		<p:dataTable var="flujo"
+			value="#{notificacionController.listaDetalleFlujo}" id="dtList"
+			rowStyleClass="#{flujo.estadoNotificacion eq 'EE' ? 'rowStyle' : null}"
+			emptyMessage="#{messages.msgEmptyMessage}">
+
+			<f:facet name="header">
+			Lista de notificaciones realizadas  
+			</f:facet>
+			<p:column headerText="Gerente Público"
+				style="width:8%; white-space: normal;text-align: justify;">
+				<h:outputText value="#{flujo.id.idGerentePublico}" />
+			</p:column>
+			<p:column headerText="Proceso"
+				style="width:18%; white-space: normal;">
+				<h:outputText value="#{flujo.actividad.proceso.denominacion}" />
+			</p:column>
+			<p:column headerText="Actividad"
+				style="width:34%; white-space: normal;">
+				<h:outputText value="#{flujo.actividad.nombre}" />
+			</p:column>
+			<p:column headerText="Fecha Envio"
+				style="width:15%; white-space: normal;text-align: justify;">
+				<h:outputText value="#{flujo.fechaCreacion}">
+					<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="N°Envios"
+				style="width:7%; white-space: normal;text-align: justify;">
+				<h:outputText value="#{flujo.nroEnvios}" />
+			</p:column>
+			<p:column headerText="Estado"
+				style="width:6%; white-space: normal;text-align: justify;">
+				<h:outputText
+					value="#{flujo.estadoNotificacion.equals('EE')?'Pendiente':'Terminado'}" />
+			</p:column>
+			<p:column headerText="#{messages.lblOpciones}" style="width:12%;">
+				<p:commandButton value="" id="btnMen" icon="ui-icon-newwin"
+					oncomplete="dlgBuscarMens.show()"
+					update=":frm:pnlBuscarMen,:frm:dtListMensajes"
+					disabled="#{flujo.estadoNotificacion eq 'EE'?false:true}">
+					<f:setPropertyActionListener value="#{flujo}"
+						target="#{notificacionController.detalleFlujo}" />
+				</p:commandButton>
+				<pe:tooltip for="btnMen" value="Reenviar notificación"
+					showEffect="fadeIn" hideEffect="fadeIn" atPosition="top center"
+					myPosition="bottom center" />
+
+				<p:commandButton value="" id="btnNoti" icon="ui-icon-newwin"
+					oncomplete="dlgBuscarNotif.show()"
+					update=":frm:pnlBuscarNoti,:frm:dtListNoti">
+					<f:setPropertyActionListener value="#{flujo}"
+						target="#{notificacionController.detalleFlujo}" />
+				</p:commandButton>
+				<pe:tooltip for="btnNoti" value="Ver detalle de las notificaciones"
+					showEffect="fadeIn" hideEffect="fadeIn" atPosition="top center"
+					myPosition="bottom center" />
+			</p:column>
+			<f:facet name="footer">
+				<div class="mensaje">Seleccione un registro para reenviar notificación o ver los detalles de las notificaciones</div>
+			</f:facet>
+		</p:dataTable>
+	</p:panel>
+
+	<!-- busqueda gp -->
+	<p:dialog id="dlgBuscar" header="Buscar Gerente Público"
+		widgetVar="dlgBuscarGP" modal="true" resizable="false" width="772"
+		showEffect="clip" closable="true" hideEffect="fold">
+
+		<p:dataTable id="dtGerente" var="ins"
+			value="#{notificacionController.listaGerentePublico}"
+			filteredValue="#{notificacionController.listaGerentePublicoFiltered}"
+			scrollable="true" scrollHeight="235" paginator="true" rows="10"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			emptyMessage="#{messages.msgEmptyMessage}">
+
+			<f:facet name="header">    
+            	Lista de Gerentes Públicos Inscritos
+            	</f:facet>
+
+			<p:column headerText="#{messages.lblCodigo}" style="width:20%"
+				filterBy="#{ins.asignacionGerenteV.cod_gerente}">
+				<h:outputText value="#{ins.asignacionGerenteV.cod_gerente}" />
+			</p:column>
+			<p:column headerText="Nombres" style="width:20%"
+				filterBy="#{ins.asignacionGerenteV.nombres}">
+				<h:outputText value="#{ins.asignacionGerenteV.nombres}" />
+			</p:column>
+			<p:column headerText="Ap.Paterno" style="width:20%"
+				filterBy="#{ins.asignacionGerenteV.ap_paterno}">
+				<h:outputText value="#{ins.asignacionGerenteV.ap_paterno}" />
+			</p:column>
+			<p:column headerText="Ap.Materno" style="width:12%">
+				<h:outputText value="#{ins.asignacionGerenteV.ap_materno}" />
+			</p:column>
+			<p:column headerText="DNI" style="width:20%"
+				filterBy="#{ins.asignacionGerenteV.dni}">
+				<h:outputText value="#{ins.asignacionGerenteV.dni}" />
+			</p:column>
+			<p:column headerText="#{messages.lblOpciones}" style="width:8%">
+				<p:commandButton update=":frm:gp, :frm:dtList"
+					oncomplete="dlgBuscarGP.hide()" icon="ui-icon-check"
+					action="#{notificacionController.buscarDetalleFlujo}"
+					title="Seleccionar Gerente Público">
+					<f:setPropertyActionListener value="#{ins}"
+						target="#{notificacionController.inscripcionSelec}" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+	</p:dialog>
+
+	<!-- busqueda mensaje -->
+	<p:dialog id="dlgBuscarMen" header="Reenviar Mensaje"
+		widgetVar="dlgBuscarMens" modal="true" resizable="false" width="700"
+		showEffect="clip" closable="true" hideEffect="fold">
+
+		<p:panelGrid id="pnlBuscarMen" styleClass="panelGrid">
+			<p:row>
+				<p:column>#{messages.lblCampania}
+				</p:column>
+				<p:column>
+					<h:outputLabel
+						value="#{notificacionController.detalleFlujo.flujo.inscripcion.campania}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblProceso}
+				</p:column>
+				<p:column>
+					<h:outputLabel
+						value="#{notificacionController.detalleFlujo.actividad.proceso.denominacion}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>Actividad
+				</p:column>
+				<p:column>
+					<h:outputLabel
+						value="#{notificacionController.detalleFlujo.actividad.nombre}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>Gerente Público
+				</p:column>
+				<p:column>
+					<h:outputLabel
+						value="#{notificacionController.inscripcionSelec.asignacionGerenteV}" />
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+		<p:separator id="s5" />
+		<p:dataTable var="row" value="#{notificacionController.listaMensaje}"
+			id="dtListMensajes" paginator="true" rows="5" scrollable="true"
+			scrollHeight="200"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			emptyMessage="#{messages.msgEmptyMessage}">
+			<f:facet name="header">  
+            Lista de Mensajes
+        </f:facet>
+			<p:column headerText="#{messages.lblCodigo}" style="width:5%">
+				<h:outputText value="#{row.id.idMensaje}" />
+			</p:column>
+			<p:column headerText="Titulo"
+				style="width:30%; white-space: normal;text-align: justify;">
+				<h:outputText value="#{row.titulo}" />
+			</p:column>
+			<p:column headerText="Cuerpo"
+				style="width:55%; white-space: normal;text-align: justify;">
+				<h:outputText value="#{row.cuerpo}" />
+			</p:column>
+			<p:column headerText="#{messages.lblOpciones}" style="width:10%">
+				<p:commandButton value="" icon="ui-icon-mail-closed"
+					id="btnMensajeGP" title="Editar"
+					action="#{notificacionController.reenviarMensaje}"
+					update=":frm:dtList,:frm:messages"
+					oncomplete="dlgBuscarMens.hide()"
+					disabled="#{notificacionController.detalleFlujo.estadoNotificacion eq 'EE'? false : true}">
+					<f:setPropertyActionListener value="#{row}"
+						target="#{notificacionController.mensajeSelec}" />
+				</p:commandButton>
+				<pe:tooltip for="btnMensajeGP" value="Reenviar Mensaje"
+					showEffect="fadeIn" hideEffect="fadeIn" atPosition="top center"
+					myPosition="bottom center" />
+			</p:column>
+		</p:dataTable>
+	</p:dialog>
+
+	<!-- busqueda notificaciones -->
+	<p:dialog id="dlgBuscarNoti" header="Notificaciones"
+		widgetVar="dlgBuscarNotif" modal="true" resizable="false" width="700"
+		showEffect="clip" closable="true" hideEffect="fold">
+
+		<p:panelGrid id="pnlBuscarNoti" styleClass="panelGrid">
+			<p:row>
+				<p:column>#{messages.lblCampania}
+				</p:column>
+				<p:column>
+					<h:outputLabel
+						value="#{notificacionController.detalleFlujo.flujo.inscripcion.campania}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblProceso}
+				</p:column>
+				<p:column>
+					<h:outputLabel
+						value="#{notificacionController.detalleFlujo.actividad.proceso.denominacion}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>Actividad
+				</p:column>
+				<p:column>
+					<h:outputLabel
+						value="#{notificacionController.detalleFlujo.actividad.nombre}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>Gerente Público
+				</p:column>
+				<p:column>
+					<h:outputLabel
+						value="#{notificacionController.inscripcionSelec.asignacionGerenteV}" />
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+		<p:separator id="s6" />
+		<p:dataTable var="row"
+			value="#{notificacionController.listaNotificacion}" id="dtListNoti"
+			paginator="true" rows="10" scrollable="true" scrollHeight="230"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			emptyMessage="#{messages.msgEmptyMessage}">
+			<f:facet name="header">  
+            Lista de Notificaciones
+        </f:facet>
+			<p:column headerText="#{messages.lblCodigo}" style="width:10%">
+				<h:outputText value="#{row.id.idNotificacion}" />
+			</p:column>
+			<p:column headerText="Enviado por"
+				style="width:30%; white-space: normal;text-align: justify;">
+				<h:outputText value="#{row.usuarioRegistra}" />
+			</p:column>
+			<p:column headerText="Dirigido a"
+				style="width:30%; white-space: normal;text-align: justify;">
+				<h:outputText
+					value="#{row.receptor eq 'JI' ? 'Jefe Inmediato' : row.receptor eq 'TE' ? 'Titular Entidad' : row.receptor eq 'GP' ? 'Gerente Público' : 'Monitoreo y Evaluación'}" />
+			</p:column>
+			<p:column headerText="Fecha de Notificación"
+				style="width:30%; white-space: normal;text-align: justify;">
+				<h:outputText value="#{row.fechaCreacion}">
+					<f:convertDateTime pattern="dd/MM/yyyy hh:mm a" />
+				</h:outputText>
+			</p:column>
+		</p:dataTable>
+	</p:dialog>
+</h:body>
+<p:ajaxStatus
+	style="width:64px;height:64px;position:fixed;right:5px;bottom:5px"
+	id="ajaxStatusPanel">
+	<f:facet name="start">
+		<p:graphicImage value="./images/loading.gif" />
+	</f:facet>
+
+	<f:facet name="complete">
+		<h:outputText value="" />
+	</f:facet>
+</p:ajaxStatus>
+</html>

@@ -1,0 +1,281 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+	<h:outputStylesheet name="css/cssContent.css" />
+</h:head>
+<h:body>
+<script type="text/javascript" src="./resources/js/calendario.js"></script>
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datos" header="Metas Alineadas al POI">
+
+		<p:focus context="datos" />
+		<p:panelGrid styleClass="panelGrid">
+			<p:row>
+				<p:column width="30">#{messages.lblCampania} <h:outputText
+						value="#{messages.msgObligatorio}" styleClass="obligatorio" />
+				</p:column>
+				<p:column width="70">
+					<p:selectOneMenu id="comboCampania"
+						value="#{metasController.campaniaSelec}" style="width:280px;"
+						tabindex="1">
+						<f:selectItems value="#{metasController.comboCampania}" />
+						<p:ajax update="dtMetas,dtList,gp,pt,btnBuscar" event="change"
+							listener="#{metasController.limpiar}" />
+					</p:selectOneMenu>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblGerentePublico} <h:outputText
+						value="#{messages.msgObligatorio}" styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<p:inputText id="gp" tabindex="2"
+						value="#{metasController.inscripcionSelec.asignacionGerenteV}"
+						style=" width : 270px;" readonly="true" />
+					<p:spacer width="5" />
+					<p:commandButton id="btnBuscar" value="Buscar"
+						action="#{metasController.buscarGerenteInscrito}"
+						icon="ui-icon-search" update="dtGerente"
+						disabled="#{metasController.swBtnBuscar}"
+						oncomplete="dlgBuscarGP.show()" tabindex="3">
+					</p:commandButton>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblPuesto} <h:outputText
+						value="#{messages.msgObligatorio}" styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<h:outputText id="pt"
+						value="#{metasController.inscripcionSelec.puestoTipoV}" />
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+		<!-- Metas -->
+		<p:panel id="pnlAgregar" header="Metas">
+			<p:panelGrid id="datosMetas" styleClass="panelGrid">
+				<p:focus context="datosMetas" />
+				<p:row>
+					<p:column>Tipo Meta <h:outputText
+							value="#{messages.msgObligatorio}" styleClass="obligatorio" />
+					</p:column>
+					<p:column>
+						<p:selectOneMenu id="comboTipoMeta"
+							value="#{metasController.nuevoMeta.tipo}" style="width:210px;"
+							tabindex="4">
+							<f:selectItems value="#{metasController.comboTipoMeta}" />
+						</p:selectOneMenu>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>Meta <h:outputText
+							value="#{messages.msgObligatorio}" styleClass="obligatorio" />
+					</p:column>
+					<p:column>
+						<p:inputText value="#{metasController.nuevoMeta.denominacion}"
+							tabindex="5" maxlength="500" styleClass="txt"
+							style="width:600px;text-align: justify;" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>Relación con POI <h:outputText
+							value="#{messages.msgObligatorio}" styleClass="obligatorio" />
+					</p:column>
+					<p:column>
+						<p:inputText value="#{metasController.nuevoMeta.relacionPOI}"
+							tabindex="6" maxlength="500" styleClass="txt"
+							style="width:600px;text-align: justify;" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>Peso (%) <h:outputText
+							value="#{messages.msgObligatorio}" styleClass="obligatorio" />
+					</p:column>
+					<p:column>
+						<p:inputText id="txtPeso"
+							value="#{metasController.nuevoMeta.peso}" tabindex="6"
+							maxlength="2" styleClass="txt" style="width:90px;" />
+						<pe:keyFilter for="txtPeso" regEx="/[0-9]/" />
+						<!--  <pe:keyFilter for="txtPeso" mask="num" />-->
+						<p:spacer height="5" />
+						Fecha Culminación <h:outputText value="#{messages.msgObligatorio}"
+							styleClass="obligatorio" />
+						<p:spacer height="5" />
+						<p:calendar id="hasta" locale="es"
+							value="#{metasController.nuevoMeta.fechaFinMeta}" showOn="button"
+							navigator="true" tabindex="8" pattern="dd/MM/yyyy">
+							<f:convertDateTime type="date" dateStyle="short"
+								pattern="dd/MM/yyyy" />
+						</p:calendar>
+						<p:spacer width="5" />
+						<p:commandButton value="Agregar" id="btnAgregar"
+							action="#{metasController.agregarMeta}"
+							disabled="#{metasController.swFlujo}"
+							update="datosMetas,dtMetas,messages" icon="ui-icon-plus"
+							tabindex="9" />
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+
+			<p:dataTable var="meta" value="#{metasController.listaMetas}"
+				id="dtMetas" rows="7" emptyMessage="#{messages.msgEmptyMessage}" selectionMode="single" rowKey="#{meta.id.idMeta}">
+
+				<p:column headerText="#{messages.lblCodigo}" style="width:10%">
+					<h:outputText value="#{meta.id.idMeta}" />
+				</p:column>
+				<p:column headerText="Tipo Meta" style="width:15%;text-align: center;">
+					<h:outputText value="#{meta.tipo}" />
+				</p:column>
+				<p:column headerText="Meta" style="width:30%; white-space: normal;text-align: justify;">
+					<h:outputText value="#{meta.denominacion}" />
+				</p:column>
+				<p:column headerText="Relación POI"
+					style="width:25%; white-space: normal;text-align: justify;">
+					<h:outputText value="#{meta.relacionPOI}" />
+				</p:column>
+				<p:column headerText="Peso (%)" style="width:10%;text-align: center;">
+					<h:outputText value="#{meta.peso}" />
+					<f:facet name="footer">
+						<h:outputText value="Total: " styleClass="total" />  #{metasController.totalPeso} %
+            </f:facet>
+				</p:column>
+				<p:column headerText="#{messages.lblOpciones}" style="width:10%">
+					<p:commandButton value="" icon="ui-icon-pencil"
+						update=":frm:datosMetas" title="Editar Meta"
+						disabled="#{metasController.swFlujo}">
+						<f:setPropertyActionListener value="#{meta}"
+							target="#{metasController.nuevoMeta}" />
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+
+		<p:separator id="s1" />
+		<table style="width: 100%">
+			<tr>
+				<td align="left"><p:commandButton value="Guardar"
+						id="btnGuardar" action="#{metasController.guardar}"
+						update="messages" icon="ui-icon-disk" tabindex="11"
+						disabled="#{metasController.swFlujo}" /> <p:commandButton
+						value="#{messages.btnCancelar}" update="datos,messages"
+						action="#{metasController.limpiar}" icon="ui-icon-close"
+						tabindex="12" /></td>
+				<td align="right"><p:commandButton value="Continuar"
+						id="btnFlujo"
+						icon="ui-icon-circle-arrow-e" tabindex="12"
+						disabled="#{metasController.swFlujo}"
+						onclick="confirmacion.show()" /></td>
+			</tr>
+		</table>
+		<p:separator id="s2" />
+		<p:dataTable var="inscripcionGerente"
+			value="#{metasController.listaInscripcion}" id="dtList"
+			scrollable="true" scrollHeight="140" paginator="true" rows="10"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			emptyMessage="#{messages.msgEmptyMessage}">
+
+			<f:facet name="header">
+Gerentes Públicos Inscritos 
+			</f:facet>
+
+			<p:column headerText="#{messages.lblCodigo}" style="width:15%"
+				sortBy="#{inscripcionGerente.asignacionGerenteV.cod_gerente}">
+				<h:outputText
+					value="#{inscripcionGerente.asignacionGerenteV.cod_gerente}" />
+			</p:column>
+			<p:column headerText="Gerente Público" style="width:60%">
+				<h:outputText value="#{inscripcionGerente.asignacionGerenteV}" />
+			</p:column>
+			<p:column headerText="DNI"
+				sortBy="#{inscripcionGerente.asignacionGerenteV.dni}"
+				style="width:15%">
+				<h:outputText value="#{inscripcionGerente.asignacionGerenteV.dni}" />
+			</p:column>
+			<p:column headerText="#{messages.lblOpciones}" style="width:10%">
+				<p:commandButton value="" icon="ui-icon-pencil"
+					action="#{metasController.buscarListaMetas}"
+					update=":frm:gp, :frm:pt, :frm:dtMetas, :frm:btnAgregar, :frm:btnGuardar, , :frm:btnFlujo "
+					title="Editar Registro de Metas alineados al POI">
+					<f:setPropertyActionListener value="#{inscripcionGerente}"
+						target="#{metasController.inscripcionSelec}" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+	</p:panel>
+	<!-- Buscar Gerente Publico -->
+	<p:dialog id="dlgBuscar" header="Buscar Gerente Público"
+		widgetVar="dlgBuscarGP" modal="true" resizable="false" width="772"
+		showEffect="clip" closable="true" hideEffect="fold">
+
+		<p:dataTable var="ins" value="#{metasController.listaGerentePublico}"
+		    filteredValue="#{metasController.listaGerentePublicoFiltered}"
+			id="dtGerente" scrollable="true" scrollHeight="235" paginator="true"
+			rows="10"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			emptyMessage="#{messages.msgEmptyMessage}">
+			<f:facet name="header">    
+            	Lista de Gerentes Públicos Inscritos
+            	</f:facet>
+			<p:column headerText="#{messages.lblCodigo}" style="width:20%"
+				filterBy="#{ins.asignacionGerenteV.cod_gerente}">
+				<h:outputText value="#{ins.asignacionGerenteV.cod_gerente}" />
+			</p:column>
+			<p:column headerText="Nombres" style="width:20%"
+				filterBy="#{ins.asignacionGerenteV.nombres}">
+				<h:outputText value="#{ins.asignacionGerenteV.nombres}" />
+			</p:column>
+			<p:column headerText="Ap.Paterno" style="width:20%"
+				filterBy="#{ins.asignacionGerenteV.ap_paterno}">
+				<h:outputText value="#{ins.asignacionGerenteV.ap_paterno}" />
+			</p:column>
+			<p:column headerText="Ap.Materno" style="width:12%">
+				<h:outputText value="#{ins.asignacionGerenteV.ap_materno}" />
+			</p:column>
+			<p:column headerText="DNI" style="width:20%"
+				filterBy="#{ins.asignacionGerenteV.dni}">
+				<h:outputText value="#{ins.asignacionGerenteV.dni}" />
+			</p:column>
+			<p:column headerText="#{messages.lblOpciones}" style="width:15%">
+				<p:commandButton value=""
+					update=":frm:gp, :frm:pt, :frm:dtMetas, :frm:btnAgregar, :frm:btnGuardar, :frm:btnFlujo "
+					action="#{metasController.seleccionarGerente}"
+					oncomplete="dlgBuscarGP.hide()" icon="ui-icon-check"
+					title="Seleccionar Gerente Público">
+					<f:setPropertyActionListener value="#{ins}"
+						target="#{metasController.inscripcionSelec}" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+	</p:dialog>
+	<p:confirmDialog message="¿Estás seguro de continuar?"
+		showEffect="fade" hideEffect="fade" header="Metas Alineadas al POI"
+		widgetVar="confirmacion">
+		<table style="width: 100%">
+			<tr>
+				<td align="center"><p:commandButton value="Si"
+						style="width:50px" styleClass="ui-confirmdialog-yes"
+						icon="ui-icon-check" oncomplete="confirmacion.hide()"
+						update="datos,messages" action="#{metasController.atenderFlujo}">
+					</p:commandButton> <p:spacer width="10" /> <p:commandButton value="No"
+						style="width:50px" styleClass="ui-confirmdialog-no"
+						icon="ui-icon-close" onclick="confirmacion.hide()" /></td>
+			</tr>
+		</table>
+	</p:confirmDialog>
+</h:body>
+<p:ajaxStatus style="width:64px;height:64px;position:fixed;right:5px;bottom:5px" id="ajaxStatusPanel">  
+    <f:facet name="start">  
+        <p:graphicImage value="./images/loading.gif" /> 
+    </f:facet>  
+      
+    <f:facet name="complete">  
+        <h:outputText value="" />  
+    </f:facet>  
+</p:ajaxStatus> 
+</html>

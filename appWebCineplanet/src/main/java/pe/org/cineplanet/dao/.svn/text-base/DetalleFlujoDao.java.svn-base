@@ -1,0 +1,35 @@
+package gob.servir.desempenio.dao;
+
+import gob.servir.desempenio.model.DetalleFlujo;
+import gob.servir.desempenio.model.DetalleFlujoPK;
+import gob.servir.desempenio.model.DetalleFlujoV;
+import gob.servir.desempenio.model.FlujoPK;
+import gob.servir.desempenio.model.InscripcionPK;
+
+import java.util.List;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+public interface DetalleFlujoDao {
+	
+	public abstract DetalleFlujo find(DetalleFlujoPK id);
+	
+	public abstract DetalleFlujo save(DetalleFlujo obj);
+	
+	public abstract DetalleFlujo edit(DetalleFlujo obj);
+	
+	public abstract List<DetalleFlujo> getListaDetalleFlujo();	
+	
+	public abstract List<DetalleFlujo> getListaDetalleFlujoTemp(InscripcionPK id);
+	
+	public abstract List<DetalleFlujo> getListaDetalleFlujo(FlujoPK id);
+	
+	public abstract String getEstadoDetalleFlujo(DetalleFlujoPK id);
+	
+	public abstract List<DetalleFlujoV> getListaDetalleFlujoV();
+	
+	public abstract List<DetalleFlujo> getListaMonitoreoFlujo(InscripcionPK id);
+	
+}

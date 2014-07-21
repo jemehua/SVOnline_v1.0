@@ -1,0 +1,245 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+	<h:outputStylesheet name="css/cssContent.css" />
+	<script type="text/javascript">
+	PrimeFaces.locales['es'] = {
+	    closeText: 'Cerrar',
+	    prevText: 'Anterior',
+	    nextText: 'Siguiente',
+	    monthNames: ['Enero','Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+	    monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
+	    dayNames: ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'],
+	    dayNamesShort: ['Dom','Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
+	    dayNamesMin: ['D','L','M','M','J','V','S'],
+	    weekHeader: 'Semana',
+	    firstDay: 1,
+	    isRTL: false,
+	    showMonthAfterYear: false,
+	    yearSuffix: '',
+	    timeOnlyTitle: 'Sólo hora',
+	    timeText: 'Tiempo',
+	    hourText: 'Hora',
+	    minuteText: 'Minuto',
+	    secondText: 'Segundo',
+	    currentText: 'Fecha actual',
+	    ampm: false,
+	    month: 'Mes',
+	    week: 'Semana',
+	    day: 'Día',
+	    allDayText : 'Todo el día'
+	};
+</script>	
+</h:head>
+<h:body>
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datos"
+		header="Personalizar Cronograma de Campaña de Evaluación">
+		<p:focus context="datos" />
+		<p:panelGrid styleClass="panelGrid" style="width:100%;">
+			<p:row>
+				<p:column width="20">#{messages.lblCampania} <h:outputText
+						value="*" styleClass="obligatorio" />
+				</p:column>
+				<p:column width="30">
+					<p:selectOneMenu id="comboCampania"
+						value="#{cronogramaEspecificoController.campaniaSelec}"
+						style="width:240px;" tabindex="1" disabled="true">
+						<f:selectItems
+							value="#{cronogramaEspecificoController.comboCampania}" />
+						<p:ajax update="dtList, dtLista" process="comboCampania"
+							event="change"
+							actionListener="#{cronogramaEspecificoController.listaCronograma}" />
+					</p:selectOneMenu>
+				</p:column>
+				<p:column width="20">
+				</p:column>
+				<p:column width="30">
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column width="20">#{messages.lblProceso}<h:outputText
+						value="*" styleClass="obligatorio" />
+				</p:column>
+				<p:column width="30">
+					<p:selectOneMenu id="comboProceso"
+						value="#{cronogramaEspecificoController.procesoSelec}"
+						style="width:240px;" tabindex="2" disabled="true">
+						<f:selectItems
+							value="#{cronogramaEspecificoController.comboProceso}" />
+						<p:ajax update="dtLista" process="comboProceso" event="change"
+							actionListener=" #{cronogramaEspecificoController.listaTemporizador} " />
+					</p:selectOneMenu>
+				</p:column>
+				<p:column width="20">
+				Gerente Público
+				</p:column>
+				<p:column width="30">
+#{cronogramaEspecificoController.inscripcionSelec.gerentePublicoV.nombres} #{cronogramaEspecificoController.inscripcionSelec.gerentePublicoV.ap_paterno} #{cronogramaEspecificoController.inscripcionSelec.gerentePublicoV.ap_materno}
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column width="20">#{messages.lblFechaInicio} <h:outputText
+						value="*" styleClass="obligatorio" />
+				</p:column>
+				<p:column width="30">
+					<p:calendar id="desde" locale="es"
+						value="#{cronogramaEspecificoController.nuevoCronograma.fechaInicio}"
+						showOn="button" navigator="true" tabindex="3">
+						<p:ajax event="dateSelect"
+							listener="#{cronogramaEspecificoController.handleDateSelect}"
+							update="messages,dtLista,out2" />
+					</p:calendar>
+				</p:column>
+				<p:column width="20">#{messages.lblFechaFin} <h:outputText
+						value="*" styleClass="obligatorio" />
+				</p:column>
+				<p:column width="30">
+					<p:calendar id="hasta" locale="es"
+						value="#{cronogramaEspecificoController.nuevoCronograma.fechaFin}"
+						showOn="button" navigator="true" tabindex="4">
+						<p:ajax event="dateSelect"
+							listener="#{cronogramaEspecificoController.handleDateSelect}"
+							update="messages,dtLista,out2" />
+					</p:calendar>
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+		<table style="width: 100%;">
+			<tr>
+				<td align="left"></td>
+				<td align="right" style="color: blue; font-weight: bold;">TOTAL
+					(días) <p:inputText id="out2"
+						style="width:60px; color:black; font-weight: bold;"
+						value="#{cronogramaEspecificoController.totalDias}"
+						readonly="true" />
+				</td>
+			</tr>
+		</table>
+
+		<p:panel id="pnlAgregar" header="Temporizador">
+
+			<p:dataTable var="fila"
+				value="#{cronogramaEspecificoController.listaTemporizador}"
+				id="dtLista" rows="20" scrollable="true" scrollHeight="230"
+				emptyMessage="#{messages.msgEmptyMessage}" rowIndexVar="rowIndex">
+
+				<p:column headerText="#{messages.lblCodigo}" style="width:6%">
+					<h:outputText value="#{fila.actividad.id.idActividad}" />
+				</p:column>
+				<p:column headerText="Actividad" style="width:50%">
+					<h:outputText value="#{fila.actividad.nombre}" />
+				</p:column>
+
+				<p:column headerText="Desde" style="width:12%">
+					<h:outputText value="#{fila.fechaInicio}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Hasta" style="width:12%">
+					<h:outputText value="#{fila.fechaFin}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Cantidad(dias)" style="width:12%">
+					<p:inputText id="txtCatidad" value="#{fila.cantidadDias}"
+						style="width:60px;"
+						valueChangeListener="#{cronogramaEspecificoController.asignarCantidadDias}"
+						disabled="#{cronogramaEspecificoController.swCantidadDias}"
+						maxlength="3">
+						<p:ajax
+							listener="#{cronogramaEspecificoController.asignarDias(fila)}"
+							update="dtLista" />
+					</p:inputText>
+					<pe:keyFilter for="txtCatidad" mask="num" />
+					<f:facet name="footer">
+						<h:outputText value="Suma: " styleClass="total" />  #{cronogramaEspecificoController.sumaDias} 
+            </f:facet>
+				</p:column>
+				<!-- <p:column headerText="#{messages.lblEstado}" style="width:10%">
+					<h:outputText
+						value="#{fila.estado.equals('A')?'Activo':'Inactivo'}" />
+				</p:column> -->
+				<p:column headerText="#{messages.lblOpciones}" style="width:8%">
+
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+
+		<p:separator id="s1" />
+		<table>
+			<tr>
+				<td><p:commandButton value="Guardar"
+						action="#{cronogramaEspecificoController.guardar}"
+						update="datos,dtList,messages" icon="ui-icon-document"
+						tabindex="11" /></td>
+				<td><p:commandButton value="#{messages.btnCancelar}"
+						onclick="lazyload()" icon="ui-icon-close" tabindex="12" /></td>
+			</tr>
+		</table>
+		<p:separator id="s2" />
+		<p:dataTable var="row"
+			value="#{cronogramaEspecificoController.listaCronograma}" id="dtList"
+			rows="5" emptyMessage="#{messages.msgEmptyMessage}">
+			<f:facet name="header">   
+            Cronograma de Campaña de Evaluación Personalizado 
+        </f:facet>
+			<p:column headerText="#{messages.lblCodigo}" style="width:8%">
+				<h:outputText value="#{row.id.idProceso}" />
+			</p:column>
+			<p:column headerText="Gerente Publico" style="width:35%">
+				<h:outputText
+					value="#{row.inscripcion.gerentePublicoV.nombres} #{row.inscripcion.gerentePublicoV.ap_paterno} #{row.inscripcion.gerentePublicoV.ap_materno}" />
+			</p:column>
+			<p:column headerText="Proceso" style="width:35%">
+				<h:outputText value="#{row.proceso.denominacion}" />
+			</p:column>
+			<p:column headerText="#{messages.lblFechaInicio}" style="width:15%">
+				<h:outputText value="#{row.fechaInicio}">
+					<f:convertDateTime pattern="dd/MM/yyyy" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="#{messages.lblFechaFin}" style="width:15%">
+				<h:outputText value="#{row.fechaFin}">
+					<f:convertDateTime pattern="dd/MM/yyyy" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="#{messages.lblEstado}" style="width:10%">
+				<h:outputText value="#{row.estado.equals('A')?'Activo':'Inactivo'}" />
+			</p:column>
+			<p:column headerText="#{messages.lblOpciones}" style="width:10%">
+				<p:commandButton value="" icon="ui-icon-pencil" update=":frm:datos"
+					title="Editar Cronograma"
+					action="#{cronogramaEspecificoController.calcularFechas}">
+					<f:setPropertyActionListener value="#{row}"
+						target="#{cronogramaEspecificoController.nuevoCronograma}" />
+					<f:setPropertyActionListener value="#{row.id.idCampania}"
+						target="#{cronogramaEspecificoController.campaniaSelec}" />
+					<f:setPropertyActionListener value="#{row.id.idProceso}"
+						target="#{cronogramaEspecificoController.procesoSelec}" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+	</p:panel>
+	<p:remoteCommand name="lazyload" update=":frm:content">
+		<f:setPropertyActionListener
+			target="#{contenidoController.includedPage}"
+			value="contents/inscripcion.xhtml" />
+	</p:remoteCommand>
+</h:body>
+<p:ajaxStatus style="width:64px;height:64px;position:fixed;right:5px;bottom:5px" id="ajaxStatusPanel">  
+    <f:facet name="start">  
+        <p:graphicImage value="./images/loading.gif" /> 
+    </f:facet>  
+      
+    <f:facet name="complete">  
+        <h:outputText value="" />  
+    </f:facet>  
+</p:ajaxStatus> 
+</html>

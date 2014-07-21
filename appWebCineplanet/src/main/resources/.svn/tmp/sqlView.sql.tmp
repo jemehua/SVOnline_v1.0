@@ -1,0 +1,42 @@
+
+
+CREATE VIEW PuestoTipoV AS
+SELECT * FROM ADMINGP_PRUEBA.puesto_tipo ORDER BY id_puesto_tipo;
+
+CREATE VIEW GerentePublicoV AS
+SELECT DISTINCT gp.COD_GERENTE, gp.nombres, gp.ap_paterno,  gp.ap_materno, gp.dni, gp.mail_01, gp.mail_02, gp. mail_03
+FROM Admingp_Prueba.Asignacion_Gerente Ag, Admingp_Prueba.Gerente_Publico Gp
+WHERE Ag.Cod_Gerente = Gp.Cod_Gerente
+ORDER BY gp.ap_paterno ASC
+
+--CREATE VIEW AsignacionGerenteV AS
+--SELECT DISTINCT ag.id_asignacion,ag.COD_GERENTE, gp.nombres, gp.ap_paterno,  gp.ap_materno, gp.dni, gp.mail_01, gp.mail_02, gp. mail_03,gp.ID_PUESTO_TIPO_PRINCIPAL, ag.ID_ED, ag.id_jefe_inmediato, ed.TE_NUMERO_DOCUMENTO, ag.fech_asignacion
+--FROM Admingp.Asignacion_Gerente ag, ADMINGP.gerente_publico gp, ADMINGP.entidad_destino ed
+--WHERE ag.COD_GERENTE = Gp.COD_GERENTE 
+--AND ag.Id_Ed=Ed.Id_Ed 
+--and fech_cese is not null
+--order by ag.COD_GERENTE
+
+-- ANTIGUO
+--CREATE VIEW AsignacionGerenteV AS
+--SELECT ag.id_asignacion,ag.COD_GERENTE, gp.nombres, gp.ap_paterno,  gp.ap_materno, gp.dni, gp.mail_01, gp.mail_02, gp. mail_03,gp.ID_PUESTO_TIPO_PRINCIPAL, ag.ID_ED, ag.id_jefe_inmediato,
+--(select TE_NUMERO_DOCUMENTO from admingp.entidad_destino where id_ed = ag.id_ed) as TE_NUMERO_DOCUMENTO, ag.fech_asignacion
+--FROM admingp.GERENTE_PUBLICO gp
+--LEFT JOIN admingp.asignacion_gerente ag ON gp.cod_gerente = ag.cod_gerente AND ag.fech_cese IS NULL
+--WHERE gp.cod_estado = '1' ORDER BY gp.COD_GERENTE
+
+CREATE VIEW AsignacionGerenteV AS
+SELECT ag.id_asignacion,gp.COD_GERENTE, gp.nombres, gp.ap_paterno,  gp.ap_materno, gp.dni, 
+        gp.mail_01, gp.mail_02, gp. mail_03,gp.ID_PUESTO_TIPO_PRINCIPAL, ag.ID_ED, 
+        ag.id_jefe_inmediato, e_d.TE_NUMERO_DOCUMENTO as TE_NUMERO_DOCUMENTO, ag.fech_asignacion
+FROM admingp.GERENTE_PUBLICO gp
+JOIN admingp.asignacion_gerente ag ON gp.cod_gerente = ag.cod_gerente AND ag.fech_cese IS NULL
+JOIN admingp.entidad_destino e_d ON e_d.id_ed = ag.id_ed
+WHERE gp.cod_estado = '1' ORDER BY gp.COD_GERENTE
+
+CREATE VIEW EntidadDestinoV AS
+SELECT id_ed, desc_ed FROM ADMINGP_PRUEBA.ENTIDAD_DESTINO ORDER BY desc_ed ASC;
+
+CREATE VIEW JefeInmediatoV AS
+SELECT  Id_Jefe_Inmediato, Numero_Documento, Nombres, Apellido_Paterno, Apellido_Materno, Cargo, Correo_Electronico_Trabajo, Correo_Electronico_Personal, Telefono_Oficina, Telefono_Celular  
+FROM ADMINGP_PRUEBA.Jefe_Inmediato

@@ -1,0 +1,33 @@
+package gob.servir.desempenio.dao;
+
+import gob.servir.desempenio.model.EvaluacionMetas;
+import gob.servir.desempenio.model.EvaluacionMetasPK;
+import gob.servir.desempenio.model.InscripcionPK;
+
+import java.util.List;
+
+public interface EvaluacionMetasDao {
+
+	public abstract EvaluacionMetas find(EvaluacionMetasPK id);
+
+	public abstract EvaluacionMetas save(EvaluacionMetas obj);
+
+	public abstract EvaluacionMetas edit(EvaluacionMetas obj);
+
+	public abstract List<EvaluacionMetas> getListaEvaluacionMetas();
+
+	public abstract List<EvaluacionMetas> getListaNotasEvaMetas(
+			InscripcionPK id);
+	
+	public abstract List<EvaluacionMetas> getListaEvaluacionMetas(
+			InscripcionPK id);
+	
+	public abstract Integer getCantidadCualitativa(InscripcionPK id);
+
+	public abstract Integer getCantidadCuantitativa(InscripcionPK id);
+
+	public abstract Integer getCantidadCuantitativaGP(InscripcionPK id);
+
+	public abstract Integer getCantidadCuantitativaJI(InscripcionPK id);
+
+}

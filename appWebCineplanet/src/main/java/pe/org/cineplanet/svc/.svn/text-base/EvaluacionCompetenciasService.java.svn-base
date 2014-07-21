@@ -1,0 +1,39 @@
+package gob.servir.desempenio.service;
+
+import gob.servir.desempenio.model.EvaluacionCompetencias;
+import gob.servir.desempenio.model.EvaluacionCompetenciasPK;
+import gob.servir.desempenio.model.InscripcionPK;
+
+import java.util.List;
+
+/**
+ * 
+ * @author Hever Pumallihua García
+ */
+public interface EvaluacionCompetenciasService {
+
+	public abstract EvaluacionCompetencias find(EvaluacionCompetenciasPK id);
+
+	public abstract EvaluacionCompetencias save(EvaluacionCompetencias obj);
+
+	public abstract EvaluacionCompetencias edit(EvaluacionCompetencias obj);
+
+	public abstract List<EvaluacionCompetencias> getListaEvaluacionCompetencias();
+	
+	public abstract List<EvaluacionCompetencias> getListaSoloEvaCompetencias(
+			InscripcionPK id);
+
+	public abstract List<EvaluacionCompetencias> getListaEvaluacionCompetencias(
+			InscripcionPK id);
+
+	public abstract Integer getCantidadCuantitativa(InscripcionPK id);
+	
+	public abstract Integer getCantidadCualitativa(InscripcionPK id);
+
+	public abstract Integer getCantidadCuantitativaGP(InscripcionPK id);
+
+	public abstract Integer getCantidadCuantitativaJI(InscripcionPK id);
+
+	public abstract Integer getCantidadCuantitativaTE(InscripcionPK id);
+
+}

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
+      http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
+	version="1.0">
+
+	<persistence-unit name="acme" transaction-type="RESOURCE_LOCAL">
+<!-- 		<persistence-unit name="acme" transaction-type="JTA"> -->
+<!-- 		<jta-data-source>java:jboss/datasources/Desempenio</jta-data-source> -->
+		 
+		<class>gob.servir.desempenio.model.Actividad</class>
+		<class>gob.servir.desempenio.model.ActividadPK</class>
+		<class>gob.servir.desempenio.model.AsignacionGerenteV</class>
+		<class>gob.servir.desempenio.model.Campania</class>
+		<class>gob.servir.desempenio.model.Competencia</class>
+		<class>gob.servir.desempenio.model.CompetenciaPK</class>
+		<class>gob.servir.desempenio.model.Cronograma</class>
+		<class>gob.servir.desempenio.model.CronogramaPK</class>
+		<class>gob.servir.desempenio.model.DetalleFlujo</class>
+		<class>gob.servir.desempenio.model.DetalleFlujoPK</class>
+		<class>gob.servir.desempenio.model.DetalleFlujoV</class>
+		<class>gob.servir.desempenio.model.DetalleFlujoVPK</class>
+		<class>gob.servir.desempenio.model.DetalleInscripcion</class>
+		<class>gob.servir.desempenio.model.DetalleInscripcionPK</class>
+		<class>gob.servir.desempenio.model.EntidadDestinoV</class>
+		<class>gob.servir.desempenio.model.EvaluacionCompetencias</class>
+		<class>gob.servir.desempenio.model.EvaluacionCompetenciasPK</class>
+		<class>gob.servir.desempenio.model.EvaluacionInicial</class>
+		<class>gob.servir.desempenio.model.EvaluacionInicialPK</class>
+		<class>gob.servir.desempenio.model.EvaluacionMetas</class>
+		<class>gob.servir.desempenio.model.EvaluacionMetasPK</class>
+		<class>gob.servir.desempenio.model.TitularEntidad</class>
+		<class>gob.servir.desempenio.model.Flujo</class>
+		<class>gob.servir.desempenio.model.FlujoPK</class>
+		<class>gob.servir.desempenio.model.Inscripcion</class>
+		<class>gob.servir.desempenio.model.InscripcionPK</class>
+		<class>gob.servir.desempenio.model.ItemMenu</class>
+		<class>gob.servir.desempenio.model.JefeInmediato</class>
+		<class>gob.servir.desempenio.model.JefeInmediatoV</class>
+		<class>gob.servir.desempenio.model.Mensaje</class>
+		<class>gob.servir.desempenio.model.MensajePK</class>
+		<class>gob.servir.desempenio.model.Menu</class>
+		<class>gob.servir.desempenio.model.Meta</class>
+		<class>gob.servir.desempenio.model.MetaPK</class>
+		<class>gob.servir.desempenio.model.Notificacion</class>
+		<class>gob.servir.desempenio.model.NotificacionPK</class>
+		<class>gob.servir.desempenio.model.Permiso</class>
+		<class>gob.servir.desempenio.model.PlanDesarrollo</class>
+		<class>gob.servir.desempenio.model.PlanDesarrolloPK</class>
+		<class>gob.servir.desempenio.model.PlanMetas</class>
+		<class>gob.servir.desempenio.model.PlanMetasPK</class>
+		<class>gob.servir.desempenio.model.Proceso</class>
+		<class>gob.servir.desempenio.model.PuestoTipoV</class>
+		<class>gob.servir.desempenio.model.Rol</class>
+		<class>gob.servir.desempenio.model.Task</class>
+		<class>gob.servir.desempenio.model.Temporizador</class>
+		<class>gob.servir.desempenio.model.TemporizadorPK</class>
+		<class>gob.servir.desempenio.model.TipoCompetencia</class>
+		<class>gob.servir.desempenio.model.UltimaCampaniaGp</class>
+		<class>gob.servir.desempenio.model.UltimaCampaniaGpPK</class>
+		<class>gob.servir.desempenio.model.Usuario</class>
+		<class>gob.servir.desempenio.model.ParametroSistema</class> 
+		<class>gob.servir.desempenio.model.DetalleTipoCompetencia</class> 
+		<class>gob.servir.desempenio.model.DetalleTipoCompetenciaPK</class> 
+
+		<properties>
+			<property name="hibernate.dialect" value="org.hibernate.dialect.Oracle10gDialect" />
+		</properties>
+	</persistence-unit>
+
+</persistence>

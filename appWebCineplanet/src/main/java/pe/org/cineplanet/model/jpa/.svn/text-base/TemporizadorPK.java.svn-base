@@ -1,0 +1,139 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package gob.servir.desempenio.model;
+
+import java.io.Serializable;
+
+import javax.persistence.*;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Embeddable
+public class TemporizadorPK implements Serializable {
+	private static final long serialVersionUID = 1L;
+
+	@Basic(optional = false)
+	@Column(name = "idCronograma")
+	private Long idCronograma;
+	@Basic(optional = false)
+	@Column(name = "idCampania")
+	private Long idCampania;
+	@Basic(optional = false)
+	@Column(name = "idActividad")
+	private Long idActividad;
+	@Basic(optional = false)
+	@Column(name = "idProceso")
+	private Long idProceso;
+
+	public TemporizadorPK() {
+		super();
+	}
+
+	public TemporizadorPK(Long idCronograma, Long idCampania, Long idActividad,
+			Long idProceso) {
+		super();
+		this.idCronograma = idCronograma;
+		this.idCampania = idCampania;
+		this.idActividad = idActividad;
+		this.idProceso = idProceso;
+	}
+
+	public Long getIdCronograma() {
+		return idCronograma;
+	}
+
+	public void setIdCronograma(Long idCronograma) {
+		this.idCronograma = idCronograma;
+	}
+
+	public Long getIdCampania() {
+		return idCampania;
+	}
+
+	public void setIdCampania(Long idCampania) {
+		this.idCampania = idCampania;
+	}
+
+	public Long getIdActividad() {
+		return idActividad;
+	}
+
+	public void setIdActividad(Long idActividad) {
+		this.idActividad = idActividad;
+	}
+
+	public Long getIdProceso() {
+		return idProceso;
+	}
+
+	public void setIdProceso(Long idProceso) {
+		this.idProceso = idProceso;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((idActividad == null) ? 0 : idActividad.hashCode());
+		result = prime * result
+				+ ((idCampania == null) ? 0 : idCampania.hashCode());
+		result = prime * result
+				+ ((idCronograma == null) ? 0 : idCronograma.hashCode());
+		result = prime * result
+				+ ((idProceso == null) ? 0 : idProceso.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TemporizadorPK other = (TemporizadorPK) obj;
+		if (idActividad == null) {
+			if (other.idActividad != null)
+				return false;
+		} else if (!idActividad.equals(other.idActividad))
+			return false;
+		if (idCampania == null) {
+			if (other.idCampania != null)
+				return false;
+		} else if (!idCampania.equals(other.idCampania))
+			return false;
+		if (idCronograma == null) {
+			if (other.idCronograma != null)
+				return false;
+		} else if (!idCronograma.equals(other.idCronograma))
+			return false;
+		if (idProceso == null) {
+			if (other.idProceso != null)
+				return false;
+		} else if (!idProceso.equals(other.idProceso))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("TemporizadorPK [idCronograma=");
+		builder.append(idCronograma);
+		builder.append(", idCampania=");
+		builder.append(idCampania);
+		builder.append(", idActividad=");
+		builder.append(idActividad);
+		builder.append(", idProceso=");
+		builder.append(idProceso);
+		builder.append("]");
+		return builder.toString();
+	}
+
+}

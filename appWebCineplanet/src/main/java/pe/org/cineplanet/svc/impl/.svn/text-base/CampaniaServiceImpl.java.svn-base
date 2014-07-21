@@ -1,0 +1,70 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.CampaniaDao;
+import gob.servir.desempenio.model.Campania;
+import gob.servir.desempenio.service.CampaniaService;
+
+import java.util.List;
+
+import javax.faces.model.SelectItem;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Service("campaniaService")
+public class CampaniaServiceImpl implements CampaniaService {
+
+	@Autowired
+	private CampaniaDao campaniaDao;
+
+	@Transactional
+	public Campania find(Long id) {
+		return campaniaDao.find(id);
+	}
+
+	@Transactional
+	public Campania save(Campania obj) {
+		return campaniaDao.save(obj);
+	}
+
+	@Transactional
+	public Campania saveTotal(Campania obj) {
+		return campaniaDao.saveTotal(obj);
+	}
+
+	@Transactional
+	public Campania edit(Campania obj) {
+		return campaniaDao.edit(obj);
+	}
+
+	public List<Campania> getListaCampania() {
+		return campaniaDao.getListaCampania();
+	}
+
+	public Long getIdMax() {
+		return campaniaDao.getIdMax();
+	}
+
+	public List<SelectItem> getComboCampania() {
+		return campaniaDao.getComboCampania();
+	}
+
+	public List<SelectItem> getComboCampaniaCreada() {
+		return campaniaDao.getComboCampaniaCreada();
+	}
+
+	public List<Campania> getListaEstadoCampania(String estado) {
+		return campaniaDao.getListaEstadoCampania(estado);
+	}
+
+	public List<Campania> findCampaniaByPostAnio(String denominacion,
+			String anio, String postAnio) {
+		return campaniaDao.findCampaniaByPostAnio(denominacion, anio, postAnio);
+	}
+
+}

@@ -1,0 +1,387 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.dao.PermisoDao;
+import gob.servir.desempenio.model.Mensaje;
+import gob.servir.desempenio.model.Permiso;
+import gob.servir.desempenio.model.Rol;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.JavaMailService;
+import gob.servir.desempenio.service.UsuarioService;
+import gob.servir.desempenio.util.Seguridad;
+
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+<<<<<<< .mine
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.ProviderNotFoundException;
+import org.springframework.security.web.WebAttributes;
+=======
+>>>>>>> .r1661
+import org.springframework.stereotype.Component;
+
+@Component("loginController")
+@Scope("session")
+<<<<<<< .mine
+public class LoginController implements PhaseListener  {
+=======
+public class LoginController
+  implements Serializable
+{
+  private static final long serialVersionUID = 1L;
+  private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
+>>>>>>> .r1661
+
+  @Autowired
+  private UsuarioService usuarioService;
+
+  @Autowired
+  private PermisoDao permisoDao;
+
+  @Autowired
+  private JavaMailService javaMailService;
+  private Usuario userSesion = null;
+  private String username = "";
+  private String clave = "";
+  private String mensaje = "";
+
+  private List<Permiso> listaPermisoAdm = new ArrayList();
+  private List<Permiso> listaPermisoOpe = new ArrayList();
+  private List<Permiso> listaPermisoMon = new ArrayList();
+  private List<Permiso> listaPermisoNoti = new ArrayList();
+  private List<Permiso> listaPermisoRep = new ArrayList();
+
+  private String user = "";
+  private String correo = "";
+
+  public LoginController() {
+    this.username = "";
+    this.clave = "";
+  }
+
+  public Usuario getUserSesion() {
+    return this.userSesion;
+  }
+
+  public void setUserSesion(Usuario userSesion) {
+    this.userSesion = userSesion;
+  }
+
+  public String getMensaje() {
+    return this.mensaje;
+  }
+
+  public void setMensaje(String mensaje) {
+    this.mensaje = mensaje;
+  }
+
+  public String getUsername() {
+    return this.username;
+  }
+
+  public void setUsername(String username) {
+    this.username = username;
+  }
+
+  public String getClave() {
+    return this.clave;
+  }
+
+  public void setClave(String clave) {
+    this.clave = clave;
+  }
+
+<<<<<<< .mine
+=======
+  public String getUser() {
+    return this.user;
+  }
+
+>>>>>>> .r1661
+  public void setUser(String user) {
+    this.user = user;
+  }
+
+  public String getCorreo() {
+    return this.correo;
+  }
+
+<<<<<<< .mine
+=======
+  public void setCorreo(String correo) {
+    this.correo = correo;
+  }
+
+>>>>>>> .r1661
+  private String rpHash(String value) {
+    int hash = 5381;
+    value = value.toUpperCase();
+    for (int i = 0; i < value.length(); i++) {
+      hash = (hash << 5) + hash + value.charAt(i);
+    }
+    return String.valueOf(hash);
+  }
+
+  public void login() {
+    logger.info("INICIAR SESION");
+    this.mensaje = "";
+
+    if (!validarLogin())
+      return;
+    String defaultRealHash = 
+      (String)FacesContext.getCurrentInstance()
+      .getExternalContext().getRequestParameterMap()
+      .get("defaultRealHash");
+    String defaultReal = 
+      (String)FacesContext.getCurrentInstance()
+      .getExternalContext().getRequestParameterMap()
+      .get("defaultReal");
+
+    if (rpHash(defaultReal).equals(defaultRealHash)) {
+      try {
+    	
+        this.userSesion = this.usuarioService.findUsuarioByUsername(this.username, 
+        		this.clave);
+        if (this.userSesion != null) {
+          if (this.userSesion.getClave().equalsIgnoreCase(this.clave)) {
+            logger.info("EL USUARIO " + this.userSesion.getUsuario() + 
+              " HA INICIADO SESION");
+            logger.info("ROL=" + this.userSesion.getRol().getNombre());
+
+            this.listaPermisoAdm = this.permisoDao.getListaPermiso(Long.valueOf(1L), 
+              this.userSesion.getRol().getIdRol());
+            this.listaPermisoOpe = this.permisoDao.getListaPermiso(Long.valueOf(2L), 
+              this.userSesion.getRol().getIdRol());
+            this.listaPermisoMon = this.permisoDao.getListaPermiso(Long.valueOf(3L), 
+              this.userSesion.getRol().getIdRol());
+            this.listaPermisoNoti = this.permisoDao.getListaPermiso(Long.valueOf(4L), 
+              this.userSesion.getRol().getIdRol());
+            this.listaPermisoRep = this.permisoDao.getListaPermiso(Long.valueOf(5L), 
+              this.userSesion.getRol().getIdRol());
+
+            SesionController sesion = new SesionController();
+            if (!sesion.crearSesion(this.userSesion)) {
+              FacesContext.getCurrentInstance().addMessage(
+                null, 
+                new FacesMessage(
+                FacesMessage.SEVERITY_WARN, 
+                "ADVERTENCIA", 
+                "Error al iniciar sesión"));
+              return;
+            }
+            this.mensaje = "";
+            return;
+          }
+          FacesContext.getCurrentInstance().addMessage(
+            null, 
+            new FacesMessage(FacesMessage.SEVERITY_WARN, 
+            "ADVERTENCIA", 
+            "Datos de acceso incorrecto"));
+          return;
+        }
+
+        FacesContext.getCurrentInstance()
+          .addMessage(
+          null, 
+          new FacesMessage(
+          FacesMessage.SEVERITY_WARN, 
+          "ADVERTENCIA", 
+          "Datos de acceso incorrecto"));
+        return;
+      }
+      catch (Exception e) {
+        e.printStackTrace();
+        logger.info("ERROR AL INICIAR SESION");
+        FacesContext.getCurrentInstance().addMessage(
+          null, 
+          new FacesMessage(FacesMessage.SEVERITY_WARN, 
+          "ADVERTENCIA", "Error al iniciar sesión"));
+        return;
+      }
+    }
+
+    System.out.println(" BAD ");
+
+    FacesContext.getCurrentInstance()
+      .addMessage(
+      null, 
+      new FacesMessage(FacesMessage.SEVERITY_WARN, 
+      "ADVERTENCIA", 
+      "El valor que ha ingresado para el Captcha es incorrecto"));
+  }
+
+  public boolean validarLogin()
+  {
+    if ((this.username.equalsIgnoreCase("")) || (this.username.length() == 0)) {
+      FacesContext.getCurrentInstance().addMessage(
+        null, 
+        new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA", 
+        "Ingrese datos de acceso"));
+      return false;
+    }
+
+    if ((this.clave.equalsIgnoreCase("")) || (this.username.length() == 0)) {
+      FacesContext.getCurrentInstance().addMessage(
+        null, 
+        new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA", 
+        "Ingrese datos de acceso"));
+      return false;
+    }
+
+    return true;
+  }
+
+  public List<Permiso> getListaPermisoNoti() {
+    return this.listaPermisoNoti;
+  }
+
+  public void setListaPermisoNoti(List<Permiso> listaPermisoNoti) {
+    this.listaPermisoNoti = listaPermisoNoti;
+  }
+
+  public List<Permiso> getListaPermisoAdm() {
+    return this.listaPermisoAdm;
+  }
+
+<<<<<<< .mine
+				usuario.setPassword(Seguridad.encrypt(usuario.getDni()));
+				//usuario.setClave(usuario.getDni());
+				usuarioService.edit(usuario);
+=======
+  public void setListaPermisoAdm(List<Permiso> listaPermisoAdm) {
+    this.listaPermisoAdm = listaPermisoAdm;
+  }
+>>>>>>> .r1661
+
+  public List<Permiso> getListaPermisoOpe() {
+    return this.listaPermisoOpe;
+  }
+
+  public void setListaPermisoOpe(List<Permiso> listaPermisoOpe) {
+    this.listaPermisoOpe = listaPermisoOpe;
+  }
+
+  public List<Permiso> getListaPermisoMon() {
+    return this.listaPermisoMon;
+  }
+
+  public void setListaPermisoMon(List<Permiso> listaPermisoMon) {
+    this.listaPermisoMon = listaPermisoMon;
+  }
+
+  public List<Permiso> getListaPermisoRep() {
+    return this.listaPermisoRep;
+  }
+
+  public void setListaPermisoRep(List<Permiso> listaPermisoRep) {
+    this.listaPermisoRep = listaPermisoRep;
+  }
+
+  public void recuperarClave()
+  {
+    if (validarDatos()) {
+      return;
+    }
+    try
+    {
+      Usuario usuario = this.usuarioService.findByUsername(this.user);
+
+      if (usuario != null)
+      {
+        Mensaje mensaje = new Mensaje();
+
+        mensaje.setTitulo("Has solicitado tu contraseña");
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Hola " + usuario.getNombre() + " ");
+        sb.append("tu contraseña es: " + usuario.getClave());
+
+        mensaje.setCuerpo(sb.toString());
+        if (usuario.getCorreo() != null) {
+          this.javaMailService.enviar(mensaje, usuario.getCorreo());
+          FacesContext.getCurrentInstance().addMessage(
+            null, 
+            new FacesMessage(FacesMessage.SEVERITY_INFO, 
+            "EXITO", "Te hemos enviado tu contraseña"));
+        }
+        else {
+          FacesContext.getCurrentInstance()
+            .addMessage(
+            null, 
+            new FacesMessage(
+            FacesMessage.SEVERITY_WARN, 
+            "ADVERTENCIA", 
+            "Ud. no tiene registrado correo electrónico"));
+        }
+      } else {
+        FacesContext.getCurrentInstance().addMessage(
+          null, 
+          new FacesMessage(FacesMessage.SEVERITY_WARN, 
+          "ADVERTENCIA", "Nombre de usuario no existe"));
+      }
+      limpiar();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+<<<<<<< .mine
+	public void beforePhase(PhaseEvent event) {
+
+		Exception e = (Exception) FacesContext.getCurrentInstance()
+				.getExternalContext().getSessionMap()
+				.get(WebAttributes.AUTHENTICATION_EXCEPTION);
+=======
+  public boolean validarDatos()
+  {
+    if (this.user.trim().length() == 0) {
+      FacesContext.getCurrentInstance().addMessage(
+        null, 
+        new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA", 
+        "Ingrese nombre de usuario"));
+      return true;
+    }
+>>>>>>> .r1661
+
+<<<<<<< .mine
+		if (e instanceof BadCredentialsException) {
+
+			FacesContext.getCurrentInstance().getExternalContext()
+					.getSessionMap()
+					.put(WebAttributes.AUTHENTICATION_EXCEPTION, null);
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Datos de acceso incorretos"));
+		}
+		
+		if (e instanceof ProviderNotFoundException) {
+
+			FacesContext.getCurrentInstance().getExternalContext()
+					.getSessionMap()
+					.put(WebAttributes.AUTHENTICATION_EXCEPTION, null);
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Datos de acceso incorretos"));
+		}
+
+	}
+=======
+    return false;
+  }
+>>>>>>> .r1661
+
+  public void limpiar() {
+    this.user = "";
+    this.correo = "";
+  }
+}

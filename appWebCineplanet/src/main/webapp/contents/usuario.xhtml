@@ -1,0 +1,258 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+
+</h:head>
+<h:body>
+	<h:outputStylesheet name="css/cssContent.css" />
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datos" header="#{messages.lblUsuario}">
+		<p:focus context="datos" />
+		<table cellpadding="2" cellspacing="4">
+			<tr>
+				<td>#{messages.lblNombre}<h:outputText value="*"
+						styleClass="obligatorio" /></td>
+				<td><p:inputText id="nombre"
+						value="#{usuarioController.nuevo.nombre}" tabindex="1"
+						maxlength="60" styleClass="txt" style="text-transform: uppercase;" /></td>
+				<td>#{messages.lblApPaterno}<h:outputText value="*"
+						styleClass="obligatorio" /></td>
+				<td><p:inputText id="apPaterno"
+						value="#{usuarioController.nuevo.apPaterno}" tabindex="2"
+						maxlength="60" styleClass="txt" style="text-transform: uppercase;" /></td>
+			</tr>
+			<tr>
+				<td>#{messages.lblApMaterno}</td>
+				<td><p:inputText id="apMaterno"
+						value="#{usuarioController.nuevo.apMaterno}" tabindex="3"
+						maxlength="60" styleClass="txt" style="text-transform: uppercase;" /></td>
+				<td>DNI<h:outputText value="*" styleClass="obligatorio" /></td>
+				<td><p:inputText id="dni"
+						value="#{usuarioController.nuevo.dni}" tabindex="4" maxlength="8"
+						styleClass="txt">
+						<pe:keyFilter for="dni" regEx="/[0-9]/i" />
+					</p:inputText></td>
+			</tr>
+
+			<tr>
+				<td>Correo electrónico<h:outputText value="*"
+						styleClass="obligatorio" /></td>
+				<td><p:inputText id="correo"
+						value="#{usuarioController.nuevo.correo}" tabindex="5"
+						maxlength="60" styleClass="txt" /></td>
+				<td>#{messages.lblUsername}<h:outputText value="*"
+						styleClass="obligatorio" /></td>
+				<td><p:inputText id="usuario"
+						value="#{usuarioController.nuevo.usuario}" tabindex="6"
+						maxlength="60" styleClass="txt" /></td>
+			</tr>
+
+			<tr>
+				<td>#{messages.lblClave}<h:outputText value="*"
+						styleClass="obligatorio" /></td>
+				<td><p:password id="clave"
+						value="#{usuarioController.nuevo.clave}" tabindex="7"
+						maxlength="8" styleClass="txt" feedback="true"
+						promptLabel="Ingrese contraseña" weakLabel="Debil"
+						goodLabel="Bueno" strongLabel="Fuerte" /></td>
+				<td>#{messages.lblConfirmarClave}<h:outputText value="*"
+						styleClass="obligatorio" /></td>
+				<td><p:password id="clave2"
+						value="#{usuarioController.confirmarClave}" tabindex="8"
+						maxlength="8" styleClass="txt" /></td>
+			</tr>
+			<tr>
+				<td>#{messages.lblRol}<h:outputText value="*"
+						styleClass="obligatorio" /></td>
+				<td><p:selectOneMenu id="comboRol"
+						value="#{usuarioController.rolSelec}" style="width:210px;"
+						tabindex="9">
+						<f:selectItems value="#{usuarioController.comboRol}" />
+						<p:ajax update="dtList" process="comboRol" event="change"  />
+					</p:selectOneMenu></td>
+				<td>Campaña de Evaluación</td>
+				<td><p:selectOneMenu id="comboCampania"
+						value="#{usuarioController.campaniaSelec}" style="width:210px;"
+						tabindex="10">
+						<f:selectItems value="#{usuarioController.comboCampania}" />
+						<p:ajax update="dtList" event="change" />
+					</p:selectOneMenu></td>
+			</tr>
+		</table>
+		<p:separator id="s1" />
+		<table>
+			<tr>
+				<td><p:commandButton value="#{messages.btnGuardar}"
+						action="#{usuarioController.guardar}"
+						update="datos,dtList,messages" icon="ui-icon-disk" tabindex="11" /></td>
+				<td><p:commandButton value="#{messages.btnCancelar}"
+						update="datos,messages" action="#{usuarioController.limpiar}"
+						icon="ui-icon-close" tabindex="12" /></td>
+			</tr>
+		</table>
+		<p:separator id="s2" />
+		<p:dataTable var="user" value="#{usuarioController.list}" id="dtList"
+			scrollable="true" scrollHeight="180" paginator="true" rows="8"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			widgetVar="userTable" emptyMessage="#{messages.msgEmptyMessage}"
+			filteredValue="#{usuarioController.filteredUser}">
+
+			<f:facet name="header">  
+            #{messages.lblListUsuario}
+        </f:facet>
+			<p:column headerText="#{messages.lblNombre}" style="width:14%"
+				filterBy="#{user.nombre}" filterStyle="width:80px">
+				<h:outputText value="#{user.nombre}" />
+			</p:column>
+			<p:column headerText="#{messages.lblApPaterno}" style="width:14%"
+				filterBy="#{user.apPaterno}" filterStyle="width:80px">
+				<h:outputText value="#{user.apPaterno}" />
+			</p:column>
+			<p:column headerText="#{messages.lblApMaterno}" style="width:14%">
+				<h:outputText value="#{user.apMaterno}" />
+			</p:column>
+			<p:column headerText="Dni" style="width:9%" filterBy="#{user.dni}"
+				filterStyle="width:40px">
+				<h:outputText value="#{user.dni}" />
+			</p:column>
+			<p:column headerText="#{messages.lblUsername}" style="width:15%"
+				filterBy="#{user.usuario}" filterStyle="width:80px">
+				<h:outputText value="#{user.usuario}" />
+			</p:column>
+			<p:column headerText="Rol" style="width:12%">
+				<h:outputText value="#{user.rol.nombre}" />
+			</p:column>
+			<p:column headerText="#{messages.lblEstado}" style="width:7%">
+				<h:outputText
+					value="#{user.estado.equals('A')?'Activo':'Inactivo'} " />
+			</p:column>
+			<p:column headerText="#{messages.lblOpciones}" style="width:15%">
+				<p:commandButton value="" icon="ui-icon-pencil"
+					update=":frm:pnlEdit" oncomplete="editDialog.show()" title="Editar">
+					<f:setPropertyActionListener value="#{user}"
+						target="#{usuarioController.modifica}" />
+					<f:setPropertyActionListener value="#{user.rol.idRol}"
+						target="#{usuarioController.rolSelecM}" />
+				</p:commandButton>
+				<p:commandButton value="" icon="ui-icon-cancel"
+					update=":frm:datos, :frm:messages" title="Resetear clave"
+					action="#{usuarioController.resetClave}"
+					disabled="#{user.rol.idRol eq '1' or user.rol.idRol eq '2'?'True':'False'}">
+					<f:setPropertyActionListener value="#{user}"
+						target="#{usuarioController.modifica}" />
+				</p:commandButton>
+
+				<p:commandButton value="" icon="ui-icon-newwin"
+					update=":frm:pnlEditGp" oncomplete="editDialogGp.show()"
+					title="Ver Gerentes" disabled="#{(user.rol.idRol eq 1 or user.rol.idRol eq 2 or user.rol.idRol eq 3) ? true : false}">
+					<f:setPropertyActionListener value="#{user}"
+						target="#{usuarioController.usuarioSelec}" />
+				</p:commandButton>
+
+			</p:column>
+		</p:dataTable>
+	</p:panel>
+
+	<p:dialog id="dlgEdit" header="Modificar Usuario"
+		widgetVar="editDialog" modal="true" resizable="false" width="350"
+		showEffect="clip" closable="true" hideEffect="fold">
+		<p:panel id="pnlEdit">
+			<table>
+				<tr>
+					<td><h:outputText value="#{messages.lblCodigo}" /></td>
+					<td><h:outputText
+							value="#{usuarioController.modifica.idUsuario}" /></td>
+				</tr>
+				<tr>
+					<td>#{messages.lblNombre}<h:outputText value="*"
+							styleClass="obligatorio" /></td>
+					<td><p:inputText value="#{usuarioController.modifica.nombre}"
+							maxlength="60" styleClass="txt" tabindex="1"
+							style="text-transform: uppercase;" /></td>
+				</tr>
+				<tr>
+					<td>#{messages.lblApPaterno}<h:outputText value="*"
+							styleClass="obligatorio" /></td>
+					<td><p:inputText
+							value="#{usuarioController.modifica.apPaterno}" maxlength="60"
+							styleClass="txt" tabindex="2" style="text-transform: uppercase;" /></td>
+				</tr>
+				<tr>
+					<td>#{messages.lblApMaterno}</td>
+					<td><p:inputText
+							value="#{usuarioController.modifica.apMaterno}" maxlength="60"
+							styleClass="txt" tabindex="3" style="text-transform: uppercase;" /></td>
+				</tr>
+				<tr>
+					<td>Correo electrónico<h:outputText value="*"
+							styleClass="obligatorio" /></td>
+					<td><p:inputText value="#{usuarioController.modifica.correo}"
+							maxlength="60" styleClass="txt" tabindex="5" /></td>
+				</tr>
+				<tr>
+					<td>#{messages.lblRol}<h:outputText value="*"
+							styleClass="obligatorio" /></td>
+					<td><p:selectOneMenu value="#{usuarioController.rolSelecM}"
+							style="width:210px;" tabindex="8">
+							<f:selectItems value="#{usuarioController.comboRol}" />
+						</p:selectOneMenu></td>
+					<td></td>
+					<td></td>
+				</tr>
+
+				<tr>
+					<td><h:outputText value="#{messages.lblEstado}" /></td>
+					<td><p:selectOneMenu
+							value="#{usuarioController.modifica.estado}" style="width:210px;"
+							tabindex="6">
+							<f:selectItems value="#{usuarioController.comboEstado}" />
+						</p:selectOneMenu></td>
+				</tr>
+			</table>
+			<f:facet name="footer">
+				<p:commandButton value="#{messages.btnModificar}"
+					actionListener="#{usuarioController.modificar}" icon="ui-icon-disk"
+					update=":frm:datos,:frm:dtList,:frm:messages"
+					oncomplete="editDialog.hide()" />
+			</f:facet>
+		</p:panel>
+	</p:dialog>
+
+	<p:dialog id="dlgEditGp" header="Gerentes Públicos"
+		widgetVar="editDialogGp" modal="true" resizable="false" width="350"
+		showEffect="clip" closable="true" hideEffect="fold">
+		<p:panel id="pnlEditGp">
+			<p:dataTable var="user"
+				value="#{usuarioController.usuarioSelec.listaGPublicos}" id="dtListGp"
+				scrollable="true" scrollHeight="180" paginator="true" rows="8"
+				paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				emptyMessage="#{messages.msgEmptyMessage}">
+
+				<p:column headerText="" style="width:100%">
+					<h:outputText value="#{user}" />
+				</p:column>
+
+			</p:dataTable>
+		</p:panel>
+	</p:dialog>
+</h:body>
+
+<p:ajaxStatus
+	style="width:64px;height:64px;position:fixed;right:5px;bottom:5px"
+	id="ajaxStatusPanel">
+	<f:facet name="start">
+		<p:graphicImage value="./images/loading.gif" />
+	</f:facet>
+
+	<f:facet name="complete">
+		<h:outputText value="" />
+	</f:facet>
+</p:ajaxStatus>
+
+</html>

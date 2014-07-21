@@ -1,0 +1,317 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.model.DetalleFlujoPK;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.Meta;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.report.MetasEIndicadoresReport;
+import gob.servir.desempenio.service.CampaniaService;
+import gob.servir.desempenio.service.DetalleFlujoService;
+import gob.servir.desempenio.service.FlujoService;
+import gob.servir.desempenio.service.InscripcionService;
+import gob.servir.desempenio.service.MetaService;
+import gob.servir.desempenio.util.Constantes;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.StreamedContent;
+import org.primefaces.model.UploadedFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+
+@Component("adjuntarPlanesGPController")
+@Scope("session")
+public class AdjuntarPlanesGPController implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private static final Logger logger = LoggerFactory
+			.getLogger(AdjuntarPlanesGPController.class);
+
+	@Autowired
+	private LoginController loginController;
+	@Autowired
+	private CampaniaService campaniaService;
+	@Autowired
+	private InscripcionService inscripcionService;
+	@Autowired
+	private FlujoService flujoService;
+	@Autowired
+	private DetalleFlujoService detalleFlujoService;
+	@Autowired
+	private MetaService metaService;
+
+	private Usuario userSesion = null;
+	// private Message message = new Message();
+
+	private Inscripcion inscripcionSelec = null;
+	private List<Meta> listaMetas = new ArrayList<Meta>();
+
+	private boolean swFlujo = true;
+
+	// fileUpload
+	private String fileName = "";
+	private byte[] bFile;
+	private String msgDoc = "";
+
+	private FacesMessage msg = null;
+
+	public AdjuntarPlanesGPController() {
+
+	}
+
+	@PostConstruct
+	public void cargar() {
+		validarSesion();
+		getInscripcion();
+		verificarEstadoFlujo();
+	}
+
+	public void getInscripcion() {
+		Inscripcion ins = inscripcionService.getInscripcionUsuario(userSesion);
+		if (ins != null) 
+			inscripcionSelec = ins;
+	}
+
+	public void verificarEstadoFlujo() {
+		if (inscripcionSelec == null) {
+			swFlujo = true;
+		} else {
+			DetalleFlujoPK id = new DetalleFlujoPK(inscripcionSelec.getId()
+					.getIdCampania(), inscripcionSelec.getId()
+					.getIdGerentePublico(), Constantes.PROCESO1,
+					Constantes.P1_VB);
+
+			String estado = detalleFlujoService.getEstadoDetalleFlujo(id);
+
+			if (estado != null) {
+				if (estado.equals(Constantes.ATENDIDO))
+					swFlujo = true;
+				else
+					swFlujo = false;
+			} else
+				swFlujo = true;
+		}
+	}
+
+	public boolean isSwFlujo() {
+		return swFlujo;
+	}
+
+	public void setSwFlujo(boolean swFlujo) {
+		this.swFlujo = swFlujo;
+	}
+
+	public String getMsgDoc() {
+		return msgDoc;
+	}
+
+	public void setMsgDoc(String msgDoc) {
+		this.msgDoc = msgDoc;
+	}
+
+	public Inscripcion getInscripcionSelec() {
+		return inscripcionSelec;
+	}
+
+	public void setInscripcionSelec(Inscripcion inscripcionSelec) {
+		this.inscripcionSelec = inscripcionSelec;
+	}
+
+//	public List<PlanMetas> getListaPlanMetas() {
+//		if (inscripcionSelec != null)
+//			listaPlanMetas = planMetasService.getListaPlanMetas(
+//					inscripcionSelec.getId(), Constantes.TRUE);
+//		return listaPlanMetas;
+//	}
+//
+//	public void setListaPlanMetas(List<PlanMetas> listaPlanMetas) {
+//		this.listaPlanMetas = listaPlanMetas;
+//	}
+	
+	public List<Meta> getListaMetas() {	
+		listaMetas.clear();
+		getInscripcion();
+		if (inscripcionSelec != null) {
+			listaMetas = metaService.getListaMetasAprobacion(
+					inscripcionSelec.getId(), Constantes.TRUE);
+		}
+
+		return listaMetas;
+	}
+
+	public void setListaMetas(List<Meta> listaMetas) {
+		this.listaMetas = listaMetas;
+	}
+	
+
+	public void validarSesion() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		
+		userSesion = (Usuario) context.getExternalContext().getSessionMap()
+				.get(loginController.getUsername());
+
+		if (userSesion == null) {
+			String ctxPath = context.getExternalContext()
+					.getRequestContextPath();
+			try {
+				context.getExternalContext().redirect(ctxPath + "/login.jsf");
+			} catch (Exception e) {
+				//e.printStackTrace();
+			}
+		}
+	}
+
+	public void guardar() {
+		validarSesion();
+
+		if (!validarGuardar()) {
+			FacesContext.getCurrentInstance().addMessage(null, msg);
+			return;
+		}
+
+		try {
+
+			Inscripcion inscripcion = inscripcionService.find(inscripcionSelec
+					.getId());
+
+			if (inscripcion != null) {
+				inscripcion.setFileName(fileName.trim());
+				inscripcion.setDocumento(bFile);
+				inscripcion.setUsuarioModifica(userSesion.getUsuario());
+				inscripcionService.edit(inscripcion);
+
+				msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+						"Registro exitoso.");
+			}
+			limpiar();
+		} catch (Exception e) {
+			e.printStackTrace();
+			msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+					"Error al registrar.");
+		}
+		FacesContext.getCurrentInstance().addMessage(null, msg);
+	}
+
+	public boolean validarGuardar() {
+
+		if (inscripcionSelec == null) {
+			msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+					"Por favor, salga del sistema e inicie sesión nuevamente.");
+			return false;
+		}
+
+		if (fileName.length() == 0 || bFile == null) {
+			msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+					"Adjunte documento escaneado.");
+			return false;
+		}
+
+		return true;
+	}
+
+	public void limpiar() {
+		fileName = "";
+		bFile = null;
+		msgDoc = "";
+	}
+
+	public void atenderFlujo() {
+
+		validarSesion();
+
+		if (!validarAtenderFlujo()) {
+			FacesContext.getCurrentInstance().addMessage(null, msg);
+			return;
+		}
+
+		try {
+			DetalleFlujoPK idDetalle = new DetalleFlujoPK(inscripcionSelec
+					.getId().getIdCampania(), inscripcionSelec.getId()
+					.getIdGerentePublico(), Constantes.PROCESO1,
+					Constantes.P1_VB);
+
+			flujoService.atenderFlujo(idDetalle, userSesion.getUsuario());
+			msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+					"Se ha adjuntado metas e indicadores.");
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+					"Se ha producido un error.");
+		}
+		FacesContext.getCurrentInstance().addMessage(null, msg);
+		limpiar();
+		verificarEstadoFlujo();
+	}
+
+	public boolean validarAtenderFlujo() {
+
+		if (inscripcionSelec == null) {
+			msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+					"Por favor, salga del sistema e inicie sesión nuevamente.");
+			return false;
+		}
+
+		if (verificarEvaMetas()) {
+			msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+					"Primero adjunte el documento escaneado.");
+			return false;
+		}
+
+		return true;
+	}
+
+	public boolean verificarEvaMetas() {
+
+		Inscripcion inscripcion = inscripcionService.find(inscripcionSelec
+				.getId());
+
+		if (inscripcion.getFileName() == null
+				&& inscripcion.getDocumento() == null)
+			return true;
+		return false;
+	}
+
+	public void handleFileUpload(FileUploadEvent event) {
+		msgDoc = "";
+		try {
+			UploadedFile fu = event.getFile();
+			fileName = fu.getFileName();
+			bFile = fu.getContents();
+			msgDoc = fileName + " cargado con exito.";
+		} catch (Exception e) {
+			e.printStackTrace();
+			msgDoc = "Error al cargar archivo" + fileName;
+		}
+	}
+
+	private StreamedContent listaPlanMetasArchivoDescarga;
+
+	public StreamedContent getListaPlanMetasArchivoDescarga() {
+		validarSesion();
+		MetasEIndicadoresReport metasEIndicadoresReport = new MetasEIndicadoresReport();
+		return metasEIndicadoresReport.generarReporteGP(inscripcionSelec,userSesion, listaMetas);
+	}
+
+	public void setListaPlanMetasArchivoDescarga(
+			StreamedContent listaPlanMetasArchivoDescarga) {
+		this.listaPlanMetasArchivoDescarga = listaPlanMetasArchivoDescarga;
+	}
+	
+}

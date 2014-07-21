@@ -1,0 +1,30 @@
+package gob.servir.desempenio.service;
+
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.Meta;
+import gob.servir.desempenio.model.PlanMetas;
+import gob.servir.desempenio.model.PlanMetasPK;
+
+import java.util.List;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+public interface PlanMetasService {
+
+	public abstract PlanMetas find(PlanMetasPK id);
+
+	public abstract PlanMetas save(PlanMetas obj);
+
+	public abstract PlanMetas edit(PlanMetas obj);
+
+	public abstract List<PlanMetas> getListaPlanMetas();
+
+	public abstract List<PlanMetas> getListaPlanMetas(Meta id);
+
+	public abstract List<PlanMetas> getListaPlanMetas(InscripcionPK inspk,
+			boolean aprobacion);
+	
+	public abstract Integer getCantidadPlanesDesaprobados(InscripcionPK inspk);
+}

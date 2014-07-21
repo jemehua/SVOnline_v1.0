@@ -1,0 +1,42 @@
+
+
+CREATE VIEW PuestoTipoV AS
+SELECT * FROM ADMINGP_PRUEBA.puesto_tipo ORDER BY id_puesto_tipo;
+
+CREATE VIEW AsignacionGerenteV AS
+SELECT ag.id_asignacion,gp.COD_GERENTE, gp.nombres, gp.ap_paterno,  gp.ap_materno, gp.dni, 
+        gp.mail_01, gp.mail_02, gp. mail_03,gp.ID_PUESTO_TIPO_PRINCIPAL, ag.ID_ED, 
+        ag.id_jefe_inmediato, e_d.TE_NUMERO_DOCUMENTO as TE_NUMERO_DOCUMENTO, ag.fech_asignacion
+FROM admingp.GERENTE_PUBLICO gp
+JOIN admingp.asignacion_gerente ag ON gp.cod_gerente = ag.cod_gerente AND ag.fech_cese IS NULL
+JOIN admingp.entidad_destino e_d ON e_d.id_ed = ag.id_ed
+WHERE gp.cod_estado = '1' ORDER BY gp.COD_GERENTE
+
+CREATE VIEW EntidadDestinoV AS
+SELECT id_ed, desc_ed, TE_NUMERO_DOCUMENTO,TE_NOMBRES, TE_APELLIDO_PATERNO,TE_APELLIDO_MATERNO,TE_CORREO_ELECTRONICO_TRABAJO,TE_CORREO_ELECTRONICO_PERSONAL, TE_TELEFONO_OFICINA, TE_TELEFONO_CELULAR, TE_CARGO  
+FROM ADMINGP.ENTIDAD_DESTINO 
+ORDER BY desc_ed ASC
+
+CREATE VIEW JefeInmediatoV AS
+SELECT  Id_Jefe_Inmediato, Numero_Documento, Nombres, Apellido_Paterno, Apellido_Materno, Cargo, Correo_Electronico_Trabajo, Correo_Electronico_Personal, Telefono_Oficina, Telefono_Celular  
+FROM ADMINGP_PRUEBA.Jefe_Inmediato
+
+CREATE VIEW DetalleFlujoV AS
+SELECT d.idactividad, d.idcampania, d.idgerentepublico, d.idproceso, d.estado, d.fechasgteenvio
+FROM detalleflujo d, campania c, proceso p, actividad a
+WHERE d.idcampania = c.idcampania
+AND d.idproceso = p.idproceso
+AND p.idproceso = a.idproceso
+AND d.idactividad = a.idactividad
+AND c.estadocampania = 'Activo'
+AND a.tipo='T'
+AND (
+(SELECT df.estado FROM detalleflujo df, actividad ac 
+  WHERE df.idactividad=ac.idactividad AND df.idproceso=ac.idproceso AND df.idcampania = d.idcampania AND df.idgerentepublico = d.idgerentepublico AND df.idproceso = d.idproceso AND df.idactividad=(d.idactividad+1) AND ac.tipo = 'C' ) = 'EE' OR
+(SELECT df.estado FROM detalleflujo df, actividad ac 
+  WHERE df.idactividad=ac.idactividad AND df.idproceso=ac.idproceso AND df.idcampania = d.idcampania AND df.idgerentepublico = d.idgerentepublico AND df.idproceso = d.idproceso AND df.idactividad=(d.idactividad+4) AND ac.tipo = 'C') = 'EE' OR
+(SELECT df.estado FROM detalleflujo df, actividad ac 
+  WHERE df.idactividad=ac.idactividad AND df.idproceso=ac.idproceso AND df.idcampania = d.idcampania AND df.idgerentepublico = d.idgerentepublico AND df.idproceso = d.idproceso AND df.idactividad=(d.idactividad+7) AND ac.tipo = 'C') = 'EE'
+)
+AND to_char(d.fechasgteenvio,'dd-MM-yyyy') = to_char(sysdate,'dd-MM-yyyy')
+ORDER BY d.idgerentepublico, d.idcampania, d.idproceso, d.idactividad

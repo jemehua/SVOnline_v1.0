@@ -1,0 +1,240 @@
+package gob.servir.desempenio.model;
+
+import java.io.Serializable;
+import java.util.Calendar;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+/**
+ * 
+ * @author Cristhian Munguia Martinez
+ */
+@Entity
+public class JefeInmediato implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	private String dni;
+	@Column
+	private String nombres;
+	@Column
+	private String apPaterno;
+	@Column
+	private String apMaterno;
+	@Column
+	private String cargo;
+	@Column
+	private String celular;
+	@Column
+	private String telefOficina;
+	@Column
+	private String correo1;
+	@Column
+	private String correo2;
+	@Column
+	private String usuarioRegistra;
+	@Column
+	private String usuarioModifica;
+	@Column
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date fechaCreacion;
+	@Column
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date fechaModificacion;
+	@Column
+	private String estado;
+
+	public JefeInmediato() {
+		super();
+	}
+
+	public JefeInmediato(String dni, String nombres, String apPaterno,
+			String apMaterno, String cargo, String celular,
+			String telefOficina, String correo1, String correo2,
+			String usuarioRegistra, String usuarioModifica, Date fechaCreacion,
+			Date fechaModificacion, String estado) {
+		super();
+		this.dni = dni;
+		this.nombres = nombres;
+		this.apPaterno = apPaterno;
+		this.apMaterno = apMaterno;
+		this.cargo = cargo;
+		this.celular = celular;
+		this.telefOficina = telefOficina;
+		this.correo1 = correo1;
+		this.correo2 = correo2;
+		this.usuarioRegistra = usuarioRegistra;
+		this.usuarioModifica = usuarioModifica;
+		this.fechaCreacion = fechaCreacion;
+		this.fechaModificacion = fechaModificacion;
+		this.estado = estado;
+	}
+
+	public String getDni() {
+		return dni;
+	}
+
+	public void setDni(String dni) {
+		this.dni = dni;
+	}
+
+	public String getNombres() {
+		return nombres;
+	}
+
+	public void setNombres(String nombres) {
+		this.nombres = nombres;
+	}
+
+	public String getApPaterno() {
+		return apPaterno;
+	}
+
+	public void setApPaterno(String apPaterno) {
+		this.apPaterno = apPaterno;
+	}
+
+	public String getApMaterno() {
+		return apMaterno;
+	}
+
+	public void setApMaterno(String apMaterno) {
+		this.apMaterno = apMaterno;
+	}
+
+	public String getCargo() {
+		return cargo;
+	}
+
+	public void setCargo(String cargo) {
+		this.cargo = cargo;
+	}
+
+	public String getCelular() {
+		return celular;
+	}
+
+	public void setCelular(String celular) {
+		this.celular = celular;
+	}
+
+	public String getTelefOficina() {
+		return telefOficina;
+	}
+
+	public void setTelefOficina(String telefOficina) {
+		this.telefOficina = telefOficina;
+	}
+
+	public String getCorreo1() {
+		return correo1;
+	}
+
+	public void setCorreo1(String correo1) {
+		this.correo1 = correo1;
+	}
+
+	public String getCorreo2() {
+		return correo2;
+	}
+
+	public void setCorreo2(String correo2) {
+		this.correo2 = correo2;
+	}
+
+	public String getUsuarioRegistra() {
+		return usuarioRegistra;
+	}
+
+	public void setUsuarioRegistra(String usuarioRegistra) {
+		this.usuarioRegistra = usuarioRegistra;
+	}
+
+	public String getUsuarioModifica() {
+		return usuarioModifica;
+	}
+
+	public void setUsuarioModifica(String usuarioModifica) {
+		this.usuarioModifica = usuarioModifica;
+	}
+
+	public Date getFechaCreacion() {
+		return fechaCreacion;
+	}
+
+	public void setFechaCreacion(Date fechaCreacion) {
+		this.fechaCreacion = fechaCreacion;
+	}
+
+	public Date getFechaModificacion() {
+		return fechaModificacion;
+	}
+
+	public void setFechaModificacion(Date fechaModificacion) {
+		this.fechaModificacion = fechaModificacion;
+	}
+
+	public String getEstado() {
+		return estado;
+	}
+
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
+	
+	@PrePersist
+	private void putFechaCreacion() {
+		setFechaCreacion(new Date(Calendar.getInstance().getTime().getTime()));
+	}
+
+	@PreUpdate
+	private void putFechaModificacion() {
+		setFechaModificacion(new Date(Calendar.getInstance().getTime()
+				.getTime()));
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((dni == null) ? 0 : dni.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		JefeInmediato other = (JefeInmediato) obj;
+		if (dni == null) {
+			if (other.dni != null)
+				return false;
+		} else if (!dni.equals(other.dni))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(nombres);
+		builder.append(" ");
+		builder.append(apPaterno);
+		builder.append(" ");
+		builder.append(apMaterno);
+		return builder.toString();
+	}
+
+}

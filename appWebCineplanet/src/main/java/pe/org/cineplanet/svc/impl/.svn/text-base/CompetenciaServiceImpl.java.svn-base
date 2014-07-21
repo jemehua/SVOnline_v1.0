@@ -1,0 +1,55 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.CompetenciaDao;
+import gob.servir.desempenio.model.Competencia;
+import gob.servir.desempenio.model.CompetenciaPK;
+import gob.servir.desempenio.service.CompetenciaService;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+/**
+ * 
+ * @author Cristhian Munguia Martinez
+ */
+@Service
+public class CompetenciaServiceImpl implements CompetenciaService {
+
+	@Autowired
+	private CompetenciaDao CompetenciaDao;
+
+	public Competencia save(Competencia obj) {
+		return CompetenciaDao.save(obj);
+	}
+
+	public Competencia edit(Competencia obj) {
+		return CompetenciaDao.edit(obj);
+	}
+
+	public Competencia find(CompetenciaPK id) {
+		return CompetenciaDao.find(id);
+	}
+
+	public List<Competencia> getListaCompetencia(Long idPuestoTipo) {
+		return CompetenciaDao.getListaCompetencia(idPuestoTipo);
+	}
+
+	public List<Competencia> getListaPerfil(Long idPuestoTipo) {
+		return CompetenciaDao.getListaPerfil(idPuestoTipo);
+	}
+
+	public List<Competencia> getListaPerfil() {
+		return CompetenciaDao.getListaPerfil();
+	}
+
+	public Integer getCountNivelDeseado(Long puestoSelec) {
+		return CompetenciaDao.getCountNivelDeseado(puestoSelec);
+	}
+	
+	public Integer getCountNivelDeseadoConfirmado(Long puestoSelec) {
+		return CompetenciaDao.getCountNivelDeseadoConfirmado(puestoSelec);
+	}
+
+}

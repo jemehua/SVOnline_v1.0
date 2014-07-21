@@ -1,0 +1,57 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.NotificacionDao;
+import gob.servir.desempenio.model.DetalleFlujoPK;
+import gob.servir.desempenio.model.Notificacion;
+import gob.servir.desempenio.model.NotificacionPK;
+import gob.servir.desempenio.service.NotificacionService;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Service
+public class NotificacionServiceImpl implements NotificacionService {
+
+	@Autowired
+	private NotificacionDao notificacionDao;
+
+	@Transactional
+	public Notificacion find(NotificacionPK id) {
+		return notificacionDao.find(id);
+	}
+
+	@Transactional
+	public Notificacion save(Notificacion obj) {
+		return notificacionDao.save(obj);
+	}
+
+	@Transactional
+	public Notificacion edit(Notificacion obj) {
+		return notificacionDao.edit(obj);
+
+	}
+
+	public List<Notificacion> getListaNotificacion() {
+		return notificacionDao.getListaNotificacion();
+	}
+	
+	public List<Notificacion> getListaNotificacion(DetalleFlujoPK id) {
+		return notificacionDao.getListaNotificacion(id);
+	}
+
+	public Long getMaxId(DetalleFlujoPK id) {
+		return notificacionDao.getMaxId(id);
+	}
+	
+	public Integer getCountByReceptor(DetalleFlujoPK id, String receptor) {
+		return notificacionDao.getCountByReceptor(id, receptor);
+	}
+
+}

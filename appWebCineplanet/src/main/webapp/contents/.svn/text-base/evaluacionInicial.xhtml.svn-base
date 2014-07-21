@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+	<h:outputStylesheet name="css/cssContent.css" />
+</h:head>
+<h:body>
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datos"
+		header="Evaluación Inicial de Competencias">
+		<p:focus context="datos" />
+		<p:panelGrid styleClass="panelGrid">
+			<p:row>
+				<p:column width="30">#{messages.lblCampania} <h:outputText
+						value="#{messages.msgObligatorio}" styleClass="obligatorio" />
+				</p:column>
+				<p:column width="70">
+					<p:selectOneMenu id="comboCampania"
+						value="#{evaluacionInicialController.campaniaSelec}"
+						style="width:280px;" tabindex="1">
+						<f:selectItems
+							value="#{evaluacionInicialController.comboCampania}" />
+						<p:ajax update="dtMetas,dtList,gp,pt,btnBuscar" event="change" listener="#{evaluacionInicialController.limpiar}"/>
+					</p:selectOneMenu>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblGerentePublico} <h:outputText
+						value="#{messages.msgObligatorio}" styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<p:inputText id="gp" tabindex="2"
+						value="#{evaluacionInicialController.inscripcionSelec.asignacionGerenteV}"
+						style=" width : 270px;" readonly="true" />
+					<p:spacer width="5" />
+					<p:commandButton id="btnBuscar" value="Buscar"
+						action="#{evaluacionInicialController.buscarGerenteInscrito}"
+						icon="ui-icon-search" update="dtGerente"
+						disabled="#{evaluacionInicialController.swBtnBuscar}"
+						oncomplete="dlgBuscarGP.show()" tabindex="3">
+					</p:commandButton>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblPuesto} <h:outputText value="#{messages.msgObligatorio}"
+						styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<h:outputText id="pt"
+						value="#{evaluacionInicialController.inscripcionSelec.puestoTipoV}" />
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+
+		<p:panel id="pnlAgregar" header="Evaluacion Inicial">
+			<p:dataTable var="evaInicial"
+				value="#{evaluacionInicialController.listaEvaluacionInicial}"
+				id="dtMetas" rows="7" emptyMessage="#{messages.msgEmptyMessage}">
+
+				<p:column headerText="#{messages.lblCodigo}" style="width:10%">
+					<h:outputText value="#{evaInicial.id.idCompetencia}" />
+				</p:column>
+				<p:column headerText="Competencia" style="width:45%">
+					<h:outputText
+						value="#{evaInicial.competencia.competencia.denominacion}" />
+				</p:column>
+				<p:column headerText="Nivel Deseado" style="width:15%">
+					<h:outputText value="#{evaInicial.competencia.nivelDeseado}" />
+				</p:column>
+				<p:column headerText="Eval.Inicial [1 - 5]" style="width:15%">
+					<p:inputText id="txtCatidad" value="#{evaInicial.nota}"
+						style="width:60px;color:blue"
+						disabled="#{evaluacionInicialController.swFlujo}"
+						valueChangeListener="#{evaluacionInicialController.asignarCantidadDias}"
+						maxlength="1">
+						<p:ajax 					
+							listener="#{evaluacionInicialController.asignarDias(evaInicial)}" />
+					</p:inputText>
+					<pe:keyFilter for="txtCatidad" regEx="/[1-5]/" />
+				</p:column>
+				<p:column headerText="Brecha" style="width:15%">
+					<h:outputText value="#{evaInicial.brecha}" />
+				</p:column>
+				<f:facet name="footer">
+				<div class="mensaje">Ingrese Evaluación Inicial del Gerente Público </div>
+			</f:facet>
+			</p:dataTable>
+		</p:panel>
+
+		<p:separator id="s1" />
+		<table style="width: 100%">
+			<tr>
+				<td align="left"><p:commandButton value="Guardar"
+						id="btGuardar" action="#{evaluacionInicialController.guardar}"
+						update="datos,dtList,messages" icon="ui-icon-disk"
+						disabled="#{evaluacionInicialController.swFlujo}" tabindex="11" />
+					<p:commandButton value="#{messages.btnCancelar}"
+						update="datos,messages"
+						action="#{evaluacionInicialController.limpiar}"
+						icon="ui-icon-close" tabindex="12" /></td>
+				<td align="right"><p:commandButton value="Continuar"
+						id="btFlujo" onclick="confirmacion.show()"
+						icon="ui-icon-circle-arrow-e" tabindex="12"
+						disabled="#{evaluacionInicialController.swFlujo}" /></td>
+			</tr>
+		</table>
+		<p:separator id="s2" />
+		<p:dataTable var="inscripcionGerente"
+			value="#{evaluacionInicialController.listaInscripcion}" id="dtList"
+			scrollable="true" scrollHeight="140" paginator="true" rows="10"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			emptyMessage="#{messages.msgEmptyMessage}">
+
+			<f:facet name="header">
+Lista de Gerentes Públicos con Evaluación Inicial
+			</f:facet>
+
+			<p:column headerText="#{messages.lblCodigo}" style="width:15%"
+				sortBy="#{inscripcionGerente.asignacionGerenteV.cod_gerente}">
+				<h:outputText
+					value="#{inscripcionGerente.asignacionGerenteV.cod_gerente}" />
+			</p:column>
+			<p:column headerText="Gerente Público" style="width:60%">
+				<h:outputText value="#{inscripcionGerente.asignacionGerenteV}" />
+			</p:column>
+			<p:column headerText="DNI"
+				sortBy="#{inscripcionGerente.asignacionGerenteV.dni}"
+				style="width:15%">
+				<h:outputText value="#{inscripcionGerente.asignacionGerenteV.dni}" />
+			</p:column>
+			<p:column headerText="#{messages.lblOpciones}" style="width:10%">
+				<p:commandButton value="" icon="ui-icon-pencil" action="#{evaluacionInicialController.seleccionarEditar}"
+					update=":frm:gp,:frm:pt, :frm:dtMetas, :frm:btGuardar, :frm:btFlujo "
+					title="Editar Registro de Metas alineados al POI">
+					<f:setPropertyActionListener value="#{inscripcionGerente}"
+						target="#{evaluacionInicialController.inscripcionSelec}" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+	</p:panel>
+
+	<p:dialog id="dlgBuscar" header="Buscar Gerente Público"
+		widgetVar="dlgBuscarGP" modal="true" resizable="false" width="772"
+		showEffect="clip" closable="true" hideEffect="fold">
+
+		<p:dataTable var="ins"
+			value="#{evaluacionInicialController.listaGerentePublico}"
+			filteredValue="#{evaluacionInicialController.listaGerentePublicoFiltered}"
+			id="dtGerente" scrollable="true" scrollHeight="235" paginator="true"
+			rows="10"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			emptyMessage="#{messages.msgEmptyMessage}">
+
+
+			<f:facet name="header">    
+            	Lista de Gerentes Públicos Inscritos
+            	</f:facet>
+
+			<p:column headerText="#{messages.lblCodigo}" style="width:20%"
+				filterBy="#{ins.asignacionGerenteV.cod_gerente}">
+				<h:outputText value="#{ins.asignacionGerenteV.cod_gerente}" />
+			</p:column>
+			<p:column headerText="Nombres" style="width:20%"
+				filterBy="#{ins.asignacionGerenteV.nombres}">
+				<h:outputText value="#{ins.asignacionGerenteV.nombres}" />
+			</p:column>
+			<p:column headerText="Ap.Paterno" style="width:20%"
+				filterBy="#{ins.asignacionGerenteV.ap_paterno}">
+				<h:outputText value="#{ins.asignacionGerenteV.ap_paterno}" />
+			</p:column>
+			<p:column headerText="Ap.Materno" style="width:12%">
+				<h:outputText value="#{ins.asignacionGerenteV.ap_materno}" />
+			</p:column>
+			<p:column headerText="DNI" style="width:20%"
+				filterBy="#{ins.asignacionGerenteV.dni}">
+				<h:outputText value="#{ins.asignacionGerenteV.dni}" />
+			</p:column>
+			<p:column headerText="#{messages.lblOpciones}" style="width:15%">
+				<p:commandButton value=""
+					update=":frm:gp, :frm:pt, :frm:dtMetas, :frm:btGuardar, :frm:btFlujo, :frm:messages"
+					action="#{evaluacionInicialController.registroPrevio}"
+					oncomplete="dlgBuscarGP.hide()" icon="ui-icon-check"
+					title="Seleccionar Gerente Público">
+					<f:setPropertyActionListener value="#{ins}"
+						target="#{evaluacionInicialController.inscripcionSelec}" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+	</p:dialog>
+	<p:confirmDialog message="¿Estás seguro de continuar?"
+		showEffect="fade" hideEffect="fade" header="Evaluación Inicial de Competencias"
+		widgetVar="confirmacion" icon="ui-icon-alert">
+		<table style="width: 100%">
+			<tr>
+				<td align="center"><p:commandButton value="Si"
+						style="width:50px" styleClass="ui-confirmdialog-yes"
+						icon="ui-icon-check" oncomplete="confirmacion.hide()"
+						update="datos,messages"
+						action="#{evaluacionInicialController.atenderFlujo}">
+					</p:commandButton> <p:spacer width="10" /> <p:commandButton value="No"
+						style="width:50px" styleClass="ui-confirmdialog-no"
+						icon="ui-icon-close" onclick="confirmacion.hide()" /></td>
+			</tr>
+		</table>
+	</p:confirmDialog>
+</h:body>
+
+<p:ajaxStatus style="width:64px;height:64px;position:fixed;right:5px;bottom:5px" id="ajaxStatusPanel">  
+    <f:facet name="start">  
+        <p:graphicImage value="./images/loading.gif" /> 
+    </f:facet>  
+      
+    <f:facet name="complete">  
+        <h:outputText value="" />  
+    </f:facet>  
+</p:ajaxStatus> 
+
+</html>

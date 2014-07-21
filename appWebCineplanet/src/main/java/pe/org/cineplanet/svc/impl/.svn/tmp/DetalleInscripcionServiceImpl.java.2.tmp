@@ -1,0 +1,104 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.DetalleInscripcionDao;
+import gob.servir.desempenio.dto.InscripcionGerente;
+import gob.servir.desempenio.model.DetalleInscripcion;
+import gob.servir.desempenio.model.DetalleInscripcionPK;
+import gob.servir.desempenio.model.EntidadDestinoV;
+import gob.servir.desempenio.model.JefeInmediatoV;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.DetalleInscripcionService;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Service
+public class DetalleInscripcionServiceImpl implements DetalleInscripcionService {
+
+	@Autowired
+	private DetalleInscripcionDao inscripcionDetalleDao;
+
+	public DetalleInscripcion find(DetalleInscripcionPK id) {
+		return inscripcionDetalleDao.find(id);
+	}
+
+	@Transactional
+	public DetalleInscripcion save(DetalleInscripcion obj) {
+		return inscripcionDetalleDao.save(obj);
+	}
+
+	@Transactional
+	public void saveTotal(DetalleInscripcion obj) throws Exception {
+		inscripcionDetalleDao.saveTotal(obj);
+	}
+
+	@Transactional
+	public DetalleInscripcion edit(DetalleInscripcion obj) {
+		return inscripcionDetalleDao.edit(obj);
+
+	}
+
+	public List<DetalleInscripcion> getListaInscripcionDetalle() {
+		return inscripcionDetalleDao.getListaInscripcionDetalle();
+	}
+
+	public Long getMaxId() {
+		return inscripcionDetalleDao.getMaxId();
+	}
+
+	public List<DetalleInscripcion> getListaInscripcionDetalle(
+			Long campaniaSelec) {
+		return inscripcionDetalleDao.getListaInscripcionDetalle(campaniaSelec);
+	}
+
+	public List<InscripcionGerente> getListaInscripcion(Long idCampania) {
+		return inscripcionDetalleDao.getListaInscripcion(idCampania);
+	}
+
+	public List<DetalleInscripcion> getInscripcionCampaña(Long idCampania,
+			Usuario usuario) {
+		return inscripcionDetalleDao.getInscripcionCampaña(idCampania, usuario);
+	}
+
+	public List<DetalleInscripcion> getListaDetalleInscripcion(Long idCampania,
+			String codGerente) {
+		return inscripcionDetalleDao.getListaDetalleInscripcion(idCampania,
+				codGerente);
+	}
+
+	public DetalleInscripcion getDetalleInscripcion(Long idCampania,
+			String codGerente) {
+		return inscripcionDetalleDao.getDetalleInscripcion(idCampania,
+				codGerente);
+	}
+
+	public DetalleInscripcion getDetalleflujoJiAndTe(Long idCampania,
+			String codGerente) {
+		return inscripcionDetalleDao.getDetalleflujoJiAndTe(idCampania,
+				codGerente);
+	}
+	
+	public void crearUsuarioJI(JefeInmediatoV ji, Long idCampania,
+			String anioCampania, String usrRegistra) throws Exception {
+		inscripcionDetalleDao.crearUsuarioJI(ji, idCampania,
+				anioCampania, usrRegistra);
+	}
+	
+	public void crearUsuarioTE(EntidadDestinoV ed, Long idCampania,
+			String anioCampania, String usrRegistra) throws Exception {
+		inscripcionDetalleDao.crearUsuarioTE(ed, idCampania,
+				anioCampania, usrRegistra);
+	}
+
+	public List<String> getDetalleInscripcionUsuario(Usuario usuario) {
+		return inscripcionDetalleDao.getDetalleInscripcionUsuario(usuario);
+	}
+
+}

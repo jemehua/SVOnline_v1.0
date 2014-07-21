@@ -1,0 +1,15 @@
+package gob.servir.desempenio.dao;
+
+import java.util.List;
+
+import javax.faces.model.SelectItem;
+
+import gob.servir.desempenio.model.EntidadDestinoV;
+
+public interface EntidadDestinoVDao {
+
+	public abstract EntidadDestinoV find(Long id);
+	
+	public abstract List<SelectItem> getComboEntidadDestino();
+
+}

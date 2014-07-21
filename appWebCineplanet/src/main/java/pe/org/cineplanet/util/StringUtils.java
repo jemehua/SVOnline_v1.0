@@ -1,0 +1,144 @@
+package pe.org.cineplanet.util;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.Normalizer;
+import java.util.regex.Pattern;
+
+public class StringUtils {
+
+	private StringUtils() {
+	}
+
+	public static String unAccent(String s) {
+		//
+		// JDK1.5
+		// use sun.text.Normalizer.normalize(s, Normalizer.DECOMP, 0);
+		//
+		String temp = Normalizer.normalize(s, Normalizer.Form.NFD);
+		Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+		return pattern.matcher(temp).replaceAll("");
+	}
+	
+	/*public static String quitarEspacio(String s) {
+		return s.replaceAll(" ", "");
+	}*/
+	
+	public static String userFormat(String s) {
+		String cad = unAccent(s);
+		return cad.replaceAll(" ", "").toLowerCase();
+	}
+	
+	public static double redondear(double valor){
+		 	String val = valor+"";
+	      BigDecimal big = new BigDecimal(val);
+	      big = big.setScale(1, RoundingMode.HALF_UP);
+	      //System.out.println("Número : "+big);
+	      return big.doubleValue();
+	}
+	
+	public static boolean validarClave(String Clave) {
+
+		String numero[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+		String letrasMa[] = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
+				"K", "L", "M", "N", "Ñ", "O", "P", "Q", "R", "S", "T", "U",
+				"V", "W", "X", "Y", "Z" };
+		String letrasMin[] = { "a", "b", "c", "d", "e", "f", "g", "h", "i",
+				"j", "k", "l", "m", "n", "ñ", "o", "p", "q", "r", "s", "t",
+				"u", "v", "w", "x", "y", "z" };
+		String epeciales[] = { "☺", "☻", "♥", "♦", "♣", "♠", "•", "◘", "○",
+				"◙", "♂", "♀", "♪", "♫", "☼", "►", "◄", "↕", "‼", "¶", "§",
+				"▬", "↨", "↑", "↓", "→", "←", "∟", "↔", "▲", "▼", "!", "\"",
+				"#", "$", "%", "'", "(", ")", "*", "+", ",", "-", ".", "/",
+				":", ";", "<", "=", ">", "?", "@", "[", "\\", "]", "^", "_",
+				"`", "{", "|", "}", "~", "⌂", "Ç", "ü", "é", "â", "ä", "à",
+				"å", "ç", "ê", "ë", "è", "ï", "î", "ì", "Ä", "Å", "É", "æ",
+				"Æ", "ô", "ö", "ò", "û", "û", "ù", "ÿ", "Ö", "Ü", "ø", "£",
+				"Ø", "×", "ƒ", "á", "í", "ó", "ú", "ª", "º", "¿", "®", "¬",
+				"½", "¼", "¡", "«", "»", "░", "▒", "▓", "│", "┤", "Á", "Â",
+				"À", "©", "╣", "║", "╗", "╝", "¢", "¥", "┐", "└", "┴", "┬",
+				"├", "─", "┼", "ã", "Ã", "╚", "╔", "╩", "╦", "╠", "═", "╬",
+				"¤", "ð", "Ð", "Ê", "Ë", "È", "ı", "Í", "Î", "Ï", "┘", "┌",
+				"█", "▄", "¦", "Ì", "▀", "Ó", "ß", "Ô", "Ò", "õ", "Õ", "µ",
+				"þ", "Þ", "Ú", "Û", "Ù", "ý", "Ý", "¯", "´", "­", "±", "‗",
+				"¾", "¶", "§", "¨", "·", "¹", "³", "²", "■", " " };
+
+		boolean bnum = true;
+		boolean blma = true;
+		boolean blmi = true;
+		boolean bles = true;
+		boolean btam = false;
+
+		if (Clave.length() == 8) {
+			int k;
+			for (k = 0; k < Clave.length(); k++) {
+
+				if (bnum)
+					for (String num : numero) {
+
+						if (("" + Clave.charAt(k)).equalsIgnoreCase(num)) {
+							bnum = false;
+							break;
+						}
+					}
+				if (blma)
+					for (String lma : letrasMa) {
+
+						if (("" + Clave.charAt(k)).equals(lma)) {
+							blma = false;
+							break;
+						}
+					}
+
+				if (blmi)
+					for (String lmi : letrasMin) {
+
+						if (("" + Clave.charAt(k)).equals(lmi)) {
+							blmi = false;
+							break;
+						}
+					}
+				if (bles)
+					for (String le : epeciales) {
+
+						if (("" + Clave.charAt(k)).equals(le)) {
+							bles = false;
+							break;
+						}
+					}
+
+			}
+		} else {
+			btam = true;
+
+		}
+
+		if (bnum == false && blma == false && blmi == false && bles == false
+				&& btam == false)
+			return false;
+
+		return true;
+	}
+	
+	public static boolean isValidEmail(String email) {
+
+		String validator = "^[_a-zA-Z0-9-]+(\\.[_a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+"
+				+ "(\\.[a-zA-Z0-9-]+)*(\\.[a-zA-Z]{2,})$";
+
+		if (!email.matches(validator))
+			return false;
+
+		return true;
+
+	}
+
+	/*public static void main(String args[]) throws Exception {
+		//String value = "é à î _ @ ñ";
+		//System.out.println(StringUtils.unAccent(value));
+		// output : e a i _ @
+
+		System.out.println(""+userFormat("Del Píno"));
+		
+	}*/
+
+}

@@ -1,0 +1,203 @@
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/repservir/!svn/ver/1525/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao
+END
+PermisoDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/repservir/!svn/ver/248/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/PermisoDao.java
+END
+FlujoDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/repservir/!svn/ver/1421/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/FlujoDao.java
+END
+EvaluacionInicialDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 121
+/repservir/!svn/ver/1644/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/EvaluacionInicialDao.java
+END
+EvaluacionMetasDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 119
+/repservir/!svn/ver/1113/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/EvaluacionMetasDao.java
+END
+InscripcionDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 115
+/repservir/!svn/ver/1465/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/InscripcionDao.java
+END
+ParametroSistemaDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 120
+/repservir/!svn/ver/1130/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/ParametroSistemaDao.java
+END
+PlanDesarrolloDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/repservir/!svn/ver/997/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/PlanDesarrolloDao.java
+END
+EvaluacionCompetenciasDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 126
+/repservir/!svn/ver/1113/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/EvaluacionCompetenciasDao.java
+END
+MensajeDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/repservir/!svn/ver/1052/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/MensajeDao.java
+END
+TipoCompetenciaDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 118
+/repservir/!svn/ver/331/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/TipoCompetenciaDao.java
+END
+ItemMenuDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/repservir/!svn/ver/248/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/ItemMenuDao.java
+END
+PlanMetasDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/repservir/!svn/ver/997/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/PlanMetasDao.java
+END
+EntidadDestinoVDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 119
+/repservir/!svn/ver/1337/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/EntidadDestinoVDao.java
+END
+UsuarioDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/repservir/!svn/ver/1663/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/UsuarioDao.java
+END
+CronogramaDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/repservir/!svn/ver/1647/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/CronogramaDao.java
+END
+ActividadDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/repservir/!svn/ver/1233/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/ActividadDao.java
+END
+RolDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/repservir/!svn/ver/275/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/RolDao.java
+END
+PuestoTipoVDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/repservir/!svn/ver/440/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/PuestoTipoVDao.java
+END
+JefeInmediatoDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/repservir/!svn/ver/354/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/JefeInmediatoDao.java
+END
+CampaniaDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/repservir/!svn/ver/1647/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/CampaniaDao.java
+END
+DetalleFlujoDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/repservir/!svn/ver/1394/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/DetalleFlujoDao.java
+END
+ProcesoDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/repservir/!svn/ver/324/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/ProcesoDao.java
+END
+AsignacionGerenteVDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 121
+/repservir/!svn/ver/446/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/AsignacionGerenteVDao.java
+END
+DetalleInscripcionDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 122
+/repservir/!svn/ver/1616/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/DetalleInscripcionDao.java
+END
+UltimaCampaniaGpDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 120
+/repservir/!svn/ver/1130/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/UltimaCampaniaGpDao.java
+END
+TitularEntidadDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/repservir/!svn/ver/604/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/TitularEntidadDao.java
+END
+DetalleTipoCompetenciaDAO.java
+K 25
+svn:wc:ra_dav:version-url
+V 126
+/repservir/!svn/ver/1299/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/DetalleTipoCompetenciaDAO.java
+END
+TemporizadorDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 115
+/repservir/!svn/ver/459/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/TemporizadorDao.java
+END
+MetaDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/repservir/!svn/ver/1420/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/MetaDao.java
+END
+CompetenciaDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 115
+/repservir/!svn/ver/1219/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/CompetenciaDao.java
+END
+JefeInmediatoVDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/repservir/!svn/ver/605/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/JefeInmediatoVDao.java
+END
+GerentePublicoVDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 118
+/repservir/!svn/ver/554/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/GerentePublicoVDao.java
+END
+NotificacionDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/repservir/!svn/ver/1394/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/dao/NotificacionDao.java
+END

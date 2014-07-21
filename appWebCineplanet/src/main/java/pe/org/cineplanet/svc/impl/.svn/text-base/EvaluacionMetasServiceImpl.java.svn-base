@@ -1,0 +1,67 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.EvaluacionMetasDao;
+import gob.servir.desempenio.model.EvaluacionMetas;
+import gob.servir.desempenio.model.EvaluacionMetasPK;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.service.EvaluacionMetasService;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Service
+public class EvaluacionMetasServiceImpl implements EvaluacionMetasService {
+
+	@Autowired
+	private EvaluacionMetasDao evaluacionMetasDao;
+
+	public EvaluacionMetas find(EvaluacionMetasPK id) {
+		return evaluacionMetasDao.find(id);
+	}
+
+	@Transactional
+	public EvaluacionMetas save(EvaluacionMetas obj) {
+		return evaluacionMetasDao.save(obj);
+	}
+
+	@Transactional
+	public EvaluacionMetas edit(EvaluacionMetas obj) {
+		return evaluacionMetasDao.edit(obj);
+	}
+
+	public List<EvaluacionMetas> getListaEvaluacionMetas() {
+		return evaluacionMetasDao.getListaEvaluacionMetas();
+	}
+	
+	public List<EvaluacionMetas> getListaNotasEvaMetas(InscripcionPK id) {
+		return evaluacionMetasDao.getListaNotasEvaMetas(id);
+	}
+
+	public List<EvaluacionMetas> getListaEvaluacionMetas(InscripcionPK id) {
+		return evaluacionMetasDao.getListaEvaluacionMetas(id);
+	}
+	
+	public Integer getCantidadCualitativa(InscripcionPK id) {
+		return evaluacionMetasDao.getCantidadCualitativa(id);
+	}
+
+	public Integer getCantidadCuantitativa(InscripcionPK id) {
+		return evaluacionMetasDao.getCantidadCuantitativa(id);
+	}
+
+	public Integer getCantidadCuantitativaGP(InscripcionPK id) {
+		return evaluacionMetasDao.getCantidadCuantitativaGP(id);
+	}
+
+	public Integer getCantidadCuantitativaJI(InscripcionPK id) {
+		return evaluacionMetasDao.getCantidadCuantitativaJI(id);
+	}
+
+}

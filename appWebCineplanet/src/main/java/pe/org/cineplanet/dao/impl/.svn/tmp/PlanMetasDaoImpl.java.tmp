@@ -1,0 +1,165 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.PlanMetasDao;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.Meta;
+import gob.servir.desempenio.model.MetaPK;
+import gob.servir.desempenio.model.PlanDesarrollo;
+import gob.servir.desempenio.model.PlanMetas;
+import gob.servir.desempenio.model.PlanMetasPK;
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Repository
+public class PlanMetasDaoImpl implements PlanMetasDao {
+	@PersistenceContext
+	private EntityManager em;
+
+	public PlanMetas find(PlanMetasPK id) {
+		try {
+			return em.find(PlanMetas.class, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public PlanMetas save(PlanMetas obj) {
+		try {
+			em.persist(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public PlanMetas edit(PlanMetas obj) {
+		try {
+			return em.merge(obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<PlanMetas> getListaPlanMetas() {
+		Query q = null;
+		q = (Query) em
+				.createQuery("select m from PlanMetas m");
+		// q.setParameter("estado", "A");
+
+		try {
+			return q.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+	
+	public PlanMetas getPlanMetas(PlanMetasPK id) {
+		Query q = null;
+		q = (Query) em
+				.createQuery("select p from PlanMetas p where p.id.idCampania =:idCampania and p.id.idGerentePublico like :idGerente and p.id.idMeta =:idMeta ");
+		q.setParameter("idCampania", id.getIdCampania());
+		q.setParameter("idGerente", "%"+ id.getIdGerentePublico()+ "%");
+		q.setParameter("idMeta", id.getIdMeta());
+		try {
+			return (PlanMetas) q.getSingleResult();
+		} catch (Exception as) {
+			//as.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<PlanMetas> getListaPlanMetas(Meta obj) {
+		Query q = null;
+		q = (Query) em
+				.createQuery("select m from PlanMetas m where m.id.idCampania =:idCampania and m.id.idGerentePublico =:idGerente and m.id.idMeta =:idMeta order by m.id.idPlanMeta");
+		q.setParameter("idCampania", obj.getId().getIdCampania());
+		q.setParameter("idGerente",obj.getId().getIdGerentePublico());
+		q.setParameter("idMeta", obj.getId().getIdMeta());
+		try {
+			return q.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<PlanMetas> getListaPlanMetas2(Meta obj) {
+		Query q = null;
+		q = (Query) em
+				.createQuery("select m from PlanMetas m where m.id.idCampania =:idCampania and m.id.idGerentePublico =:idGerente order by m.id.idPlanMeta");
+		q.setParameter("idCampania", obj.getId().getIdCampania());
+		q.setParameter("idGerente", obj.getId().getIdGerentePublico());		
+		try {
+			return q.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public Long getMaxId() {
+		Query q = null;
+
+		q = (Query) em
+				.createQuery("select max(m.id.idPlanMeta) from PlanMetas m ");
+		try {
+
+			return (Long) q.getSingleResult() + 1L;
+		} catch (Exception e) {
+			// e.printStackTrace();
+			return 1L;
+		}
+	}
+
+	public List<PlanMetas> getTotalPlanDesaprobado(Inscripcion inscripcion) {
+
+		Query q = null;
+		q = (Query) em
+				.createQuery("select m from PlanMetas m where m.id.idCampania =:idCampania and m.id.idGerentePublico =:idGerente and m.aprobacion=0 order by m.id.idPlanMeta");
+		q.setParameter("idCampania", inscripcion.getId().getIdCampania());
+		q.setParameter("idGerente", inscripcion.getId().getIdGerentePublico());		
+		try {
+			return q.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<PlanMetas> getListaPlanMetasVerificacion(InscripcionPK inspk) {
+		Query q = null;
+		q = (Query) em
+				.createQuery("select m from PlanMetas m where m.id.idCampania =:idCampania and m.id.idGerentePublico =:idGerente order by m.id.idPlanMeta");
+		q.setParameter("idCampania", inspk.getIdCampania());
+		q.setParameter("idGerente", inspk.getIdGerentePublico());		
+		try {
+			return q.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+}

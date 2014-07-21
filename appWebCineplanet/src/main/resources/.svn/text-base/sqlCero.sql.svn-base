@@ -1,0 +1,344 @@
+--SELECT 'DROP TABLE '||table_name||' CASCADE CONSTRAINTS;' FROM user_tables
+
+INSERT INTO "DESEMPENO3"."MENU" (IDMENU, ESTADO, NOMBRE) VALUES ('1', 'A', 'Administración');
+INSERT INTO "DESEMPENO3"."MENU" (IDMENU, ESTADO, NOMBRE) VALUES ('2', 'A', 'Operación');
+INSERT INTO "DESEMPENO3"."MENU" (IDMENU, ESTADO, NOMBRE) VALUES ('3', 'A', 'Evaluación');
+INSERT INTO "DESEMPENO3"."MENU" (IDMENU, ESTADO, NOMBRE) VALUES ('4', 'A', 'Notificación');
+INSERT INTO "DESEMPENO3"."MENU" (IDMENU, ESTADO, NOMBRE) VALUES ('5', 'A', 'Reportes');
+--administracion
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('1', 'A', 'Usuario', 'contents/usuario.xhtml', '1');
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('2', 'A', 'Cambio de Contraseña', 'contents/cambioClave.xhtml', '1');
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('3', 'A', 'Campaña', 'contents/campania.xhtml', '1');
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('4', 'A', 'Cronograma', 'contents/cronograma.xhtml', '1');
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('5', 'A', 'Mensajes', 'contents/mensajes.xhtml', '1');
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('6', 'A', 'Inscripción', 'contents/inscripcion.xhtml', '1');
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('7', 'A', 'Perfil', 'contents/competencia.xhtml', '1');
+--opreaciones
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('8', 'A', 'Evaluación Inicial', 'contents/evaluacionInicial.xhtml', '2');
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('9', 'A', 'Metas Alineadas al POI', 'contents/metas.xhtml', '2');
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('10', 'A', 'Verificación Indicadores y Metas', 'contents/aprobacionMetas.xhtml', '2');
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('11', 'A', 'Modificación Indicadores y Metas', 'contents/conformidadMetas.xhtml', '2');
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('12', 'A', 'Adjuntar Metas e Indicadores', 'contents/descargarAdjuntarPlanesGP.xhtml', '2');
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('13', 'A', 'Verificación Metas e Indicadores', 'contents/visualizarPlanes.xhtml', '2');
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('14', 'A', 'Plan Desarrollo de Competencias', 'contents/planDesarrolloCompetencias.xhtml', '2');
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('15', 'A', 'Plan Acción de Metas', 'contents/planAccionMetas.xhtml', '2');
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('16', 'A', 'Verificación de Planes', 'contents/verificarPlanes.xhtml', '2');
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('17', 'A', 'Modificación de Planes', 'contents/verificarPlanesGP.xhtml', '2');
+--evaluacion
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('18', 'A', 'Cualitativa de Competencias', 'contents/cualitativaCompetencias.xhtml', '3');
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) values ('19', 'A', 'Cualitativa de Metas','contents/cualitativaMetas.xhtml','3');
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) values ('20', 'A', 'Cuantitativa de Competencias','contents/cuantitativaCompetencias.xhtml','3');
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) values ('21', 'A', 'Cuantitativa de Metas','contents/cuantitativaMetas.xhtml','3');
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('22', 'A', 'Evaluación de Gerente Público', 'contents/evaluarGerente.xhtml', '3');
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('23', 'A', 'Resultados Evaluación Medio Año', 'contents/evaluacionMedio.xhtml', '3');
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('24', 'A', 'Resultados Evaluación Medio Año', 'contents/evaluacionMedioGP.xhtml', '3');
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('25', 'A', 'Resultados Evaluación Fin de Año', 'contents/evaluacionFinal.xhtml', '3');
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('26', 'A', 'Resultados Evaluación Fin de Año', 'contents/evaluacionFinalGP.xhtml', '3');
+--notificacion
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('27', 'A', 'Inicio de Evaluación', 'contents/inicioEvaluacion.xhtml', '4');
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('28', 'A', 'Monitoreo de Flujos', 'contents/flujos.xhtml', '4');
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('29', 'A', 'Notificación', 'contents/notificacion.xhtml', '4');
+
+--INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('30', 'A', 'Resultados', 'contents/reporteResultados.xhtml', '5');
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('31', 'A', 'Monitoreo', 'contents/reporteMonitoreo.xhtml', '5');
+INSERT INTO "DESEMPENO3"."ITEMMENU" (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('32', 'A', 'Resultado de Planes', 'contents/visualizarPlanesGP.xhtml', '2');
+--roles
+INSERT INTO "DESEMPENO3"."ROL" (IDROL, ESTADO, NOMBRE) VALUES ('1', 'A', 'Administrador');
+INSERT INTO "DESEMPENO3"."ROL" (IDROL, ESTADO, NOMBRE) VALUES ('2', 'A', 'Evaluador');
+INSERT INTO "DESEMPENO3"."ROL" (IDROL, ESTADO, NOMBRE) VALUES ('3', 'A', 'Gerente Público');
+INSERT INTO "DESEMPENO3"."ROL" (IDROL, ESTADO, NOMBRE) VALUES ('4', 'A', 'Jefe Inmediato');
+INSERT INTO "DESEMPENO3"."ROL" (IDROL, ESTADO, NOMBRE) VALUES ('5', 'A', 'Titular Entidad');
+INSERT INTO "DESEMPENO3"."ROL" (IDROL, ESTADO, NOMBRE) VALUES ('6', 'A', 'Jefe Inmediato/Titular Entidad');
+
+--administrador
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('1', '1', '1', '1');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('2', '1', '2', '1');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('3', '1', '3', '1');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('4', '1', '4', '1');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('5', '1', '5', '1');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('6', '1', '6', '1');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('7', '1', '7', '1');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('8', '1', '8', '1');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('9', '1', '9', '1');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('10', '1', '11', '1');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('11', '1', '13', '1');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('12', '1', '16', '1');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('13', '1', '23', '1');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('14', '1', '25', '1');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('15', '1', '27', '1');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('16', '1', '28', '1');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('17', '1', '29', '1');
+
+
+--INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('44', '1', '30', '1');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('45', '1', '31', '1');
+--monitoreo y evaluacion
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('18', '1', '2', '2');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('19', '1', '8', '2');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('20', '1', '9', '2');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('21', '1', '11', '2');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('22', '1', '13', '2');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('23', '1', '16', '2');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('24', '1', '23', '2');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('25', '1', '25', '2');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('26', '1', '28', '2');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('27', '1', '29', '2');
+--INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('46', '1', '30', '2');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('47', '1', '31', '2');
+--gerente publico
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('28', '1', '2', '3');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('29', '1', '10', '3');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('30', '1', '12', '3');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('31', '1', '14', '3');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('32', '1', '15', '3');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('33', '1', '17', '3');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('34', '1', '18', '3');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('35', '1', '19', '3');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('36', '1', '20', '3');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('37', '1', '21', '3');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('38', '1', '24', '3');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('39', '1', '26', '3');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('48', '1', '32', '3');
+--jefe inmedito
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('40', '1', '2', '4');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('41', '1', '22', '4');
+--titular entidad
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('42', '1', '2', '5');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('43', '1', '22', '5');
+--titular entidad
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('44', '1', '2', '6');
+INSERT INTO "DESEMPENO3"."PERMISO" (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('46', '1', '22', '6');
+
+INSERT INTO "DESEMPENO3"."USUARIO" (IDUSUARIO, APMATERNO, APPATERNO, ESTADO, NOMBRE, USUARIO, IDROL) VALUES ('1', 'Garcia', 'Pumallihua', 'A', 'Hever', 'hpumallihua', '1');
+INSERT INTO "DESEMPENO3"."USUARIO" (IDUSUARIO, APMATERNO, APPATERNO, ESTADO, NOMBRE, USUARIO, IDROL) VALUES ('2', 'Huaman', 'Medina', 'A', 'Jeronimo', 'jmedina', '1');
+INSERT INTO "DESEMPENO3"."USUARIO" (IDUSUARIO, APMATERNO, APPATERNO, ESTADO, NOMBRE, USUARIO, IDROL) VALUES ('3', 'Martinez', 'Munguia', 'A', 'Alberto', 'cmunguiam', '1');
+INSERT INTO "DESEMPENO3"."USUARIO" (IDUSUARIO, APMATERNO, APPATERNO, ESTADO, NOMBRE, USUARIO, IDROL) VALUES ('4', 'De', 'Prueba', 'A', 'Usuario', 'admin', '1');
+
+INSERT INTO "DESEMPENO3"."PROCESO" (IDPROCESO, DENOMINACION) VALUES ('1', 'Planeamiento del Desempeño');
+INSERT INTO "DESEMPENO3"."PROCESO" (IDPROCESO, DENOMINACION) VALUES ('2', 'Evaluación Medio Año');
+INSERT INTO "DESEMPENO3"."PROCESO" (IDPROCESO, DENOMINACION) VALUES ('3', 'Evaluación Fin de Año');
+
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('1', '1', 'A', 'Verificar el Periodo de Ingreso del GP', 'A', 'ME');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('2', '1', 'A', 'Registrar Perfil', 'A', 'ME');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('3', '1', 'A', 'Registrar Evaluación Inicial', 'A', 'ME');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('4', '1', 'A', 'Registrar Propuesta de Indicadores y Metas ', 'A', 'ME');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('5', '1', 'A', 'Notificar al GP del registro de Indicadores y Metas ', 'T', 'ME');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('6', '1', 'A', 'Recibir Notificación (1)', 'C', 'GP');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('7', '1', 'A', 'Revisar y Proponer modificación de Indicadores y Metas ', 'A', 'GP');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('8', '1', 'A', 'Notificar Monitoreo y Evaluación de las modificaciones propuestas', 'N', 'GP');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('9', '1', 'A', 'Verificar y Revisar Observaciones', 'A', 'ME');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('10', '1', 'A', 'Notificar a GP de las Metas Finales', 'N', 'ME');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('11', '1', 'A', 'V°B°', 'A', 'GP');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('12', '1', 'A', 'Verificar firma de Metas e Indicadores', 'A', 'ME');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('13', '1', 'A', 'Notificar a GP de los indicadores y metas finales', 'T', 'ME');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('14', '1', 'A', 'Recibir Notificación (2)', 'C', 'GP');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('15', '1', 'A', 'Registrar Plan de Desarrollo de Competencias ', 'A', 'GP');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('16', '1', 'A', 'Registrar Plan de Acción de Metas ', 'A', 'Gp');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('17', '1', 'A', 'Notificar Monitoreo y Evaluación de los planes registrados', 'N', 'GP');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('18', '1', 'A', 'Verificar el registro de las evaluaciones ingresada al sistema', 'A', 'ME');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('19', '1', 'A', 'Habilitar accesos al GP y enviar observaciones', 'N', 'ME');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('20', '1', 'A', 'Recibir y Analizar las observaciones correspondientes a los planes registrados', 'A', 'GP');
+
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('1', '2', 'A', 'Notificar a Gerente Público el cronograma de Evaluaciones de medio año', 'T', 'ME');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('2', '2', 'A', 'Recibir Notificación', 'C', 'GP');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('3', '2', 'A', 'Registra Evaluación Cualitativa de Competencias', 'A', 'GP');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('4', '2', 'A', 'Registra Evaluación Cualitativa de Metas', 'A', 'GP');
+
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('1', '3', 'A', 'Notificar el cronograma de registro de evaluaciones de fin de año', 'T', 'ME');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('2', '3', 'A', 'Recibir Notificación (1)', 'C', 'GP');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('3', '3', 'A', 'Evaluar Cuantitativamente Competencias Nro.1', 'A', 'GP');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('4', '3', 'A', 'Evaluar Cuantitativamente las Metas Nro.1', 'A', 'GP');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('5', '3', 'A', 'Recibir Notificación (2)', 'C', 'JI');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('6', '3', 'A', 'Evaluar Cuantitativamente Competencias Nro.2', 'A', 'JI');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('7', '3', 'A', 'Evaluar Cuantitativamente Metas Nro.2', 'A', 'JI');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('8', '3', 'A', 'Recibir Notificación (3)', 'C', 'TE');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('9', '3', 'A', 'Evaluar Cuantitativamente Competencias Nro.3', 'A', 'TE');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('10', '3', 'A', 'Procesar las evaluaciones', 'A', 'ME');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('11', '3', 'A', 'Actualizar las Competencias del GP', 'A', 'ME');
+INSERT INTO "DESEMPENO3"."ACTIVIDAD" (IDACTIVIDAD, IDPROCESO, ESTADO, NOMBRE, TIPO, RESPONSABLE) VALUES ('12', '3', 'A', 'Notificar el resultado final de las evaluaciones al GP', 'N', 'ME');
+
+INSERT INTO "DESEMPENO3"."TIPOCOMPETENCIA" (IDCOMPETENCIA,DENOMINACION,ESTADO) values ('1','ORIENTACIÓN A RESULTADOS','A');
+INSERT INTO "DESEMPENO3"."TIPOCOMPETENCIA" (IDCOMPETENCIA,DENOMINACION,ESTADO) values ('2','COMUNICACIÓN EFECTIVA','A');
+INSERT INTO "DESEMPENO3"."TIPOCOMPETENCIA" (IDCOMPETENCIA,DENOMINACION,ESTADO) values ('3','ACTITUD DE SERVICIO','A');
+INSERT INTO "DESEMPENO3"."TIPOCOMPETENCIA" (IDCOMPETENCIA,DENOMINACION,ESTADO) values ('4','TRABAJO EN EQUIPO','A');
+INSERT INTO "DESEMPENO3"."TIPOCOMPETENCIA" (IDCOMPETENCIA,DENOMINACION,ESTADO) values ('5','INNOVACIÓN Y MEJORA CONTINUA','A');
+INSERT INTO "DESEMPENO3"."TIPOCOMPETENCIA" (IDCOMPETENCIA,DENOMINACION,ESTADO) values ('6','LIDERAZGO','A');
+INSERT INTO "DESEMPENO3"."TIPOCOMPETENCIA" (IDCOMPETENCIA,DENOMINACION,ESTADO) values ('7','SENTIDO DE URGENCIA','A');
+
+-- INSERT INTO "DESEMPENO3"."PARAMETROSISTEMA" (ID,VALOR,DESCRIPCION,ESTADO) values ('1','http://172.16.19.112:8080/confirmacion','url para envio automatico de correo','A');
+INSERT INTO "DESEMPENO3"."PARAMETROSISTEMA" (ID,VALOR,DESCRIPCION,ESTADO) values ('1','http://172.16.19.110:8080/confirmacion','url para envio automatico de correo','A');
+
+-- insert diccionario
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (1,1,'<ul>
+<li>no existe evidencia de competencia o comportamiento observable</li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (2,1,'<ul>
+<li>no existe evidencia de competencia o comportamiento observable</li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (3,1,'<ul>
+<li>Identifica claramente los medios y estrategias que debe utilizar  para el cumplimiento de sus objetivos.</li>
+<li>Realiza cambios específicos en los métodos de trabajo para asegurar el cumplimiento de los objetivos y metas fijadas.</li>
+<li>Utiliza métodos y herramientas técnicas para comprobar el cumplimiento de los objetivos establecidos.</li>
+<li>Facilita el trabajo de los demás para el logro de los objetivos.</li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (4,1,'<ul>
+<li>Establece metas u objetivos y los prioriza.</li>
+<li>Logra los objetivos establecidos.</li>
+<li>Optimiza el uso de recursos significativos, tales como tiempo, personas y/o inversiones para garantizar el cumplimiento de objetivos.</li>
+<li>Supera los resultados obtenidos en su  gestión pasada.</li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (5,1,'<ul>
+<li>Se fija metas u objetivos ambiciosos y las alcanza.</li>
+<li>Toma riesgos calculados.</li>
+<li>Compara sus resultados contrastándolos con los de otros y con los propios.</li>
+<li>Alinea sus objetivos a las demandas del entorno interno y/o externo.</li>
+</ul>','A');
+
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (1,2,'<ul>
+<li>no existe evidencia de competencia o comportamiento observable</li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (2,2,'<ul>
+<li>no existe evidencia de competencia o comportamiento observable</li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (3,2,'<ul>
+<li>Trasmite clara y oportunamente de forma verbal y escrita las ideas, prioridades y planes de acción.</li>
+<li>Mantiene informado a sus usuarios internos y/o externos sobre  su gestión.</li>
+<li>Escucha a sus interlocutores.</li>
+<li>Adapta su lenguaje a las características particulares de su interlocutor o de su audiencia.</li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (4,2,'<ul>
+<li>Escucha las opiniones y puntos de vista de los demás.</li>
+<li>Demuestra capacidad de síntesis al comunicarse.</li>
+<li>Implementa canales de comunicación para trasmitir aspectos de su gestión. </li>
+<li>Verifica que su mensaje haya sido comprendido por las demás personas.</li>
+<li>Se expresa de manera clara y comprensible </li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (5,2,'<ul>
+<li>Identifica, diseña e implementa medios y/o formas de comunicación.</li>
+<li>Comunica clara y oportunamente las ideas, prioridades y planes de acción logrando que los receptores entiendan su mensaje. </li>
+<li>Persuade a otros sobre una idea o propuesta.</li>
+<li>Escucha con apertura diferentes puntos de vista e ideas. </li>
+<li>Comparte información relevante con sus colaboradores y otras áreas de la Institución.</li>
+</ul>','A');
+
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (1,3,'<ul>
+<li>no existe evidencia de competencia o comportamiento observable</li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (2,3,'<ul>
+<li>no existe evidencia de competencia o comportamiento observable</li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (3,3,'<ul>
+<li>Trata con cortesía y respeto a sus usuarios.</li>
+<li>Responde oportunamente a las preguntas, quejas o problemas que el usuario le plantea.</li>
+<li>Da seguimiento a los requerimientos de los usuarios hasta que estos sean atendidos.</li>
+<li>Se muestra tolerante y paciente mientras resuelve quejas, reclamos o requerimientos de usuarios.</li>
+<li>Se mantiene informado sobre las necesidades de sus usuarios.</li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (4,3,'<ul>
+<li>Demuestra empoderamiento en la atención de las necesidades de sus usuarios.</li>
+<li>Ofrece al usuario información adicional que le pueda ser de utilidad o beneficio.</li>
+<li>Demuestra una actitud positiva de servicio hacia el usuario.</li>
+<li>Adecúa sus procesos y servicios de acuerdo a las necesidades tanto actuales como potenciales de los usuarios o clientes.</li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (5,3,'<ul>
+<li>Se preocupa por atender a su usuario y aborda las necesidades de fondo realizando acciones que cumplan las expectativas de los mismos.</li>
+<li>Adapta sus proyectos y/o actividades en base a las necesidades de sus usuarios.</li>
+<li>Demuestra que su prioridad principal es servir a sus usuarios.</li>
+<li>Planifica sus acciones y las de su Institución o equipo, considerando las necesidades de sus usuarios.</li>
+</ul>','A');
+
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (1,4,'<ul>
+<li>no existe evidencia de competencia o comportamiento observable</li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (2,4,'<ul>
+<li>no existe evidencia de competencia o comportamiento observable</li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (3,4,'<ul>
+<li>Coopera activamente con los miembros de su equipo.</li>
+<li>Comparte información que puede afectar al equipo.</li>
+<li>Involucra a todos los actores del equipo para definir los objetivos a conseguir.</li>
+<li>Tiene en cuenta  los aportes realizados por los miembros de su equipo.</li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (4,4,'<ul>
+<li>Apoya y defiende las decisiones u orientaciones del equipo en la Instancia que corresponda.</li>
+<li>Convoca a personas claves fuera de su equipo para garantizar el cumplimiento de los objetivos.</li>
+<li>Logra acuerdos con los miembros del equipo respecto a la manera de trabajo a ser utilizada para lograr los objetivos.</li>
+<li>Promueve la participación de los miembros del equipo en la definición de metas y ejecución de las actividades asignadas.</li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (5,4,'<ul>
+<li>Motiva a los miembros de su equipo para que trabajen por metas comunes.</li>
+<li>Fomenta y reconoce las contribuciones individuales de los miembros del equipo.</li>
+<li>Identifica las fortalezas de los miembros de su equipo.</li>
+<li>Coordina y articula el cumplimiento de objetivos a nivel de distintos equipos y colabora para su cumplimiento.</li>
+</ul>','A');
+
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (1,5,'<ul>
+<li>no existe evidencia de competencia o comportamiento observable</li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (2,5,'<ul>
+<li>no existe evidencia de competencia o comportamiento observable</li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (3,5,'<ul>
+<li>Mejora los procesos de servicio a los usuarios en base a procesos y normas establecidas.</li>
+<li>Participa activamente en la implementación de mejoras.</li>
+<li>Realiza acciones de mejora para solucionar los problemas que se le presenten.</li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (4,5,'<ul>
+<li>Investiga respecto a las mejores prácticas que pueden ser implementadas para mejorar la calidad de servicio a los usuarios.</li>
+<li>Propone e implementa nuevas y mejores maneras de hacer el trabajo y solucionar problemas.</li>
+<li>Promueve espacios para generar alternativas de mejora a los procesos de servicio al usuario.</li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (5,5,'<ul>
+<li>Genera ideas y estrategias que producen la innovación y mejora en su gestión.</li>
+<li>Diseña e implementa proyectos y procesos para mejorar los resultados orientados a servicio al usuario.</li>
+<li>Genera modelos de buena práctica de gestión.</li>
+</ul>','A');
+
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (1,6,'<ul>
+<li>no existe evidencia de competencia o comportamiento observable</li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (2,6,'<ul>
+<li>no existe evidencia de competencia o comportamiento observable</li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (3,6,'<ul>
+<li>Influye en otros para trabajar por el logro de objetivos.</li>
+<li>Comparte sus conocimientos de manera franca y abierta procurando el aprendizaje de sus colaboradores.</li>
+<li>Proporciona guías / instrucciones para orientar el trabajo de los demás al cumplimiento de metas.</li>
+<li>Estimula y reconoce las acciones de los colaboradores orientadas a promover el logro de resultados y la eficiencia.</li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (4,6,'<ul>
+<li>Actúa de manera coherente entre sus palabras y hechos generando confianza en el personal, usuarios y demás actores.</li>
+<li>Genera colaboración y entusiasmo para alcanzar los objetivos.</li>
+<li>Promueve el desarrollo de los miembros del equipo.</li>  
+<li>Retroalimenta a su equipo de trabajo.</li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (5,6,'<ul>
+<li>Genera compromiso para alcanzar los objetivos.</li>
+<li>Inspira y motiva con su ejemplo a otras personas para que lo apoyen en el cumplimiento de metas y objetivos.</li>
+<li>Empodera a los miembros del equipo mediante la delegación de responsabilidades de alto impacto.</li>
+<li>Genera un espacio de confianza que le permite conocer los intereses individuales de los miembros del equipo.</li>
+<li>Armoniza el logro de los objetivos comunes con los intereses individuales.</li>
+</ul>','A');
+
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (1,7,'<ul>
+<li>no existe evidencia de competencia o comportamiento observable</li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (2,7,'<ul>
+<li>no existe evidencia de competencia o comportamiento observable</li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (3,7,'<ul>
+<li>Cumple con las actividades asignados establecidos como de mayor prioridad reconociendo su importancia.</li>
+<li>Muestra tolerancia y tranquilidad ante situaciones urgentes presentadas en su gestión.</li>
+<li>Genera soluciones para resolver situaciones de carácter urgente.</li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (4,7,'<ul>
+<li>Reconoce situaciones de carácter urgente y actúa proactivamente para tomar decisiones y solucionar problemas a nivel Institucional.</li>
+<li>Actúa con urgencia ante situaciones suscitadas que afectan la gestión institucional.</li>
+<li>Mantiene actitud positiva en situaciones de presión.</li>
+</ul>','A');
+INSERT INTO "DESEMPENO3"."DETALLETIPOCOMPETENCIA"(IDDETALLE,IDTIPOCOMPETENCIA,DESCRIPCION,ESTADO) VALUES (5,7,'<ul>
+<li>Identifica y establece la prioridad de atención a los proyectos de mayor impacto a nivel Interinstitucional.</li>
+<li>Actúa oportunamente ante situaciones de carácter urgente tomando decisiones acertadas bajo condiciones de extrema presión.</li>
+<li>Mantiene su predisposición y actitud positiva, y la transmite a su grupo, en situaciones de carácter urgente.</li>
+</ul>','A');
+

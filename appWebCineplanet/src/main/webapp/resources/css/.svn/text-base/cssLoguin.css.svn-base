@@ -1,0 +1,184 @@
+body {
+	font-family: Calibri, Verdana, sans-serif;
+	font-size: 9pt;
+	background-image: url('../../images/franja_3.png');
+	background-repeat: repeat-x;
+}
+
+.contenedor {
+	width: 960px;
+	height: auto;
+	margin: 0 auto;
+	background-color: white;
+	border-right: solid 2px #a0a0a0;
+	border-bottom: solid 2px #a0a0a0;
+}
+
+.contenedor .header {
+	width: 960px;
+	height: 67px;;
+	float: left;
+	margin-bottom: 5px;
+	margin-top: 5px;
+	clear: both;
+}
+
+.contenedor .header .encabezado {
+	width: 549px;
+	height: 67px;;
+	background-image: url('../../images/encabezado.png');
+	float: left;
+}
+
+.contenedor .header .logo {
+	width: 200px;
+	height: 67px;;
+	background-image: url('../../images/logo_servir.png');
+	float: right;
+	margin-right: 10px;
+}
+
+.contenedor .franja {
+	width: 960px;
+	height: 60px;
+	clear: both;
+	background-image: url('../../images/franja_2.png');
+	background-repeat: repeat-x;
+	font-weight: bold;
+	color: white;
+	font-size: 11pt;
+	line-height: 60px;
+	text-indent: 10px;
+}
+
+.contenedor .main {
+	width: 960px;
+	height: auto;
+	clear: both;
+}
+
+.contenedor .main .izq {
+	width: 430px;
+	margin-right: 10px;
+	float: left;
+	height: auto;
+	padding: 30px;
+}
+
+.contenedor .main .izq .bienvenido {
+	width: 430px;
+	float: left;
+	height: 64px;
+	background-image: url('../../images/bienvenido.png');
+	background-repeat: no-repeat;
+	margin-bottom: 20px;
+}
+
+.contenedor .main .izq .version {
+	width: 430px;
+	float: left;
+	height: 21px;
+	font-size: 10pt;
+	font-weight: bold;
+	margin-bottom: 15px;
+}
+
+.contenedor .main .izq .texto {
+	width: 430px;
+	float: left;
+	height: 21px;
+	font-size: 9pt;
+	margin-bottom: 10px;
+}
+
+.contenedor .main .der {
+	width: 340px;
+	height: auto;
+	float: right;
+	padding: 30px 60px;
+	background-image: url('../../images/franja_3.png');
+	background-repeat: repeat-x;
+}
+
+.contenedor .main .der .tituloLogin {
+	width: 340px;
+	height: 21px;
+	line-height: 21px;
+	color: #b60400;
+	font-size: 11pt;
+	font-weight: bold;
+	text-align: left;
+	margin-bottom: 10px;
+}
+
+.contenedor .main .der .fila {
+	width: 340px;
+	height: 21px;
+	color: #58585a;
+	line-height: 21px;
+	font-weight: bold;
+	text-align: left;
+	margin-bottom: 10px;
+}
+
+.contenedor .main .der .captcha {
+	width: 318px;
+	height: 80px;
+	margin-bottom: 10px;
+}
+
+.contenedor .main .der .boton {
+	width: 129px;
+	height: 30px;
+	float: left;
+	margin-bottom: 10px;
+}
+
+.contenedor .footer {
+	width: 960px;
+	clear: both;
+	height: auto;
+}
+
+.contenedor .footer .foo1 {
+	width: 955px; 
+	height: 50px;
+	background-image: url('../../images/franja_4.png');
+	background-repeat: repeat-x;
+	text-align: left;
+	font-weight: bold;
+	color: #58585a;
+	padding-left: 5px;
+	line-height: 15px;
+}
+
+.contenedor .footer .foo2 {
+	width: 955px;
+	height: 20px;
+	text-align: right;
+	font-size: 7pt;
+	line-height: 20px;
+	font-weight: bold;
+	padding-right: 5px;
+	color: #58585a;
+}
+
+/* .boton .btn { */
+/* 	background: -moz-linear-gradient(#b30400 0%, #F60 100%); */
+/* 	background: -ms-linear-gradient(#b30400 0%, #F60 100%); */
+/* 	background: -o-linear-gradient(#b30400 0%, #F60 100%); */
+/* 	background: -webkit-linear-gradient(#b30400 0%, #F60 100%); */
+/* 	background: linear-gradient(#b30400 0%, #F60 100%); */
+/* 	border: solid 1px #DEDEDE; */
+/* 	border-radius: 5px; */
+/* 	text-align: center; */
+/* 	width:129; */
+/* 	padding: 5px; */
+/* 	color: #fff; */
+/* 	width: 75px; */
+/* } */
+
+.boton .btn:hover {
+	background: -moz-linear-gradient(#fff 0%, #DEDEDE 100%);
+	color: #999;
+}

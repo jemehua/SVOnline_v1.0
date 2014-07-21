@@ -1,0 +1,139 @@
+package gob.servir.desempenio.bean;
+
+import gob.servir.desempenio.model.Actividad;
+import gob.servir.desempenio.model.ActividadPK;
+import gob.servir.desempenio.model.Campania;
+import gob.servir.desempenio.model.DetalleFlujo;
+import gob.servir.desempenio.model.DetalleFlujoPK;
+import gob.servir.desempenio.model.Flujo;
+import gob.servir.desempenio.model.FlujoPK;
+import gob.servir.desempenio.model.GerentePublicoV;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.Mensaje;
+import gob.servir.desempenio.model.MensajePK;
+import gob.servir.desempenio.model.Notificacion;
+import gob.servir.desempenio.model.NotificacionPK;
+import gob.servir.desempenio.model.Proceso;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.ActividadService;
+import gob.servir.desempenio.service.CampaniaService;
+import gob.servir.desempenio.service.GerentePublicoVService;
+import gob.servir.desempenio.service.NotificacionService;
+import gob.servir.desempenio.service.ProcesoService;
+
+import java.util.Date;
+import java.util.List;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@ContextConfiguration("/test-context.xml")
+@RunWith(SpringJUnit4ClassRunner.class)
+@Transactional
+public class NotificacionTest {
+
+	@Autowired
+	private NotificacionService notificacionService;
+	@Autowired
+	private ProcesoService procesoService;
+	@Autowired
+	private ActividadService actividadService;
+	@Autowired
+	private CampaniaService campaniaService;
+	@Autowired
+	private GerentePublicoVService gerentePublicoVService;
+
+	// inicializar data
+	@Before
+	public void prepararData() {
+		// proceso
+		Proceso proceso = new Proceso();
+		proceso.setIdProceso(1L);
+		proceso.setDenominacion("Planeamiento");
+		procesoService.save(proceso);
+
+		// actividad
+		ActividadPK actividadPK = new ActividadPK(1L, 1L);
+		Actividad actividad = new Actividad();
+		actividad.setId(actividadPK);
+		actividad.setNombre("Actividad 1");
+		actividad.setEstado("A");
+		actividad.setTipo("A");
+		actividadService.save(actividad);
+
+		// mensaje
+		MensajePK mensajePK = new MensajePK(1L, 1L, 1L,1L);
+		Mensaje mensaje = new Mensaje();
+		mensaje.setId(mensajePK);
+		mensaje.setTitulo("titulo");
+		mensaje.setCuerpo("cuerpo");
+
+		// campaña
+		Campania campania = new Campania();
+		campania.setIdCampania(1L);
+		campania.setDenominacion("Campania 1");
+		campania.setEstadoCampania("Activo");
+		campania.setEstado("A");
+		campaniaService.save(campania);
+
+		// Gerente
+		//GerentePublicoV gerentePublicoV = gerentePublicoVService.find("CGP002");
+		GerentePublicoV gerentePublicoV = new GerentePublicoV();
+		gerentePublicoV.setCod_gerente("CGP001");
+		gerentePublicoVService.save(gerentePublicoV);
+
+		// Inscripcion
+		InscripcionPK inscripcionPK = new InscripcionPK(1L,
+				"CGP001");
+		Inscripcion inscripcion = new Inscripcion();
+		inscripcion.setId(inscripcionPK);
+		inscripcion.setFechaCreacion(new Date());
+		inscripcion.setEstado("A");
+
+		// flujo
+		FlujoPK flujoPK = new FlujoPK(1L, "CGP001", 1L);
+		Flujo flujo = new Flujo();
+		flujo.setId(flujoPK);
+		flujo.setEstado("AT");
+
+		// detalle flujo
+		DetalleFlujoPK detalleFlujoPK = new DetalleFlujoPK(1L,
+				"CGP001", 1L, 1L);
+		DetalleFlujo detalleFlujo = new DetalleFlujo();
+		detalleFlujo.setId(detalleFlujoPK);
+		detalleFlujo.setEstado("AT");
+
+	}
+
+	@Test
+	public void deberiaGuardarUsuario() {
+
+		// Arrange - Preparar
+		NotificacionPK id = new NotificacionPK(notificacionService.getMaxId(new DetalleFlujoPK(1L, "CGP001", 1L, 1L)),
+				1L, 1L, 1L, "CGP001", 1L);
+
+		Notificacion notificacion = new Notificacion();
+		notificacion.setId(id);
+		notificacion.setEstado("A");
+
+		// Act - Actuar
+		Notificacion usuarioResp = notificacionService.save(notificacion);
+
+		// Assert - Afirmar
+		System.out.println(usuarioResp.toString());
+		Assert.assertNotNull(usuarioResp);
+	}
+
+}

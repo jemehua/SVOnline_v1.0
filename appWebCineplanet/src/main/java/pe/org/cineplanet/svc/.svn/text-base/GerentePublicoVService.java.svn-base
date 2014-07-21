@@ -1,0 +1,19 @@
+package gob.servir.desempenio.service;
+
+import gob.servir.desempenio.model.GerentePublicoV;
+
+import java.util.List;
+
+/**
+ * 
+ * @author Hever Pumallihua García
+ */
+public interface GerentePublicoVService {
+
+	public abstract GerentePublicoV find(String codGerente);
+	
+	public abstract GerentePublicoV save(GerentePublicoV obj);
+
+	public abstract List<GerentePublicoV> getListaGerentePublico();
+
+}

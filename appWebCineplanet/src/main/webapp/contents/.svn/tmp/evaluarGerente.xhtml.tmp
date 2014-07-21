@@ -1,0 +1,118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+	<h:outputStylesheet name="css/cssContent.css" />
+</h:head>
+<h:body>
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datos" header="Evaluación de Gerente Publico">
+		<p:focus context="datos" />
+		<p:panelGrid styleClass="panelGrid">
+			<p:row>
+				<p:column width="30">#{messages.lblCampania}<h:outputText
+						value="*" styleClass="obligatorio" />
+				</p:column>
+				<p:column width="70">
+					<p:selectOneMenu id="comboCampania"
+						value="#{evaluarGerenteController.campaniaSelec}"
+						style="width:280px;" tabindex="1">
+						<f:selectItems value="#{evaluarGerenteController.comboCampania}" />
+						<p:ajax event="change" update="dtIncripcion"/>
+					</p:selectOneMenu>
+				</p:column>
+			</p:row>
+
+		</p:panelGrid>
+
+		<p:spacer height="10" />
+		<p:dataTable var="detalleInscripcion"
+			value="#{evaluarGerenteController.listaDetalleInscripcion}"
+			id="dtIncripcion" scrollable="true" scrollHeight="235"
+			paginator="true" rows="10"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			emptyMessage="No hay resultados para el criterio de busqueda">
+
+			<f:facet name="header">    
+            	Lista de Gerentes Publicos
+            </f:facet>
+			<p:column headerText="#{messages.lblCodigo}" style="width:17%"
+				filterBy="#{detalleInscripcion.inscripcion.id.idGerentePublico}">
+				<h:outputText
+					value="#{detalleInscripcion.inscripcion.id.idGerentePublico}" />
+			</p:column>
+			<p:column headerText="#{messages.lblNombre}" style="width:17%"
+				filterBy="#{detalleInscripcion.inscripcion.asignacionGerenteV.nombres}">
+				<h:outputText
+					value="#{detalleInscripcion.inscripcion.asignacionGerenteV.nombres}" />
+			</p:column>
+			<p:column headerText="#{messages.lblApPaterno}" style="width:17%"
+				filterBy="#{detalleInscripcion.inscripcion.asignacionGerenteV.ap_paterno}">
+				<h:outputText
+					value="#{detalleInscripcion.inscripcion.asignacionGerenteV.ap_paterno}" />
+			</p:column>
+			<p:column headerText="#{messages.lblApMaterno}" style="width:14%">
+				<h:outputText
+					value="#{detalleInscripcion.inscripcion.asignacionGerenteV.ap_materno}" />
+			</p:column>
+			<p:column headerText="Puesto Tipo" style="width:20%">
+				<h:outputText
+					value="#{detalleInscripcion.inscripcion.puestoTipoV.dsc_puesto_tipo}" />
+			</p:column>
+			<p:column headerText="#{messages.lblOpciones}" style="width:15%">
+
+				<p:commandButton id="evalCuantMet" value=" " icon="ui-icon-newwin"
+					update=":frm:content" immediate="true"
+					disabled="#{evaluarGerenteController.swRolJI eq true ? true : false}">
+					<f:setPropertyActionListener
+						target="#{contenidoController.includedPage}"
+						value="contents/cuantitativaMetasJI.xhtml" />
+					<f:setPropertyActionListener
+						target="#{cuantitativaMetasJIController.inscripcionSelec}"
+						value="#{detalleInscripcion.inscripcion}" />
+				</p:commandButton>
+				<pe:tooltip for="evalCuantMet"
+					value="Evaluación Cuantitativa de Metas" showEffect="fadeIn"
+					hideEffect="fadeIn" atPosition="top center"
+					myPosition="bottom center" />
+				<p:commandButton id="evaCuantComp" value=" " icon="ui-icon-newwin"
+					update=":frm:content" immediate="true"
+					disabled="#{evaluarGerenteController.swRolJI eq true ? true : false}">
+					<f:setPropertyActionListener
+						target="#{contenidoController.includedPage}"
+						value="contents/cuantitativaCompetenciasJI.xhtml" />
+					<f:setPropertyActionListener
+						target="#{cuantitativaCompetenciasJIController.inscripcionSelec}"
+						value="#{detalleInscripcion.inscripcion}" />
+				</p:commandButton>
+				<pe:tooltip for="evaCuantComp"
+					value="Evaluación Cuantitativa de Competencias" showEffect="fadeIn"
+					hideEffect="fadeIn" atPosition="top center"
+					myPosition="bottom center" />
+
+
+
+				<p:commandButton id="evaCuantCompTE" value=" " icon="ui-icon-newwin"
+					update=":frm:content" immediate="true"
+					disabled="#{evaluarGerenteController.swRolTE eq true ? true : false}">
+					<f:setPropertyActionListener
+						target="#{contenidoController.includedPage}"
+						value="contents/cuantitativaCompetenciasTE.xhtml" />
+					<f:setPropertyActionListener
+						target="#{cuantitativaCompetenciasTEController.inscripcionSelec}"
+						value="#{detalleInscripcion.inscripcion}" />
+				</p:commandButton>
+				<pe:tooltip for="evaCuantCompTE"
+					value="Evaluación Cuantitativa de Competencias"
+					showEffect="fadeIn" hideEffect="fadeIn" atPosition="top center"
+					myPosition="bottom center" />
+			</p:column>
+		</p:dataTable>
+	</p:panel>
+</h:body>
+</html>

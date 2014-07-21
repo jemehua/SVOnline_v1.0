@@ -1,0 +1,29 @@
+package gob.servir.desempenio.dao;
+
+import gob.servir.desempenio.model.EvaluacionInicial;
+import gob.servir.desempenio.model.EvaluacionInicialPK;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.InscripcionPK;
+
+import java.util.List;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+public interface EvaluacionInicialDao {
+
+	public abstract EvaluacionInicial find(EvaluacionInicialPK id);
+
+	public abstract EvaluacionInicial save(EvaluacionInicial obj);
+
+	public abstract EvaluacionInicial edit(EvaluacionInicial obj);
+
+	public abstract List<EvaluacionInicial> getListaEvaluacionInicial();
+
+	public abstract List<EvaluacionInicial> getListaEvaluacionInicial(
+			InscripcionPK id, int opcion);
+	
+	public abstract Integer getCountEvaluacionInicial(Inscripcion inscripcionSelec);
+
+}

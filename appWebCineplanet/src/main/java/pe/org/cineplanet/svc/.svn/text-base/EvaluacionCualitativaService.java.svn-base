@@ -1,0 +1,26 @@
+package gob.servir.desempenio.service;
+
+import gob.servir.desempenio.model.EvaluacionCompetencias;
+import gob.servir.desempenio.model.EvaluacionCompetenciasPK;
+
+import java.util.List;
+
+/**
+ * 
+ * @author Hever Pumallihua García
+ */
+public interface EvaluacionCualitativaService {
+	
+	public abstract EvaluacionCompetencias find(EvaluacionCompetenciasPK id);
+
+	public abstract EvaluacionCompetencias  save(EvaluacionCompetencias  obj);
+
+	public abstract EvaluacionCompetencias  edit(EvaluacionCompetencias  obj);
+
+	public abstract List<EvaluacionCompetencias > getListaEvaluacionCualitativa ();
+	
+	public abstract Long getMaxId(Long idCompetencia, Long idCampania, String CodGerente, Long idPuesto);
+	
+	public abstract List<EvaluacionCompetencias > getListaEvaluacionCualitativa (Long idCompetencia, Long idCampania, String CodGerente, Long idPuesto);
+
+}

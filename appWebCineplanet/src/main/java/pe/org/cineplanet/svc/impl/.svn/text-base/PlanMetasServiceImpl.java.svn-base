@@ -1,0 +1,58 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.PlanMetasDao;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.PlanMetas;
+import gob.servir.desempenio.model.PlanMetasPK;
+import gob.servir.desempenio.service.PlanMetasService;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Service
+public class PlanMetasServiceImpl implements PlanMetasService {
+
+	@Autowired
+	private PlanMetasDao planMetasDao;
+
+	@Transactional
+	public PlanMetas find(PlanMetasPK id) {
+		return planMetasDao.find(id);
+	}
+
+	@Transactional
+	public PlanMetas save(PlanMetas obj) {
+		return planMetasDao.save(obj);
+	}
+
+	@Transactional
+	public PlanMetas edit(PlanMetas obj) {
+		return planMetasDao.edit(obj);
+	}
+
+	public List<PlanMetas> getListaPlanMetas() {
+		return planMetasDao.getListaPlanMetas();
+	}
+	
+	public List<PlanMetas> getListaPlanMetas(InscripcionPK id) {
+		return planMetasDao.getListaPlanMetas(id);
+	}
+
+	public List<PlanMetas> getListaPlanMetas(InscripcionPK id,
+			boolean aprobacion) {
+		return planMetasDao.getListaPlanMetas(id, aprobacion);
+	}
+
+	public Integer getCantidadPlanesDesaprobados(InscripcionPK inspk,
+			boolean aprobacion) {
+		return planMetasDao.getCantidadPlanesDesaprobados(inspk, aprobacion);
+	}
+
+}

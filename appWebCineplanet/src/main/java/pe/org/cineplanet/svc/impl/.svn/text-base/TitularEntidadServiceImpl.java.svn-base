@@ -1,0 +1,41 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.TitularEntidadDao;
+import gob.servir.desempenio.model.TitularEntidad;
+import gob.servir.desempenio.service.TitularEntidadService;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Service
+public class TitularEntidadServiceImpl implements TitularEntidadService {
+
+	@Autowired
+	private TitularEntidadDao titularEntidadDao;
+
+	@Transactional
+	public TitularEntidad save(TitularEntidad obj) {
+		return titularEntidadDao.save(obj);
+	}
+
+	@Transactional
+	public TitularEntidad edit(TitularEntidad obj) {
+		return titularEntidadDao.edit(obj);
+	}
+
+	public List<TitularEntidad> getListaTitularEntidad() {
+		return titularEntidadDao.getListaTitularEntidad();
+	}
+
+	public TitularEntidad find(String id) {
+		return titularEntidadDao.find(id);
+	}
+
+}

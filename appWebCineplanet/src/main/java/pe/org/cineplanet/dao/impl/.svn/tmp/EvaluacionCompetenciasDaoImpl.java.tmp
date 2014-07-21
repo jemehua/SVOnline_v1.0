@@ -1,0 +1,215 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.EvaluacionCompetenciasDao;
+import gob.servir.desempenio.model.Competencia;
+import gob.servir.desempenio.model.EvaluacionCompetencias;
+import gob.servir.desempenio.model.EvaluacionCompetenciasPK;
+import gob.servir.desempenio.model.EvaluacionInicial;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.PlanDesarrollo;
+import gob.servir.desempenio.model.TipoCompetencia;
+import gob.servir.desempenio.util.Constantes;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua García
+ */
+@Repository
+public class EvaluacionCompetenciasDaoImpl implements EvaluacionCompetenciasDao {
+	@PersistenceContext
+	private EntityManager em;
+
+	public EvaluacionCompetencias find(EvaluacionCompetenciasPK id) {
+		try {
+			return em.find(EvaluacionCompetencias.class, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public EvaluacionCompetencias save(EvaluacionCompetencias obj) {
+		try {
+			em.persist(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public EvaluacionCompetencias edit(EvaluacionCompetencias obj) {
+		try {
+			return em.merge(obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<EvaluacionCompetencias> getListaEvaluacionCompetencias() {
+		TypedQuery<EvaluacionCompetencias> tq = em.createNamedQuery(
+				"EvaluacionCompetencias.getListAll",
+				EvaluacionCompetencias.class);
+
+		try {
+			return tq.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<EvaluacionCompetencias> getListaEvaluacionCompetencias(
+			InscripcionPK id) {
+		Query q = null;
+		q = (Query) em
+				.createQuery("SELECT p.planDesarrollo.evaluacionInicial.competencia.competencia.denominacion, p.planDesarrollo.evaluacionInicial.competencia.nivelDeseado, p.planDesarrollo.evaluacionInicial.nota, p.planDesarrollo.evaluacionInicial.brecha, "
+						+ "p.planDesarrollo.actCapacitacion, p.planDesarrollo.actEntrenamiento, p.planDesarrollo.fechaFinCapacitacion, p.planDesarrollo.fechaFinEntrenamiento, "
+						+ "p.id, p.notaGP, p.notaJI, p.notaTE, p.promedio, p.porcentaje "
+						+ "FROM EvaluacionCompetencias p "
+						+ "WHERE p.id.idCampania =:idCampania "
+						+ "AND p.id.idGerentePublico =:idGerente "
+						+ "AND p.estado =:estado "
+						+ "ORDER BY p.id.idCompetencia ASC");
+		q.setParameter("idCampania", id.getIdCampania());
+		q.setParameter("idGerente", id.getIdGerentePublico());
+		q.setParameter("estado", Constantes.ACTIVO);
+
+		List<Object[]> listObjects = new ArrayList<Object[]>();
+		List<EvaluacionCompetencias> listaEvaluacionCompetencias = new ArrayList<EvaluacionCompetencias>();
+		try {
+			listObjects = q.getResultList();
+
+			for (Object[] row : listObjects) {
+
+				TipoCompetencia tipoCompetencia = new TipoCompetencia();
+				tipoCompetencia.setDenominacion((String) row[0]);
+
+				Competencia competencia = new Competencia();
+				competencia.setNivelDeseado((Integer) row[1]);
+				competencia.setCompetencia(tipoCompetencia);
+
+				EvaluacionInicial evaluacionInicial = new EvaluacionInicial();
+				evaluacionInicial.setNota((Integer) row[2]);
+				evaluacionInicial.setBrecha((Integer) row[3]);
+				evaluacionInicial.setCompetencia(competencia);
+
+				PlanDesarrollo planDesarrollo = new PlanDesarrollo();
+				planDesarrollo.setActCapacitacion((String) row[4]);
+				planDesarrollo.setActEntrenamiento((String) row[5]);
+				planDesarrollo.setFechaFinCapacitacion((Date) row[6]);
+				planDesarrollo.setFechaFinEntrenamiento((Date) row[7]);
+				planDesarrollo.setEvaluacionInicial(evaluacionInicial);
+
+				EvaluacionCompetencias evaluacionCompetencias = new EvaluacionCompetencias();
+				evaluacionCompetencias.setId((EvaluacionCompetenciasPK) row[8]);
+				evaluacionCompetencias.setNotaGP((Integer) row[9]);
+				evaluacionCompetencias.setNotaJI((Integer) row[10]);
+				evaluacionCompetencias.setNotaTE((Integer) row[11]);
+				evaluacionCompetencias.setPromedio((Integer) row[12]);
+				evaluacionCompetencias.setPorcentaje((Integer) row[13]);
+				evaluacionCompetencias.setPlanDesarrollo(planDesarrollo);
+
+				listaEvaluacionCompetencias.add(evaluacionCompetencias);
+			}
+
+			return listaEvaluacionCompetencias;
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public Integer getCantidadCuantitativa(InscripcionPK id) {
+		TypedQuery<Long> tq = em.createNamedQuery(
+				"EvaluacionCompetencias.getCountEvaComp",
+				Long.class);
+		tq.setParameter("idCampania", id.getIdCampania());
+		tq.setParameter("idGerente", id.getIdGerentePublico());
+		tq.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+			return tq.getSingleResult().intValue();
+		} catch (Exception as) {
+			return 0;
+		}
+	}
+	
+	
+	public Integer getCantidadCualitativa(InscripcionPK id) {
+		TypedQuery<Long> tq = em.createNamedQuery(
+				"EvaluacionCompetencias.getCountEvaCualitativa",
+				Long.class);
+		tq.setParameter("idCampania", id.getIdCampania());
+		tq.setParameter("idGerente", id.getIdGerentePublico());
+		tq.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+			return tq.getSingleResult().intValue();
+		} catch (Exception as) {
+			return 0;
+		}
+	}
+
+	public Integer getCantidadCuantitativaGP(InscripcionPK id) {
+		TypedQuery<Long> tq = em.createNamedQuery(
+				"EvaluacionCompetencias.getCountEvaCuantitativaGP",
+				Long.class);
+		tq.setParameter("idCampania", id.getIdCampania());
+		tq.setParameter("idGerente", id.getIdGerentePublico());
+		tq.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+			return tq.getSingleResult().intValue();
+		} catch (Exception as) {
+			return 0;
+		}
+	}
+
+	public Integer getCantidadCuantitativaJI(InscripcionPK id) {
+		TypedQuery<Long> tq = em.createNamedQuery(
+				"EvaluacionCompetencias.getCountEvaCuantitativaJI",
+				Long.class);
+		tq.setParameter("idCampania", id.getIdCampania());
+		tq.setParameter("idGerente", id.getIdGerentePublico());
+		tq.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+			return tq.getSingleResult().intValue();
+		} catch (Exception as) {
+			return 0;
+		}
+	}
+
+	public Integer getCantidadCuantitativaTE(InscripcionPK id) {
+		TypedQuery<Long> tq = em.createNamedQuery(
+				"EvaluacionCompetencias.getCountEvaCuantitativaTE",
+				Long.class);
+		tq.setParameter("idCampania", id.getIdCampania());
+		tq.setParameter("idGerente", id.getIdGerentePublico());
+		tq.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+			return tq.getSingleResult().intValue();
+		} catch (Exception as) {
+			return 0;
+		}
+	}
+
+}

@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/repservir/!svn/ver/1397/desempenio/branches/desempenio/src/test/resources
+END
+db.properties
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/repservir/!svn/ver/554/desempenio/branches/desempenio/src/test/resources/db.properties
+END
+test-context.xml
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/repservir/!svn/ver/546/desempenio/branches/desempenio/src/test/resources/test-context.xml
+END
+test-db.xml
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/repservir/!svn/ver/248/desempenio/branches/desempenio/src/test/resources/test-db.xml
+END
+log4j.xml
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/repservir/!svn/ver/248/desempenio/branches/desempenio/src/test/resources/log4j.xml
+END
+test-mail.xml
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/repservir/!svn/ver/1397/desempenio/branches/desempenio/src/test/resources/test-mail.xml
+END

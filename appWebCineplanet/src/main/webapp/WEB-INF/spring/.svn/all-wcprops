@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/repservir/!svn/ver/1535/desempenio/branches/desempenio/src/main/webapp/WEB-INF/spring
+END
+mail.xml
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/repservir/!svn/ver/1396/desempenio/branches/desempenio/src/main/webapp/WEB-INF/spring/mail.xml
+END
+daemon.xml
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/repservir/!svn/ver/1134/desempenio/branches/desempenio/src/main/webapp/WEB-INF/spring/daemon.xml
+END
+db.xml
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/repservir/!svn/ver/1665/desempenio/branches/desempenio/src/main/webapp/WEB-INF/spring/db.xml
+END
+root-context.xml
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/repservir/!svn/ver/1665/desempenio/branches/desempenio/src/main/webapp/WEB-INF/spring/root-context.xml
+END
+spring-quartz.xml
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/repservir/!svn/ver/1535/desempenio/branches/desempenio/src/main/webapp/WEB-INF/spring/spring-quartz.xml
+END
+spring-security.xml
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/repservir/!svn/ver/1666/desempenio/branches/desempenio/src/main/webapp/WEB-INF/spring/spring-security.xml
+END
+spring-aop.xml
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/repservir/!svn/ver/1532/desempenio/branches/desempenio/src/main/webapp/WEB-INF/spring/spring-aop.xml
+END

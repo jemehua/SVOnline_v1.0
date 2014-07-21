@@ -1,0 +1,183 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.TemporizadorDao;
+import gob.servir.desempenio.model.Actividad;
+import gob.servir.desempenio.model.Temporizador;
+import gob.servir.desempenio.model.TemporizadorPK;
+import gob.servir.desempenio.util.Constantes;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Repository
+public class TemporizadorDaoImpl implements TemporizadorDao {
+	@PersistenceContext
+	private EntityManager em;
+
+	public Temporizador find(TemporizadorPK id) {
+		try {
+			return em.find(Temporizador.class, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Temporizador save(Temporizador obj) {
+		try {
+			em.persist(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Temporizador edit(Temporizador obj) {
+		try {
+			return em.merge(obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<Temporizador> getListaTemporizador() {
+
+		TypedQuery<Temporizador> tq = em.createNamedQuery(
+				"Temporizador.getAllListaTemporizador", Temporizador.class);
+
+		tq.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+			return tq.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<Temporizador> getListaTemporizador(Long idCampania) {
+
+		TypedQuery<Temporizador> tq = em
+				.createNamedQuery("Temporizador.getListaTemporizadorCampania",
+						Temporizador.class);
+
+		tq.setParameter("idCampania", idCampania);
+		tq.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+			return tq.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<Temporizador> getListaTempByProcesoCampania(Long idCampania,
+			Long idProceso) {
+
+		TypedQuery<Temporizador> tq = em.createNamedQuery(
+				"Temporizador.getListaTempByProcesoCampania",
+				Temporizador.class);
+
+		tq.setParameter("idCampania", idCampania);
+		tq.setParameter("idProceso", idProceso);
+		tq.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+			return tq.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<Temporizador> getListaTemporizador(Long idCampania,
+			Long idProceso, Long idCronograma) {
+		
+		TypedQuery<Temporizador> tq = em.createNamedQuery(
+				"Temporizador.getListaTemporizadorCronograma",
+				Temporizador.class);
+
+		tq.setParameter("idCampania", idCampania);
+		tq.setParameter("idProceso", idProceso);
+		tq.setParameter("idCronograma", idCronograma);
+		tq.setParameter("estado",  Constantes.ACTIVO);
+
+		try {
+			return tq.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<Temporizador> getListaTemporizador(Long idCampania,
+			Long idProceso) {
+		
+		TypedQuery<Temporizador> tq = em.createNamedQuery(
+				"Temporizador.getListaTemporizadorCampaniaAndProceso",
+				Temporizador.class);
+		
+		
+		tq.setParameter("idCampania", idCampania);
+		tq.setParameter("idProceso", idProceso);
+
+		List<Temporizador> listaTemp = new ArrayList<Temporizador>();
+		List<Temporizador> listaTempResp = new ArrayList<Temporizador>();
+		List<Actividad> listaActividad = new ArrayList<Actividad>();
+		
+		Query q = null;
+
+		try {
+
+			listaTemp = tq.getResultList();
+
+			if (listaTemp.size() > 0) {
+				listaTempResp = listaTemp;
+
+			} else {
+				q = (Query) em
+						.createQuery("SELECT a FROM Actividad a WHERE a.id.idProceso =:idProceso AND a.estado =:estado ORDER BY a.id.idActividad");
+
+				q.setParameter("idProceso", idProceso);
+			
+				q.setParameter("estado", Constantes.ACTIVO);
+
+				listaActividad = q.getResultList();
+
+				Temporizador temp = null;
+				for (Actividad row : listaActividad) {
+
+					temp = new Temporizador();
+
+					temp.setActividad(row);
+
+					listaTempResp.add(temp);
+				}
+			}
+
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+
+		return listaTempResp;
+	}
+
+}

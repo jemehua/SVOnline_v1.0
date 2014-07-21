@@ -1,0 +1,42 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.JefeInmediatoDao;
+import gob.servir.desempenio.model.JefeInmediato;
+
+import gob.servir.desempenio.service.JefeInmediatoService;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Cristhian Munguia Martinez
+ */
+@Service
+public class JefeInmediatoServiceImpl implements JefeInmediatoService {
+
+	@Autowired
+	private JefeInmediatoDao jefeInmediatoDao;
+
+	@Transactional
+	public JefeInmediato save(JefeInmediato obj) {
+		return jefeInmediatoDao.save(obj);
+	}
+	@Transactional
+	public JefeInmediato edit(JefeInmediato obj) {
+		return jefeInmediatoDao.edit(obj);
+	}
+
+	public List<JefeInmediato> getListaJefeInmediato() {
+		return jefeInmediatoDao.getListaJefeInmediato();
+	}
+
+	public JefeInmediato find(String id) {
+
+		return jefeInmediatoDao.find(id);
+	}
+
+}

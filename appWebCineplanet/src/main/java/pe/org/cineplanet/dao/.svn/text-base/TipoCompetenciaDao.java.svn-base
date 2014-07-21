@@ -1,0 +1,25 @@
+package gob.servir.desempenio.dao;
+
+import gob.servir.desempenio.model.TipoCompetencia;
+
+import java.util.List;
+
+import javax.faces.model.SelectItem;
+
+/**
+ * 
+ * @author Cristhian Munguia Martinez
+ */
+public interface TipoCompetenciaDao {
+
+	public abstract TipoCompetencia save(TipoCompetencia obj);
+
+	public abstract TipoCompetencia edit(TipoCompetencia obj);
+
+	public abstract TipoCompetencia find(Long id);
+
+	public abstract List<TipoCompetencia> getListaCompetencia();
+
+	public abstract List<SelectItem> getComboCompetencia();
+
+}

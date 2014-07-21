@@ -1,0 +1,21 @@
+package gob.servir.desempenio.service;
+
+import gob.servir.desempenio.model.JefeInmediato;
+
+import java.util.List;
+
+/**
+ * 
+ * @author Cristhian Munguia Martinez
+ */
+public interface JefeInmediatoService {
+
+	public abstract JefeInmediato save(JefeInmediato obj);
+
+	public abstract JefeInmediato find(String id);
+
+	public abstract JefeInmediato edit(JefeInmediato obj);
+
+	public abstract List<JefeInmediato> getListaJefeInmediato();
+
+}

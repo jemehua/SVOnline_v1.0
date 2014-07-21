@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<h:outputStylesheet name="css/cssContent.css" />
+</h:head>
+<h:body>
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datos"
+		header="Evaluación Cualitativa del Plan de Desarrollo de Competencias">
+		<p:focus context="datos" />
+		<p:spacer height="10" />
+		<p:panelGrid styleClass="panelGrid">
+			<p:row>
+				<p:column width="30">#{messages.lblCampania}
+				</p:column>
+				<p:column width="70">
+					<h:outputLabel
+						value="#{cualitativaCompetenciasController.inscripcionSelec.campania}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblGerentePublico}
+				</p:column>
+				<p:column>
+					<h:outputLabel
+						value="#{cualitativaCompetenciasController.inscripcionSelec.asignacionGerenteV}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblPuesto}
+				</p:column>
+				<p:column>
+					<h:outputText
+						value="#{cualitativaCompetenciasController.inscripcionSelec.puestoTipoV}" />
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+		<p:spacer height="10" />
+		<p:dataTable var="evaInicial"
+			value="#{cualitativaCompetenciasController.listaPlanDesarrollo}"
+			id="dtMetas"
+			selection="#{cualitativaCompetenciasController.planDesarrolloSelec}"
+			selectionMode="single" rows="7"
+			rowKey="#{evaInicial.id.idCompetencia}"
+			emptyMessage="#{messages.msgEmptyMessage}">
+
+			<!--  <p:ajax event="rowSelect" update=":frm:pgPlan"/>-->
+
+			<p:ajax event="rowSelect"
+				listener="#{cualitativaCompetenciasController.onRowSelect}"
+				update=":frm:pgPlan" />
+
+			<f:facet name="header">  
+            Lista de Competencias [Brecha > 0]
+            </f:facet>
+
+			<p:column headerText="#{messages.lblCodigo}" style="width:10%">
+				<h:outputText value="#{evaInicial.id.idCompetencia}" />
+			</p:column>
+			<p:column headerText="Competencia" style="width:60%">
+				<h:outputText
+					value="#{evaInicial.evaluacionInicial.competencia.competencia.denominacion}" />
+			</p:column>
+			<p:column headerText="Nivel Deseado" style="width:10%">
+				<h:outputText
+					value="#{evaInicial.evaluacionInicial.competencia.nivelDeseado}" />
+			</p:column>
+			<p:column headerText="Eval.Inicial" style="width:10%">
+				<h:outputText value="#{evaInicial.evaluacionInicial.nota}" />
+			</p:column>
+			<p:column headerText="Brecha" style="width:10%">
+				<h:outputText value="#{evaInicial.evaluacionInicial.brecha}" />
+			</p:column>
+			<f:facet name="footer">
+				<div class="mensaje">Seleccione un registro e ingrese su
+					evaluación cualitativa</div>
+			</f:facet>
+
+		</p:dataTable>
+		<p:spacer height="10" />
+		<p:panelGrid id="pgPlan" styleClass="panelGrid">
+			<p:focus context="pgPlan" />
+			<p:row>
+				<p:column width="30">Competencia
+				</p:column>
+				<p:column width="70">
+					<h:outputLabel
+						value="#{cualitativaCompetenciasController.planDesarrolloSelec.evaluacionInicial.competencia.competencia.denominacion}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column width="30">Actividad de Capacitación
+				</p:column>
+				<p:column width="70">
+					<h:outputLabel
+						value="#{cualitativaCompetenciasController.planDesarrolloSelec.actCapacitacion}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>Fecha de culminación
+				</p:column>
+				<p:column>
+					<h:outputText value="#{cualitativaCompetenciasController.planDesarrolloSelec.fechaFinCapacitacion}">
+						<f:convertDateTime pattern="dd/MM/yyyy" /> 
+					</h:outputText>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>Actividad de Entrenamiento
+				</p:column>
+				<p:column>
+					<h:outputLabel
+						value="#{cualitativaCompetenciasController.planDesarrolloSelec.actEntrenamiento}" />
+				</p:column>
+			</p:row>
+			
+			<p:row>
+				<p:column>Fecha de culminación
+				</p:column>
+				<p:column>
+					<h:outputText value="#{cualitativaCompetenciasController.planDesarrolloSelec.fechaFinEntrenamiento}">
+						<f:convertDateTime pattern="dd/MM/yyyy" /> 
+					</h:outputText>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>Evaluación Cualitativa<h:outputText value="*"
+						styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<p:inputText
+						value="#{cualitativaCompetenciasController.cualitativa.descripcion}"
+						disabled="#{cualitativaCompetenciasController.planDesarrolloSelec eq null ? true : false}"
+						tabindex="1" maxlength="240" styleClass="txt" style="width:580px;" />
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+		<p:separator height="0" />
+		<table style="width: 100%">
+			<tr>
+				<td align="left"><p:commandButton value="Guardar"
+						id="btn_guardar"
+						action="#{cualitativaCompetenciasController.guardar}"
+						disabled="#{cualitativaCompetenciasController.swFlujo}"
+						update="dtMetas,pgPlan,messages" icon="ui-icon-disk"
+						tabindex="3" /> <p:commandButton value="#{messages.btnCancelar}"
+						update="datos,messages"
+						action="#{cualitativaCompetenciasController.limpiar}"
+						icon="ui-icon-close" tabindex="4" /></td>
+				<td align="right"><p:commandButton value="Continuar"
+						id="btFlujo" onclick="confirmacion.show()" 
+						icon="ui-icon-circle-arrow-e" tabindex="5"
+						disabled="#{cualitativaCompetenciasController.swFlujo}" /></td>
+			</tr>
+		</table>
+		<p:separator id="s2" />
+	</p:panel>
+	<p:confirmDialog message="¿Estás seguro de continuar?"
+		showEffect="fade" hideEffect="fade" header="Evaluación Cualitativa del Plan de Desarrollo de Competencias"
+		widgetVar="confirmacion">
+		<table style="width: 100%">
+			<tr>
+				<td align="center"><p:commandButton value="Si"
+						style="width:50px" styleClass="ui-confirmdialog-yes"
+						icon="ui-icon-check" oncomplete="confirmacion.hide()"
+						update="datos,messages,btn_guardar,btFlujo"
+						action="#{cualitativaCompetenciasController.atenderFlujo}">
+					</p:commandButton> <p:spacer width="10" /> <p:commandButton value="No"
+						style="width:50px" styleClass="ui-confirmdialog-no"
+						icon="ui-icon-close" onclick="confirmacion.hide()" /></td>
+			</tr>
+		</table>
+	</p:confirmDialog>
+</h:body>
+<p:ajaxStatus style="width:64px;height:64px;position:fixed;right:5px;bottom:5px" id="ajaxStatusPanel">  
+    <f:facet name="start">  
+        <p:graphicImage value="./images/loading.gif" /> 
+    </f:facet>  
+      
+    <f:facet name="complete">  
+        <h:outputText value="" />  
+    </f:facet>  
+</p:ajaxStatus> 
+</html>

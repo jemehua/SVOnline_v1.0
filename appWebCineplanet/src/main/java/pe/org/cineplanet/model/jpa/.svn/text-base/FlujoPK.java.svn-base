@@ -1,0 +1,118 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package gob.servir.desempenio.model;
+
+import java.io.Serializable;
+
+import javax.persistence.*;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Embeddable
+public class FlujoPK implements Serializable {
+	private static final long serialVersionUID = 1L;
+
+	@Basic(optional = false)
+	@Column(name = "idCampania")
+	private Long idCampania;
+	@Basic(optional = false)
+	@Column(name = "idGerentePublico")
+	private String idGerentePublico;
+	@Basic(optional = false)
+	@Column(name = "idProceso")
+	private Long idProceso;
+
+	public FlujoPK() {
+		super();
+	}
+
+	public FlujoPK(Long idCampania, String idGerentePublico, Long idProceso) {
+		super();
+		this.idCampania = idCampania;
+		this.idGerentePublico = idGerentePublico;
+		this.idProceso = idProceso;
+	}
+
+	public Long getIdCampania() {
+		return idCampania;
+	}
+
+	public void setIdCampania(Long idCampania) {
+		this.idCampania = idCampania;
+	}
+
+	public String getIdGerentePublico() {
+		return idGerentePublico;
+	}
+
+	public void setIdGerentePublico(String idGerentePublico) {
+		this.idGerentePublico = idGerentePublico;
+	}
+
+	public Long getIdProceso() {
+		return idProceso;
+	}
+
+	public void setIdProceso(Long idProceso) {
+		this.idProceso = idProceso;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((idCampania == null) ? 0 : idCampania.hashCode());
+		result = prime
+				* result
+				+ ((idGerentePublico == null) ? 0 : idGerentePublico.hashCode());
+		result = prime * result
+				+ ((idProceso == null) ? 0 : idProceso.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		FlujoPK other = (FlujoPK) obj;
+		if (idCampania == null) {
+			if (other.idCampania != null)
+				return false;
+		} else if (!idCampania.equals(other.idCampania))
+			return false;
+		if (idGerentePublico == null) {
+			if (other.idGerentePublico != null)
+				return false;
+		} else if (!idGerentePublico.equals(other.idGerentePublico))
+			return false;
+		if (idProceso == null) {
+			if (other.idProceso != null)
+				return false;
+		} else if (!idProceso.equals(other.idProceso))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("FlujoPK [idCampania=");
+		builder.append(idCampania);
+		builder.append(", idGerentePublico=");
+		builder.append(idGerentePublico);
+		builder.append(", idProceso=");
+		builder.append(idProceso);
+		builder.append("]");
+		return builder.toString();
+	}
+
+}

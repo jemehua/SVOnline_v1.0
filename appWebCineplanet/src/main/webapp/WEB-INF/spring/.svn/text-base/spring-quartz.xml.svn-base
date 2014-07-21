@@ -1,0 +1,69 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean id="runMeTask" class="gob.servir.desempenio.quartz.EnvioAutomatico" />
+	<bean id="runMeTask2" class="gob.servir.desempenio.quartz.EjecutarTarea" />
+
+	<!-- Spring Quartz -->
+	<bean name="runMeJob" class="org.springframework.scheduling.quartz.JobDetailBean">
+
+		<property name="jobClass" value="gob.servir.desempenio.quartz.RunMeJob" />
+
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="runMeTask" value-ref="runMeTask" />
+				<entry key="runMeTask2" value-ref="runMeTask2" />
+			</map>
+		</property>
+
+	</bean>
+	
+	<bean name="runMeJob2" class="org.springframework.scheduling.quartz.JobDetailBean">
+
+		<property name="jobClass" value="gob.servir.desempenio.quartz.RunMeJob2" />
+
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="runMeTask2" value-ref="runMeTask2" />
+			</map>
+		</property>
+
+	</bean>
+
+	<!-- <bean id="runMeJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean"> 
+		<property name="targetObject" ref="runMeTask" /> <property name="targetMethod" 
+		value="printMe" /> 
+		</bean> -->
+
+	<!-- Simple Trigger, run every 5 seconds -->
+	 <bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+		<property name="jobDetail" ref="runMeJob2" />
+		<property name="repeatInterval" value="5000" />
+		<property name="startDelay" value="1000" />
+	</bean>
+
+	<!-- Cron Trigger, run every 5 seconds -->
+	<bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="runMeJob" />
+		<!--<property name="cronExpression" value="0/5 * * * * ?" />-->
+		<property name="cronExpression" value="0 30 9 * * ?" />
+	</bean>
+
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="jobDetails">
+			<list>
+				<ref bean="runMeJob" />
+<!-- 				<ref bean="runMeJob2" /> -->
+			</list> 
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="cronTrigger" />
+<!-- 				<ref bean="simpleTrigger" /> -->
+			</list>
+		</property>
+	</bean>
+
+</beans>

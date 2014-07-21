@@ -1,0 +1,34 @@
+package gob.servir.desempenio.service;
+
+import gob.servir.desempenio.model.Cronograma;
+import gob.servir.desempenio.model.CronogramaPK;
+import gob.servir.desempenio.model.Temporizador;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Service
+public interface CronogramaService {
+
+	public abstract Cronograma find(CronogramaPK id);
+
+	public abstract Cronograma save(Cronograma obj);
+
+	public abstract Cronograma save(Cronograma obj, int cantidadTemp);
+
+	public abstract Cronograma save(Cronograma obj,	List<Temporizador> listaTemporizador);
+
+	public abstract Cronograma edit(Cronograma obj);
+
+	public abstract List<Cronograma> getListaCronograma();
+
+	public abstract List<Cronograma> getListaCronograma(Long idCampania);
+
+	public abstract Long getMaxId(Long idCampania);
+
+}

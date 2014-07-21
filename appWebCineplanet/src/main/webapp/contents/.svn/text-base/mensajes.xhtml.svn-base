@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<h:outputStylesheet name="css/cssContent.css" />
+</h:head>
+<h:body>
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datos" header="Mensajes">
+		<p:focus context="datos" />
+		<table style="width: 100%;" cellspacing="2" cellpadding="2">
+			<tr>
+				<td>#{messages.lblCampania}<h:outputText value="*"
+						styleClass="obligatorio" /></td>
+				<td><p:selectOneMenu id="comboCampania"
+						value="#{mensajeController.campaniaSelec}" style="width:240px;"
+						tabindex="1" disabled="#{mensajeController.swEditar}">
+						<f:selectItems value="#{mensajeController.comboCampania}" />
+						<p:ajax update="comboCampania,dtList" process="comboCampania"
+							event="change" />
+					</p:selectOneMenu></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>#{messages.lblProceso}<h:outputText value="*"
+						styleClass="obligatorio" /></td>
+				<td><p:selectOneMenu id="comboProceso"
+						value="#{mensajeController.procesoSelec}" style="width:240px;"
+						tabindex="2" disabled="#{mensajeController.swEditar}">
+						<f:selectItems value="#{mensajeController.comboProceso}" />
+						<p:ajax update="comboActividad,dtList" process="comboProceso"
+							event="change"
+							actionListener="#{mensajeController.comboActividad}" />
+					</p:selectOneMenu></td>
+				<td>Actividad<h:outputText value="*" styleClass="obligatorio" /></td>
+				<td><p:selectOneMenu id="comboActividad"
+						value="#{mensajeController.actividadSelec}" style="width:240px;"
+						tabindex="3" disabled="#{mensajeController.swEditar}">
+						<f:selectItems value="#{mensajeController.comboActividad}" />
+						<p:ajax update="dtList" process="comboActividad" event="change" />
+					</p:selectOneMenu></td>
+			</tr>
+		</table> 
+		<table style="width: 100%;" cellspacing="2" cellpadding="2">
+			<tr>
+				<td>Titulo<h:outputText value="*" styleClass="obligatorio" /></td>
+			</tr> 
+			<tr>
+				<td><p:inputText value="#{mensajeController.mensaje.titulo}" 
+						maxlength="200" styleClass="txt" tabindex="3"
+						style="width:750px; text-transform: uppercase;" /></td>
+			</tr>
+			<tr>
+				<td>Cuerpo<h:outputText value="*" styleClass="obligatorio" /></td>
+			</tr>
+			<tr>
+				<td><p:editor id="editor"
+						value="#{mensajeController.mensaje.cuerpo}" width="760"
+						tabindex="4" maxlength="4000" /></td>
+			</tr>
+		</table>
+		<p:separator id="s1" />
+		<table>
+			<tr>
+				<td><p:commandButton value="#{messages.btnGuardar}"
+						update="datos,dtList,messages"
+						actionListener="#{mensajeController.guardarMensaje}"
+						icon="ui-icon-disk">
+					</p:commandButton></td>
+				<td><p:commandButton value="#{messages.btnCancelar}"
+						update="datos,messages" action="#{mensajeController.limpiarTodo}"
+						icon="ui-icon-close" tabindex="5" /></td>
+			</tr>
+		</table>
+		<p:separator id="s2" />
+		<p:dataTable var="row" value="#{mensajeController.listaMensaje}"
+			id="dtList" paginator="true" rows="5" scrollable="true"
+			scrollHeight="115"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			emptyMessage="#{messages.msgEmptyMessage}">
+			<f:facet name="header">  
+            Lista de Mensajes
+        </f:facet>
+			<p:column headerText="#{messages.lblCodigo}" style="width:5%">
+				<h:outputText value="#{row.id.idMensaje}" />
+			</p:column>
+			<p:column headerText="Titulo" style="width:30%; white-space: normal">
+				<h:outputText value="#{row.titulo}" />
+			</p:column>
+			<p:column headerText="Cuerpo" style="width:43%; white-space: normal">
+				<h:outputText value="#{row.cuerpo}" />
+			</p:column>
+			<p:column headerText="Tipo" style="width:8%">
+				<h:outputText
+					value="#{row.tipo.equals('P')?'Principal':'Secundario'}" />
+			</p:column>
+			<p:column headerText="#{messages.lblEstado}" style="width:7%">
+				<h:outputText value="#{row.estado.equals('A')?'Activo':'Inactivo'}" />
+			</p:column>
+			<p:column headerText="#{messages.lblOpciones}" style="width:7%">
+				<p:commandButton value="" icon="ui-icon-pencil"
+					update=":frm:datos,dtList" title="Editar">
+					<f:setPropertyActionListener value="#{row.id.idCampania}"
+						target="#{mensajeController.campaniaSelec}" />
+					<f:setPropertyActionListener value="#{row.id.idProceso}"
+						target="#{mensajeController.procesoSelec}" />
+					<f:setPropertyActionListener value="#{row.id.idActividad}"
+						target="#{mensajeController.actividadSelec}" />
+					<f:setPropertyActionListener value="#{row}"
+						target="#{mensajeController.mensaje}" />
+					<f:setPropertyActionListener value="true"
+						target="#{mensajeController.swEditar}" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+
+	</p:panel>
+
+</h:body>
+<p:ajaxStatus style="width:64px;height:64px;position:fixed;right:5px;bottom:5px" id="ajaxStatusPanel">  
+    <f:facet name="start">  
+        <p:graphicImage value="./images/loading.gif" /> 
+    </f:facet>  
+      
+    <f:facet name="complete">  
+        <h:outputText value="" />  
+    </f:facet>  
+</p:ajaxStatus> 
+</html>

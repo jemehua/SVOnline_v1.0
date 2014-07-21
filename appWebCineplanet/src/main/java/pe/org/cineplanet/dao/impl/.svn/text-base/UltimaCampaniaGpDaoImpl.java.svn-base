@@ -1,0 +1,89 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.UltimaCampaniaGpDao;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.UltimaCampaniaGp;
+import gob.servir.desempenio.model.UltimaCampaniaGpPK;
+import gob.servir.desempenio.util.Constantes;
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Repository
+public class UltimaCampaniaGpDaoImpl implements UltimaCampaniaGpDao {
+	@PersistenceContext
+	private EntityManager em;
+
+	public UltimaCampaniaGp find(UltimaCampaniaGpPK id) {
+		try {
+			return em.find(UltimaCampaniaGp.class, id);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	@Transactional
+	public UltimaCampaniaGp save(UltimaCampaniaGp obj) {
+		try {
+			em.persist(obj);
+			return obj;
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	@Transactional
+	public UltimaCampaniaGp edit(UltimaCampaniaGp obj) {
+		try {
+			return em.merge(obj);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	public List<UltimaCampaniaGp> getListaUltimaCampaniaGp(InscripcionPK id) {
+
+		TypedQuery<UltimaCampaniaGp> tq = em.createNamedQuery(
+				"UltimaCampaniaGp.getListaUltimaCampaniaGpCampania",
+				UltimaCampaniaGp.class);
+
+		tq.setParameter("idCampania", id.getIdCampania());
+		tq.setParameter("codGerente", id.getIdGerentePublico());
+		tq.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+			return tq.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<UltimaCampaniaGp> getListaUltimaCampaniaGp(String codGerente) {
+		
+		TypedQuery<UltimaCampaniaGp> tq = em.createNamedQuery(
+				"UltimaCampaniaGp.getListaUltimaCampaniaGpGerente",
+				UltimaCampaniaGp.class);
+		
+		tq.setParameter("codGerente", codGerente);
+		tq.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+			return tq.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+}

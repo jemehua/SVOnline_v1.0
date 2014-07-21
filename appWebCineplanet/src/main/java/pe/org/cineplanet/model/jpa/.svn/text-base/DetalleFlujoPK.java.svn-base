@@ -1,0 +1,142 @@
+package gob.servir.desempenio.model;
+
+import java.io.Serializable;
+
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Embeddable
+public class DetalleFlujoPK implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Basic(optional = false)
+	@Column(name = "idCampania")
+	private Long idCampania;
+	@Basic(optional = false)
+	@Column(name = "idGerentePublico")
+	private String idGerentePublico;
+	@Basic(optional = false)
+	@Column(name = "idProceso")
+	private Long idProceso;
+	@Basic(optional = false)
+	@Column(name = "idActividad")
+	private Long idActividad;
+
+	public DetalleFlujoPK() {
+		super();
+	}
+
+	public DetalleFlujoPK(Long idCampania, String idGerentePublico,
+			Long idProceso, Long idActividad) {
+		super();
+		this.idCampania = idCampania;
+		this.idGerentePublico = idGerentePublico;
+		this.idProceso = idProceso;
+		this.idActividad = idActividad;
+	}
+
+	public Long getIdCampania() {
+		return idCampania;
+	}
+
+	public void setIdCampania(Long idCampania) {
+		this.idCampania = idCampania;
+	}
+
+	public String getIdGerentePublico() {
+		return idGerentePublico;
+	}
+
+	public void setIdGerentePublico(String idGerentePublico) {
+		this.idGerentePublico = idGerentePublico;
+	}
+
+	public Long getIdProceso() {
+		return idProceso;
+	}
+
+	public void setIdProceso(Long idProceso) {
+		this.idProceso = idProceso;
+	}
+
+	public Long getIdActividad() {
+		return idActividad;
+	}
+
+	public void setIdActividad(Long idActividad) {
+		this.idActividad = idActividad;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((idActividad == null) ? 0 : idActividad.hashCode());
+		result = prime * result
+				+ ((idCampania == null) ? 0 : idCampania.hashCode());
+		result = prime
+				* result
+				+ ((idGerentePublico == null) ? 0 : idGerentePublico.hashCode());
+		result = prime * result
+				+ ((idProceso == null) ? 0 : idProceso.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DetalleFlujoPK other = (DetalleFlujoPK) obj;
+		if (idActividad == null) {
+			if (other.idActividad != null)
+				return false;
+		} else if (!idActividad.equals(other.idActividad))
+			return false;
+		if (idCampania == null) {
+			if (other.idCampania != null)
+				return false;
+		} else if (!idCampania.equals(other.idCampania))
+			return false;
+		if (idGerentePublico == null) {
+			if (other.idGerentePublico != null)
+				return false;
+		} else if (!idGerentePublico.equals(other.idGerentePublico))
+			return false;
+		if (idProceso == null) {
+			if (other.idProceso != null)
+				return false;
+		} else if (!idProceso.equals(other.idProceso))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("DetalleFlujoPK [idCampania=");
+		builder.append(idCampania);
+		builder.append(", idGerentePublico=");
+		builder.append(idGerentePublico);
+		builder.append(", idProceso=");
+		builder.append(idProceso);
+		builder.append(", idActividad=");
+		builder.append(idActividad);
+		builder.append("]");
+		return builder.toString();
+	}
+
+}

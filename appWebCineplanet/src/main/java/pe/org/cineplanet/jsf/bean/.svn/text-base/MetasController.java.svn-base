@@ -1,0 +1,675 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.model.DetalleFlujoPK;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.Meta;
+import gob.servir.desempenio.model.MetaPK;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.CampaniaService;
+import gob.servir.desempenio.service.DetalleFlujoService;
+import gob.servir.desempenio.service.FlujoService;
+import gob.servir.desempenio.service.InscripcionService;
+import gob.servir.desempenio.service.MetaService;
+import gob.servir.desempenio.util.Constantes;
+import gob.servir.desempenio.util.Message;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+
+@Controller("metasController")
+@Scope("session")
+public class MetasController implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private static final Logger logger = LoggerFactory
+			.getLogger(MetasController.class);
+
+	@Autowired
+	private LoginController loginController;
+	@Autowired
+	private CampaniaService campaniaService;
+	@Autowired
+	private MetaService metaService;
+	@Autowired
+	private InscripcionService inscripcionService;
+	@Autowired
+	private FlujoService flujoService;
+	@Autowired
+	private DetalleFlujoService detalleFlujoService;
+
+	private Usuario userSesion = null;
+	private Message message = new Message();
+
+	private List<SelectItem> comboCampania = new ArrayList<SelectItem>();
+	private Long campaniaSelec = 0L;
+
+	// Buscar gp
+	private Inscripcion inscripcionSelec = null;
+	private List<Inscripcion> listaGerentePublico = new ArrayList<Inscripcion>();
+	private List<Inscripcion> listaGerentePublicoFiltered = new ArrayList<Inscripcion>();
+	private boolean swBtnBuscar = true;
+	// private String valorBusqueda2 = "";
+
+	// Agregar
+	private Meta nuevoMeta = new Meta();
+	private List<SelectItem> comboTipoMeta = new ArrayList<SelectItem>();
+	private List<Meta> listaMetas = new ArrayList<Meta>();
+	private Integer totalPeso = 0;
+
+	// lista
+	private List<Inscripcion> listaInscripcion = new ArrayList<Inscripcion>();
+
+	private boolean swFlujo = true;
+
+	public MetasController() {
+
+	}
+
+	@PostConstruct
+	public void cargar() {
+		validarSesion();
+		cargarComboTipoMeta();
+		verificarEstadoFlujo();
+	}
+
+	public void verificarEstadoFlujo() {
+		if (inscripcionSelec == null) {
+			swFlujo = true;
+		} else {
+			String detalle = detalleFlujoService
+					.getEstadoDetalleFlujo(new DetalleFlujoPK(inscripcionSelec
+							.getId().getIdCampania(), inscripcionSelec.getId()
+							.getIdGerentePublico(), Constantes.PROCESO1,
+							Constantes.P1_REGISTRO_METAS_INDICADORES));
+
+			if (detalle != null) {
+				if (detalle.equalsIgnoreCase(Constantes.ATENDIDO))
+					swFlujo = true;
+				else
+					swFlujo = false;
+			} else
+				swFlujo = true;
+		}
+	}
+
+	public boolean isSwFlujo() {
+		return swFlujo;
+	}
+
+	public void setSwFlujo(boolean swFlujo) {
+		this.swFlujo = swFlujo;
+	}
+
+	public Integer getTotalPeso() {
+		return totalPeso;
+	}
+
+	public void setTotalPeso(Integer totalPeso) {
+		this.totalPeso = totalPeso;
+	}
+
+	public boolean isSwBtnBuscar() {
+		if (campaniaSelec != 0L)
+			swBtnBuscar = false;
+		else
+			swBtnBuscar = true;
+		return swBtnBuscar;
+	}
+
+	public void setSwBtnBuscar(boolean swBtnBuscar) {
+		this.swBtnBuscar = swBtnBuscar;
+	}
+
+	public void buscarListaGerentesConMetas() {
+		listaInscripcion.clear();
+
+		if (campaniaSelec != 0L)
+			listaInscripcion = inscripcionService.getListaInscripcion(
+					campaniaSelec, 1);// 1=Metas
+	}
+
+	public List<Inscripcion> getListaInscripcion() {
+		return listaInscripcion;
+	}
+
+	public void setListaInscripcion(List<Inscripcion> listaInscripcion) {
+		this.listaInscripcion = listaInscripcion;
+	}
+
+	public Meta getNuevoMeta() {
+		return nuevoMeta;
+	}
+
+	public void setNuevoMeta(Meta nuevoMeta) {
+		this.nuevoMeta = nuevoMeta;
+	}
+
+	public void cargarComboTipoMeta() {
+		comboTipoMeta.clear();
+
+		SelectItem item = null;
+		item = new SelectItem(Constantes.FUNCIONAL, Constantes.FUNCIONAL);
+		comboTipoMeta.add(item);
+		item = new SelectItem(Constantes.INNOVACION, Constantes.INNOVACION);
+		comboTipoMeta.add(item);
+	}
+
+	public List<SelectItem> getComboTipoMeta() {
+		return comboTipoMeta;
+	}
+
+	public void setComboTipoMeta(List<SelectItem> comboTipoMeta) {
+		this.comboTipoMeta = comboTipoMeta;
+	}
+
+	public Inscripcion getInscripcionSelec() {
+		return inscripcionSelec;
+	}
+
+	public void setInscripcionSelec(Inscripcion inscripcionSelec) {
+		this.inscripcionSelec = inscripcionSelec;
+	}
+
+	public void buscarGerenteInscrito() {
+		listaGerentePublico.clear();
+		if (campaniaSelec != 0L)
+			listaGerentePublico = inscripcionService
+					.getListaGerentePublico(campaniaSelec);
+		listaGerentePublicoFiltered = listaGerentePublico;
+	}
+
+	public List<Inscripcion> getListaGerentePublico() {
+		return listaGerentePublico;
+	}
+
+	public void setListaGerentePublico(List<Inscripcion> listaGerentePublico) {
+		this.listaGerentePublico = listaGerentePublico;
+	}
+
+	public List<Inscripcion> getListaGerentePublicoFiltered() {
+		return listaGerentePublicoFiltered;
+	}
+
+	public void setListaGerentePublicoFiltered(
+			List<Inscripcion> listaGerentePublicoFiltered) {
+		this.listaGerentePublicoFiltered = listaGerentePublicoFiltered;
+	}
+
+	public void buscarListaMetas() {
+		listaMetas.clear();
+		if (inscripcionSelec != null) {
+			listaMetas = metaService.getListaMetas(inscripcionSelec.getId());
+
+			totalPeso = 0;
+			for (Meta row : listaMetas) {
+				totalPeso += row.getPeso();
+			}
+		}
+	}
+
+	public List<Meta> getListaMetas() {
+		return listaMetas;
+	}
+
+	public void setListaMetas(List<Meta> listaMetas) {
+		this.listaMetas = listaMetas;
+	}
+
+	public List<SelectItem> getComboCampania() {
+		comboCampania = campaniaService.getComboCampania();
+		return comboCampania;
+	}
+
+	public void setComboCampania(List<SelectItem> comboCampania) {
+		this.comboCampania = comboCampania;
+	}
+
+	public Long getCampaniaSelec() {
+		return campaniaSelec;
+	}
+
+	public void setCampaniaSelec(Long campaniaSelec) {
+		this.campaniaSelec = campaniaSelec;
+	}
+
+	public void validarSesion() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		
+		userSesion = (Usuario) context.getExternalContext().getSessionMap()
+				.get(loginController.getUsername());
+
+		if (userSesion == null) {
+			String ctxPath = context.getExternalContext()
+					.getRequestContextPath();
+			try {
+				context.getExternalContext().redirect(ctxPath + "/login.jsf");
+			} catch (Exception e) {
+				//e.printStackTrace();
+			}
+		}
+	}
+
+	public void agregarMeta() {
+
+		validarSesion();
+
+		try {
+
+			if (!validarAgregar())
+				return;
+
+			if (nuevoMeta.getId() != null) {// edit
+
+				Meta meta = metaService.find(nuevoMeta.getId());
+				meta.setTipo(nuevoMeta.getTipo());
+				meta.setDenominacion(nuevoMeta.getDenominacion());
+				meta.setRelacionPOI(nuevoMeta.getRelacionPOI());
+				meta.setPeso(nuevoMeta.getPeso());
+				meta.setFechaFinMeta(nuevoMeta.getFechaFinMeta());
+				meta.setUsuarioModifica(userSesion.getUsuario());
+				metaService.edit(meta);
+				FacesContext.getCurrentInstance().addMessage(
+						null,
+						new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+								message.getMessage("msgModificar")));
+
+			} else {// nuevo
+				Long idMeta = metaService.getMaxId(inscripcionSelec.getId());
+
+				MetaPK id = new MetaPK(idMeta, inscripcionSelec.getId()
+						.getIdCampania(), inscripcionSelec.getId()
+						.getIdGerentePublico());
+
+				nuevoMeta.setId(id);
+				nuevoMeta.setEstadoModificacionMeta(true);
+				nuevoMeta.setEstado(Constantes.ACTIVO);
+
+				nuevoMeta.setUsuarioRegistra(userSesion.getUsuario());
+				nuevoMeta.setAprobacion(Constantes.TRUE);
+				metaService.save(nuevoMeta);
+
+				FacesContext.getCurrentInstance().addMessage(
+						null,
+						new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+								message.getMessage("msgAgregar")));
+			}		
+		} catch (Exception e) {
+			logger.info("ERRROR AL AGREGAR META");
+			// e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+							message.getMessage("msgAgregarError")));
+		}
+		limpiarAgregar();
+		buscarListaMetas();
+	}
+
+	public boolean validarAgregar() {
+
+		String txtObligatorio = message.getMessage("msgTxtObligatorio");
+
+		if (inscripcionSelec == null) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Seleccione Gerente Público"));
+			return false;
+		}
+
+		if (nuevoMeta.getDenominacion().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+
+		if (nuevoMeta.getRelacionPOI().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+
+		if (nuevoMeta.getFechaFinMeta() == null) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							message.getMessage("msgTxtObligatorio")));
+			return false;
+		}
+
+		if (nuevoMeta.getPeso() < 1 || nuevoMeta.getPeso() > 100) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Ingrese peso valido max. 100%"));
+			return false;
+		}
+
+		if (nuevoMeta.getId() == null) {
+			if (nuevoMeta.getTipo().equalsIgnoreCase(Constantes.FUNCIONAL)) {
+				if (validarCantidadMetaFuncional()) {
+					FacesContext
+							.getCurrentInstance()
+							.addMessage(
+									null,
+									new FacesMessage(
+											FacesMessage.SEVERITY_WARN,
+											"ADVERTENCIA",
+											"Ingrese como 2 mínimo y máximo 5 metas funcionales"));
+					return false;
+				}
+			} else {
+				if (validarCantidadMetaInnovacion()) {
+					FacesContext
+							.getCurrentInstance()
+							.addMessage(
+									null,
+									new FacesMessage(
+											FacesMessage.SEVERITY_WARN,
+											"ADVERTENCIA",
+											"Ingrese como mínimo 1 y máximo 2 metas innovación"));
+					return false;
+				}
+			}
+			if ((totalPeso + nuevoMeta.getPeso()) > 100) {
+				FacesContext
+						.getCurrentInstance()
+						.addMessage(
+								null,
+								new FacesMessage(FacesMessage.SEVERITY_WARN,
+										"ADVERTENCIA",
+										"La sumatoria del peso de las metas debe ser igual a 100%"));
+				return false;
+			}
+		}
+		if (nuevoMeta.getId() != null) {
+			Meta temp = metaService.find(nuevoMeta.getId());
+
+			if (!temp.getTipo().equalsIgnoreCase(nuevoMeta.getTipo())) {
+				if (nuevoMeta.getTipo().equalsIgnoreCase(Constantes.FUNCIONAL)) {
+					if (validarCantidadMetaFuncional()) {
+						FacesContext
+								.getCurrentInstance()
+								.addMessage(
+										null,
+										new FacesMessage(
+												FacesMessage.SEVERITY_WARN,
+												"ADVERTENCIA",
+												"Ingrese como 2 mínimo y máximo 5 metas funcionales E"));
+
+						return false;
+					}
+				} else {
+					if (validarCantidadMetaInnovacion()) {
+						FacesContext
+								.getCurrentInstance()
+								.addMessage(
+										null,
+										new FacesMessage(
+												FacesMessage.SEVERITY_WARN,
+												"ADVERTENCIA",
+												"Ingrese como mínimo 1 y máximo 2 metas innovación E"));
+
+						return false;
+					}
+				}
+			}
+			if (((totalPeso - temp.getPeso()) + nuevoMeta.getPeso()) > 100) {
+				FacesContext
+						.getCurrentInstance()
+						.addMessage(
+								null,
+								new FacesMessage(FacesMessage.SEVERITY_WARN,
+										"ADVERTENCIA",
+										"La sumatoria del peso de las metas debe ser igual a 100% E"));
+				return false;
+			}
+
+		}
+
+		return true;
+	}
+
+	private boolean validarCantidadMetaFuncional() {
+		buscarListaMetas();
+		Integer cantidad = 0;
+
+		for (Meta row : listaMetas) {
+			if (row.getTipo().equalsIgnoreCase(Constantes.FUNCIONAL)) {
+				cantidad += 1;
+			}
+		}
+
+		if (cantidad > 4) {
+			return true;
+		}
+
+		return false;
+	}
+
+	private boolean validarCantidadMetaInnovacion() {
+		buscarListaMetas();
+		Integer cantidad = 0;
+
+		for (Meta row : listaMetas) {
+			if (row.getTipo().equalsIgnoreCase(Constantes.INNOVACION)) {
+				cantidad += 1;
+			}
+		}
+
+		if (cantidad > 1) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public void guardar() {
+		validarSesion();
+
+		if (!validarGuardar())
+			return;
+
+		try {
+
+			Inscripcion inscripcionResp = inscripcionService
+					.find(inscripcionSelec.getId());
+
+			inscripcionResp.setUsuarioModifica(userSesion.getUsuario());
+			inscripcionResp.setEstadoMetas(Constantes.REGISTRADO);
+
+			inscripcionService.edit(inscripcionResp);
+
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+							"Registro exitoso"));
+
+			// limpiar();
+		} catch (Exception e) {
+			logger.info("ERRROR AL REGISTRAR META");
+			// e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+							message.getMessage("msgRegistrarError")));
+		}
+	}
+
+	public boolean validarGuardar() {
+
+		if (inscripcionSelec == null) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Seleccione Gerente Público"));
+			return false;
+		}
+
+		if (validarCantidadMetas()) {
+			FacesContext
+					.getCurrentInstance()
+					.addMessage(
+							null,
+							new FacesMessage(FacesMessage.SEVERITY_WARN,
+									"ADVERTENCIA",
+									"Ingrese 2 metas funcionales y 1 meta de innovación como mínimo"));
+			return false;
+		}
+
+		if (validarSumaTotal()) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"La suma de los pesos de las metas debe ser 100%"));
+			return false;
+		}
+
+		return true;
+	}
+
+	private boolean validarCantidadMetas() {
+
+		Integer sumaMetaFuncional = 0;
+		Integer sumaMetaInnovacion = 0;
+
+		for (Meta row : listaMetas) {
+			if (row.getTipo().equalsIgnoreCase(Constantes.FUNCIONAL))
+				sumaMetaFuncional += 1;
+			else
+				sumaMetaInnovacion += 1;
+		}
+
+		if (!(sumaMetaFuncional > 1 && sumaMetaInnovacion > 0)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	private boolean validarSumaTotal() {
+
+		Integer suma = 0;
+
+		for (Meta row : listaMetas) {
+
+			suma += row.getPeso();
+
+		}
+
+		if (suma != 100) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	public void seleccionarGerente() {
+		verificarEstadoFlujo();
+		buscarListaMetas();
+		buscarListaGerentesConMetas();
+	}
+
+	public void limpiar() {
+		nuevoMeta = new Meta();
+		inscripcionSelec = null;
+		totalPeso = 0;
+		seleccionarGerente();
+	}
+
+	public void limpiarAgregar() {
+		nuevoMeta = new Meta();
+	}
+
+	public void atenderFlujo() {
+
+		validarSesion();
+
+		if (!validarAtenderFlujo())
+			return;
+
+		try {
+			DetalleFlujoPK idDetalle = new DetalleFlujoPK(inscripcionSelec
+					.getId().getIdCampania(), inscripcionSelec.getId()
+					.getIdGerentePublico(), Constantes.PROCESO1,
+					Constantes.P1_REGISTRO_METAS_INDICADORES);
+
+			flujoService.atenderFlujo(idDetalle, userSesion.getUsuario());
+			FacesContext
+					.getCurrentInstance()
+					.addMessage(
+							null,
+							new FacesMessage(FacesMessage.SEVERITY_INFO,
+									"EXITO",
+									"Se ha enviado las metas propuestas al Gerente Público"));
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+							"Ha ocurrido un error"));
+		}
+		limpiar();
+	}
+
+	public boolean validarAtenderFlujo() {
+
+		if (inscripcionSelec == null) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Seleccione Gerente Público"));
+			return false;
+		}
+
+		if (verificarRegistroMetas()) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Primero haga clic en el boton Guardar"));
+			return false;
+		}
+
+		if (!validarGuardar())
+			return false;
+
+		return true;
+	}
+
+	private boolean verificarRegistroMetas() {
+
+		Inscripcion inscripcion = inscripcionService.find(inscripcionSelec
+				.getId());
+
+		if (inscripcion.getEstadoMetas()
+				.equalsIgnoreCase(Constantes.REGISTRADO))
+			return false;
+		else
+			return true;
+	}
+
+}

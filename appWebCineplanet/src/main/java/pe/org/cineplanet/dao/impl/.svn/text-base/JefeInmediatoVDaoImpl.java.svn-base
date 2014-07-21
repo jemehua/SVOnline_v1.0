@@ -1,0 +1,56 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.JefeInmediatoVDao;
+import gob.servir.desempenio.model.JefeInmediatoV;
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+
+import org.springframework.stereotype.Repository;
+
+/**
+ * 
+ * @author Hever Pumallihua García
+ */
+@Repository
+public class JefeInmediatoVDaoImpl implements JefeInmediatoVDao {
+
+	@PersistenceContext
+	private EntityManager em;
+
+	public JefeInmediatoV find(Long id) {
+		return em.find(JefeInmediatoV.class, id);
+	}
+
+	public JefeInmediatoV getNombreCompletoAndDni(Long id) {
+
+		try {
+
+			TypedQuery<JefeInmediatoV> tq = em.createNamedQuery(
+					"JefeInmediatoV.getNombreCompletoAndDni",
+					JefeInmediatoV.class);
+			tq.setParameter("id", id);
+			return tq.getSingleResult();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<JefeInmediatoV> getListaJefeInmediato() {
+
+		try {
+			TypedQuery<JefeInmediatoV> tq = em.createNamedQuery(
+					"JefeInmediatoV.getAllListaJefeInmediato",
+					JefeInmediatoV.class);
+			return tq.getResultList();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+}

@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+	<h:outputStylesheet name="css/cssContent.css" />
+</h:head>
+<h:body>
+	<script type="text/javascript" src="./resources/js/calendario.js"></script>
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datos" header="Cronograma de Campaña de Evaluación">
+		<p:focus context="datos" />
+		<p:panelGrid styleClass="panelGrid">
+			<p:row> 
+				<p:column>#{messages.lblCampania} <h:outputText value="*"
+						styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<p:selectOneMenu id="comboCampania"
+						value="#{cronogramaController.campaniaSelec}" style="width:240px;"
+						tabindex="1" disabled="#{cronogramaController.swEditar}">
+						<f:selectItems value="#{cronogramaController.comboCampania}" />
+						<p:ajax update="dtList, dtLista" process="comboCampania"
+							event="change" />
+					</p:selectOneMenu>
+				</p:column>
+				<p:column></p:column>
+				<p:column></p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblProceso}<h:outputText value="*"
+						styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<p:selectOneMenu id="comboProceso"
+						value="#{cronogramaController.procesoSelec}" style="width:240px;"
+						tabindex="2" disabled="#{cronogramaController.swEditar}">
+						<f:selectItems value="#{cronogramaController.comboProceso}" />
+						<p:ajax update="dtLista" process="comboProceso" event="change" />
+					</p:selectOneMenu>
+				</p:column>
+				<p:column></p:column>
+				<p:column></p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblFechaInicio} <h:outputText
+						value="*" styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<p:calendar id="desde" locale="es"
+						value="#{cronogramaController.nuevoCronograma.fechaInicio}"
+						showOn="button" navigator="true" tabindex="3" pattern="dd/MM/yyyy">
+					</p:calendar>
+				</p:column>
+				<p:column>#{messages.lblFechaFin}</p:column>
+				<p:column>
+					<p:calendar id="hasta" locale="es"
+						value="#{cronogramaController.nuevoCronograma.fechaFin}"
+						showOn="button" navigator="true" tabindex="4" pattern="dd/MM/yyyy">
+					</p:calendar>
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+
+		<p:panel id="pnlAgregar" header="Temporizador">
+
+			<p:dataTable var="fila"
+				value="#{cronogramaController.listaTemporizador}" id="dtLista"
+				rows="20" scrollable="true" scrollHeight="165"
+				emptyMessage="#{messages.msgEmptyMessage}" rowIndexVar="rowIndex">
+
+				<p:column headerText="#{messages.lblCodigo}" style="width:6%">
+					<h:outputText value="#{fila.actividad.id.idActividad}" />
+				</p:column>
+				<p:column headerText="Actividad" style="width:50%">
+					<h:outputText value="#{fila.actividad.nombre}" />
+				</p:column>
+				<p:column headerText="Intervalo(días)" style="width:12%">
+					<p:inputText id="txtCatidad" value="#{fila.cantidadDias}"
+						style="width:60px;"
+						valueChangeListener="#{cronogramaController.asignarCantidadDias}">
+						<p:ajax listener="#{cronogramaController.asignarDias(fila)}" />
+					</p:inputText>
+					<pe:keyFilter for="txtCatidad" regEx="/[0-9]/" />
+				</p:column>
+
+				<p:column headerText="#{messages.lblOpciones}" style="width:8%">
+					<p:commandButton id="viewMessg" value="" icon="ui-icon-newwin"
+						update=":frm:content" immediate="true"
+						disabled="#{fila.actividad.tipo eq 'T' ? false : true}">
+						<f:setPropertyActionListener
+							target="#{contenidoController.includedPage}"
+							value="contents/mensajes.xhtml" />
+						<f:setPropertyActionListener
+							target="#{mensajeController.campaniaSelec}"
+							value="#{cronogramaController.campaniaSelec}" />
+						<f:setPropertyActionListener
+							target="#{mensajeController.procesoSelec}"
+							value="#{fila.actividad.id.idProceso}" />
+						<f:setPropertyActionListener
+							target="#{mensajeController.actividadSelec}"
+							value="#{fila.actividad.id.idActividad}" />
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+
+		<p:separator id="s1" />
+		<table>
+			<tr>
+				<td><p:commandButton value="Guardar"
+						action="#{cronogramaController.guardar}"
+						update="datos,dtList,messages" icon="ui-icon-disk"
+						tabindex="6" /></td>
+				<td><p:commandButton value="#{messages.btnCancelar}"
+						update="datos,messages" action="#{cronogramaController.limpiar}"
+						icon="ui-icon-close" tabindex="7" /></td>
+			</tr>
+		</table>
+		<p:separator id="s2" />
+		<p:dataTable var="row" value="#{cronogramaController.listaCronograma}"
+			id="dtList" rows="10" emptyMessage="#{messages.msgEmptyMessage}">
+			<f:facet name="header">   
+            Cronograma de Campaña de Evaluación  
+        </f:facet>
+
+			<p:column headerText="#{messages.lblCodigo}" style="width:8%">
+				<h:outputText value="#{row.id.idProceso}" />
+			</p:column>
+			<p:column headerText="Proceso" style="width:35%">
+				<h:outputText value="#{row.proceso.denominacion}" />
+			</p:column>
+			<p:column headerText="#{messages.lblFechaInicio}" style="width:15%">
+				<h:outputText value="#{row.fechaInicio}">
+					<f:convertDateTime pattern="dd/MM/yyyy" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="#{messages.lblFechaFin}" style="width:15%">
+				<h:outputText value="#{row.fechaFin}">
+					<f:convertDateTime pattern="dd/MM/yyyy" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="#{messages.lblEstado}" style="width:10%">
+				<h:outputText value="#{row.estado.equals('A')?'Activo':'Inactivo'}" />
+			</p:column>
+			<p:column headerText="#{messages.lblOpciones}" style="width:10%">
+				<p:commandButton value="" icon="ui-icon-pencil" update=":frm:datos"
+					title="Editar Cronograma">
+					<f:setPropertyActionListener value="#{row}"
+						target="#{cronogramaController.nuevoCronograma}" />
+					<f:setPropertyActionListener value="#{row.id.idCampania}"
+						target="#{cronogramaController.campaniaSelec}" />
+					<f:setPropertyActionListener value="#{row.id.idProceso}"
+						target="#{cronogramaController.procesoSelec}" />
+					<f:setPropertyActionListener value="true"
+						target="#{cronogramaController.swEditar}" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+	</p:panel>
+</h:body>
+<p:ajaxStatus style="width:64px;height:64px;position:fixed;right:5px;bottom:5px" id="ajaxStatusPanel">  
+    <f:facet name="start">  
+        <p:graphicImage value="./images/loading.gif" /> 
+    </f:facet>  
+      
+    <f:facet name="complete">  
+        <h:outputText value="" />  
+    </f:facet>  
+</p:ajaxStatus> 
+</html>

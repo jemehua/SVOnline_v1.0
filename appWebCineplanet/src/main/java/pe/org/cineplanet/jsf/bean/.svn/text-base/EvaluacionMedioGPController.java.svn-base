@@ -1,0 +1,181 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.model.EvaluacionCompetencias;
+import gob.servir.desempenio.model.EvaluacionMetas;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.report.EvaluacionMedioReport;
+import gob.servir.desempenio.service.CampaniaService;
+import gob.servir.desempenio.service.DetalleFlujoService;
+import gob.servir.desempenio.service.EvaluacionCompetenciasService;
+import gob.servir.desempenio.service.EvaluacionMetasService;
+import gob.servir.desempenio.service.FlujoService;
+import gob.servir.desempenio.service.InscripcionService;
+import gob.servir.desempenio.service.PlanDesarrolloService;
+import gob.servir.desempenio.service.PlanMetasService;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.faces.context.FacesContext;
+import org.primefaces.model.StreamedContent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+
+@Component("evaluacionMedioGPController")
+@Scope("session")
+public class EvaluacionMedioGPController implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private static final Logger logger = LoggerFactory
+			.getLogger(InscripcionController.class);
+
+	@Autowired
+	private LoginController loginController;
+	@Autowired
+	private CampaniaService campaniaService;
+	@Autowired
+	private InscripcionService inscripcionService;
+	@Autowired
+	private PlanMetasService planMetasService;
+	@Autowired
+	private PlanDesarrolloService planDesarrolloService;
+	@Autowired
+	private FlujoService flujoService;
+	@Autowired
+	private DetalleFlujoService detalleFlujoService;
+	@Autowired
+	private EvaluacionMetasService evaluacionMetasService;
+	@Autowired
+	private EvaluacionCompetenciasService evaluacionCompetenciasService;
+
+	// Busqueda GP
+	private Inscripcion inscripcionSelec = null;
+
+	private List<EvaluacionMetas> listaEvaluacionMetas = new ArrayList<EvaluacionMetas>();
+	private EvaluacionMetas evaluacionMetasSelec = null;
+
+	private EvaluacionCompetencias evaluacionCompetenciasSelec = null;
+	private List<EvaluacionCompetencias> listaEvaluacionCompetencias = new ArrayList<EvaluacionCompetencias>();
+
+	private Usuario userSesion = null;
+
+	public EvaluacionMedioGPController() {
+		super();
+	}
+
+	@PostConstruct
+	public void init() {
+		validarSesion();
+		getInscripcion();
+		seleccionarGerente();
+	}
+
+	public Inscripcion getInscripcionSelec() {
+		return inscripcionSelec;
+	}
+
+	public void setInscripcionSelec(Inscripcion inscripcionSelec) {
+		this.inscripcionSelec = inscripcionSelec;
+	}
+
+	public void seleccionarGerente() {
+
+		buscarEvaluacionMetas();
+		buscarEvaCompetencias();
+	}
+
+	public void getInscripcion() {
+		Inscripcion ins = inscripcionService.getInscripcionUsuario(userSesion);
+		if (ins != null)
+			inscripcionSelec = ins;
+	}
+
+	public void validarSesion() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		
+		userSesion = (Usuario) context.getExternalContext().getSessionMap()
+				.get(loginController.getUsername());
+
+		if (userSesion == null) {
+			String ctxPath = context.getExternalContext()
+					.getRequestContextPath();
+			try {
+				context.getExternalContext().redirect(ctxPath + "/login.jsf");
+			} catch (Exception e) {
+				//e.printStackTrace();
+			}
+		}
+	}
+
+	public void buscarEvaluacionMetas() {
+		listaEvaluacionMetas.clear();
+		if (inscripcionSelec != null)
+			listaEvaluacionMetas = evaluacionMetasService
+					.getListaEvaluacionMetas(inscripcionSelec.getId());
+		else
+			init();
+	}
+
+	public List<EvaluacionMetas> getListaEvaluacionMetas() {
+		return listaEvaluacionMetas;
+	}
+
+	public void setListaEvaluacionMetas(
+			List<EvaluacionMetas> listaEvaluacionMetas) {
+		this.listaEvaluacionMetas = listaEvaluacionMetas;
+	}
+
+	public void buscarEvaCompetencias() {
+		listaEvaluacionCompetencias.clear();
+		if (inscripcionSelec != null)
+			listaEvaluacionCompetencias = evaluacionCompetenciasService
+					.getListaEvaluacionCompetencias(inscripcionSelec.getId());
+	}
+
+	public List<EvaluacionCompetencias> getListaEvaluacionCompetencias() {
+		return listaEvaluacionCompetencias;
+	}
+
+	public void setListaEvaluacionCompetencias(
+			List<EvaluacionCompetencias> listaEvaluacionCompetencias) {
+		this.listaEvaluacionCompetencias = listaEvaluacionCompetencias;
+	}
+
+	public EvaluacionMetas getEvaluacionMetasSelec() {
+		return evaluacionMetasSelec;
+	}
+
+	public void setEvaluacionMetasSelec(EvaluacionMetas evaluacionMetasSelec) {
+		this.evaluacionMetasSelec = evaluacionMetasSelec;
+	}
+
+	public EvaluacionCompetencias getEvaluacionCompetenciasSelec() {
+		return evaluacionCompetenciasSelec;
+	}
+
+	public void setEvaluacionCompetenciasSelec(
+			EvaluacionCompetencias evaluacionCompetenciasSelec) {
+		this.evaluacionCompetenciasSelec = evaluacionCompetenciasSelec;
+	}
+	
+	private StreamedContent docMedioAnio;
+	
+	public StreamedContent getDocMedioAnio() {
+		validarSesion();
+		EvaluacionMedioReport EvalMedioRep = new EvaluacionMedioReport();
+		return EvalMedioRep.generarReporteGP(inscripcionSelec, userSesion, listaEvaluacionMetas, listaEvaluacionCompetencias);
+	}
+
+	public void setDocMedioAnio(StreamedContent docMedioAnio) {
+		this.docMedioAnio = docMedioAnio;
+	}
+
+}

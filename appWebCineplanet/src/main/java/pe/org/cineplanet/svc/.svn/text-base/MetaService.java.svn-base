@@ -1,0 +1,33 @@
+package gob.servir.desempenio.service;
+
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.Meta;
+import gob.servir.desempenio.model.MetaPK;
+
+import java.util.List;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+public interface MetaService {
+
+	public abstract Meta find(MetaPK id);
+
+	public abstract Meta save(Meta obj);
+
+	public abstract Meta edit(Meta obj);
+
+	public abstract List<Meta> getListaMeta();
+
+	public abstract List<Meta> getListaMetas(InscripcionPK id);
+
+	public abstract List<Meta> getListaMetasAprobacion(InscripcionPK id,
+			boolean aprobacion);
+
+	public abstract Long getMaxId(InscripcionPK id);
+	
+	public abstract Integer getCantidadMetasModificados(InscripcionPK inspk,
+			boolean modificado,boolean aprobacion);
+
+}

@@ -1,0 +1,122 @@
+body {
+	margin:0 auto;
+	font-family: Calibri, Arial, Verdana;
+	font-size: 9pt;
+	background-image: url('../../images/franja_3.png');
+	background-repeat: repeat-x; 
+}
+
+#page {
+	background: #ffffff;
+	width: 1024px;
+	margin:0 auto;
+	border-right: solid 2px #a0a0a0;
+	border-bottom: solid 2px #a0a0a0;
+}
+
+#header {
+	height: 90px;
+	width:1024px;
+	clear:both;
+	margin-bottom: 5px;
+}
+
+#container {
+	padding: 4px;
+	clear: both;
+	width: 1016px;
+	height: auto;
+	float: left;
+	background-color: #ffffff;
+}
+
+#container #sidebar {
+	float: left;
+	width: 200px;	
+	border: 1px solid #d0d0d0;
+	min-height: 240px;
+	padding: 4px;
+}
+
+#container #content {
+	float: right;
+	min-height: 550px;
+	width: 798px;
+}
+
+#footer {
+	width:1016px;
+	height:70px;
+	border-top: 1px solid #c0c0c0;
+	clear : both;
+}
+
+.panel {
+	border: 1px solid #d0d0d0;
+	padding: 8px;
+	margin: 8px 4px 16px 4px;
+	background: #fafafa;
+}
+
+.panel h1 {
+	font-size: 120%;
+	display: block;
+	background: #f0f0f0;
+	padding: 6px;
+	margin: -8px;
+	border-bottom: 1px solid #d0d0d0;
+	margin-bottom: 8px;
+}
+
+.adm{
+	font-size: 5pt;
+}
+
+.odd {
+	background: #f0f0f0;
+}
+
+.even {
+	background: #ffffff;
+}
+
+.dataTable {
+	border-collapse: collapse;;
+	width: 100%;
+}
+
+.dataTable th {
+	background: #204080;
+	color: #f0f0f0;
+	padding: 6px;
+	border: 1px solid #f0f0f0;
+}
+
+.dataTable td {
+	border: 1px solid #d0d0d0;
+	padding: 4px;
+}
+
+.caption {
+	float: left;
+	width: 100px;
+}
+
+.formCaption {
+	float: left;
+	width: 100px;
+	padding-top: 4px;
+}
+
+.value {	
+	margin-right: 8px;
+}
+
+.errorMessage {
+	color: #ff0000;
+	font-weight: bold;
+}
+
+.property {
+	margin-bottom: 12px;
+}

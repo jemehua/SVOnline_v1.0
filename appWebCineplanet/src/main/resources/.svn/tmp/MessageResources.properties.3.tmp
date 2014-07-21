@@ -1,0 +1,100 @@
+
+nombreSistema=SISTEMA DE EVALUACIÓN DEL DESEMPEÑO DE GERENTES PÚBLICOS
+bienvenido=Bienvenido:
+
+#loguin
+accesoSistema=Acceso al Sistema
+usuario=Usuario
+clave=Contraseña
+msgCaptcha=Ingrese Captcha
+msgSession=Su usuario ha iniciado sesión en más de una estación
+urlServer=http://172.16.19.110:8080/
+pathPageRequest=spring-jsf-jpa/home.jsf
+
+#button
+btnGuardar=Guardar
+btnCancelar=Cancelar
+btnModificar=Modificar
+btnAgregar=Agregar
+btnPermiso=Permiso
+btnBuscar=Buscar
+btnCerrar=Cerrar
+
+#outputLabel
+lblCampania=Campaña de Evaluación
+lblCompetencias=Registro de Perfil de Gerente Público
+lblCodigo=Código  
+lblNombre=Nombre
+lblDenominacion=Denominación 
+lblEstado=Estado
+lblUsuario=Usuario
+lblListUsuario=Lista de Usuarios
+lblListTipoDoc=Lista de Tipos de Documentos
+lblListActComp=Lista de Actividad/Compuerta
+lblActComp=Actividad/Compuerta
+lblRol=Rol
+lblListRol=Lista de Roles 
+lblApPaterno=Apellido Paterno
+lblApMaterno=Apellido Materno
+lblUsername=Nombre de Usuario
+lblClave=Contraseña    
+lblConfirmarClave=Confirmar Contraseña
+lblClaveNueva=Nueva Contraseña
+lblConfirmarClaveNueva=Confirmar Nueva Contraseña
+lblProceso=Proceso
+lblActividad=Actividad
+lblReqDoc=Agregar Documento ?
+lblTipoDoc=Tipo Documento
+lblOpciones=Opciones
+lblTipo=Tipo
+lblMenu=Menu
+lblItemMenu= Opciones de Menu
+lblListItemMenu=Lista de Opciones del Menu
+lblGerentePublico=Gerente Público
+lblPuesto=Puesto Tipo
+
+lblFechaInicio=Desde
+lblFechaFin=Hasta
+lblEstCampania=Condición
+
+lblVerificarPlanes=Verificar Planes
+
+#messages
+
+msgRegistrarNivelDeseado = Primero debe registrar Competencias para el Puesto Tipo.
+
+msgValidarTemporizador = Debe configurar todas las actividades temporizadas del proceso seleccionado.
+msgValidarFecha = Fecha inicio debe ser menor a la fecha fin.
+msgModificarVacio = No se puede modificar con campos vacios.
+msgEmptyMessage = No se encontraron registros.
+msgRegistrar=Registro exitoso.
+msgRegistrarError=Ha ocurrido un error al guardar.
+msgModificar=Registro modificado.
+msgModificarError=Ha ocurrido un error al modificar.
+msgAgregar=Registro agregado.
+msgAgregarError=Ha ocurrido un error al agregar.
+msgTxtObligatorio=Ingrese campos obligatorios.
+msgSelecRol=Seleccione rol.
+msgSelecProceso=Seleccione proceso.
+msgSelecActividad=Seleccione actividad.
+msgSelecTipoDoc=Seleccione tipo de documento.
+msgUsernameExiste=El nombre de usuario ya existe.
+msgConfirmarClave=Las contraseñas deben coincidir.
+msgTipoDocExiste=Tipo de documento ya existe en la lista, agregue otro.
+msgAgregarTipoDocExito=Tipo de Documento agregado.
+msgAgregarTipoDocError=Ha ocurrido un error al agregar tipo de documento.
+msgEliminarTipoDoc=Ha ocurrido un error al eliminar tipo de documento.
+msgAgregarTipoDoc=Debe agregar tipo de documento.
+msgRegistroExite=Registro ya existe
+msgDocumentoEliminar=Está seguro de eliminar el registro ?
+msgClaveError=La contraseña invalida [Tamaño 8 con una letra: mayuscula, minuscula, numero, caracter]
+msgEliminado=Registro eliminado.
+msgEliminadoError=Ha ocurrido un error al eliminar.
+
+footerText=This text is defined in the MessageResource.properties file
+
+cerrarSesion=Cerrar Sesión
+seleccione=Seleccione
+
+correoME=programador2@servir.gob.pe,jmedina@servir.gob.pe
+

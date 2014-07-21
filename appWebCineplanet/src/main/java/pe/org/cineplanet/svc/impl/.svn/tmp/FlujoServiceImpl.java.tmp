@@ -1,0 +1,62 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.FlujoDao;
+import gob.servir.desempenio.model.DetalleFlujoPK;
+import gob.servir.desempenio.model.Flujo;
+import gob.servir.desempenio.model.FlujoPK;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.service.FlujoService;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Service
+public class FlujoServiceImpl implements FlujoService {
+
+	@Autowired
+	private FlujoDao flujoDao;
+
+	@Transactional
+	public Flujo find(FlujoPK id) {
+		return flujoDao.find(id);
+	}
+
+	@Transactional
+	public Flujo save(Flujo obj) {
+		return flujoDao.save(obj);
+	}
+	
+	@Transactional
+	public Flujo edit(Flujo obj) {
+		return flujoDao.edit(obj);
+		
+	}
+
+	public List<Flujo> getListaFlujo() {
+		return flujoDao.getListaFlujo();
+	}
+	
+	public List<Flujo> getListaFlujo(InscripcionPK id) {
+		return flujoDao.getListaFlujo(id);
+	}
+	
+	public boolean atenderFlujo(DetalleFlujoPK id, String usuarioSesion) {
+		return flujoDao.atenderFlujo(id, usuarioSesion);
+	}
+	
+	public List<Flujo> getListaFlujo(Long idCampania, Long idProceso, String estado) {
+		return flujoDao.getListaFlujo(idCampania, idProceso, estado);
+	}
+
+	public boolean isEstadoIniciado(InscripcionPK inscripcionPK) {
+		return flujoDao.isEstadoIniciado(inscripcionPK);
+	}
+
+}

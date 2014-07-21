@@ -1,0 +1,118 @@
+package gob.servir.desempenio.model;
+
+import java.io.Serializable;
+
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Embeddable
+public class CronogramaPK implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	@Basic(optional = false)
+	@Column(name = "idCronograma")
+	private Long idCronograma;
+	@Basic(optional = false)
+	@Column(name = "idProceso")
+	private Long idProceso;
+	@Basic(optional = false)
+	@Column(name = "idCampania")
+	private Long idCampania;
+
+	public CronogramaPK() {
+		super();
+	}
+
+	public CronogramaPK(Long idCronograma, Long idProceso, Long idCampania) {
+		super();
+		this.idCronograma = idCronograma;
+		this.idProceso = idProceso;
+		this.idCampania = idCampania;
+	}
+
+	public Long getIdCronograma() {
+		return idCronograma;
+	}
+
+	public void setIdCronograma(Long idCronograma) {
+		this.idCronograma = idCronograma;
+	}
+
+	public Long getIdProceso() {
+		return idProceso;
+	}
+
+	public void setIdProceso(Long idProceso) {
+		this.idProceso = idProceso;
+	}
+
+	public Long getIdCampania() {
+		return idCampania;
+	}
+
+	public void setIdCampania(Long idCampania) {
+		this.idCampania = idCampania;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((idCampania == null) ? 0 : idCampania.hashCode());
+		result = prime * result
+				+ ((idCronograma == null) ? 0 : idCronograma.hashCode());
+		result = prime * result
+				+ ((idProceso == null) ? 0 : idProceso.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CronogramaPK other = (CronogramaPK) obj;
+		if (idCampania == null) {
+			if (other.idCampania != null)
+				return false;
+		} else if (!idCampania.equals(other.idCampania))
+			return false;
+		if (idCronograma == null) {
+			if (other.idCronograma != null)
+				return false;
+		} else if (!idCronograma.equals(other.idCronograma))
+			return false;
+		if (idProceso == null) {
+			if (other.idProceso != null)
+				return false;
+		} else if (!idProceso.equals(other.idProceso))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("CronogramaPK [idCronograma=");
+		builder.append(idCronograma);
+		builder.append(", idProceso=");
+		builder.append(idProceso);
+		builder.append(", idCampania=");
+		builder.append(idCampania);
+		builder.append("]");
+		return builder.toString();
+	}
+
+}

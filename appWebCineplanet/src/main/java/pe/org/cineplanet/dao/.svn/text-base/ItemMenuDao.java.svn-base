@@ -1,0 +1,24 @@
+package gob.servir.desempenio.dao;
+
+import gob.servir.desempenio.model.ItemMenu;
+import gob.servir.desempenio.model.Rol;
+
+import java.util.List;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+public interface ItemMenuDao {
+	
+	public abstract ItemMenu find(Long id);
+	
+	public abstract ItemMenu save(ItemMenu obj);
+	
+	public abstract void save(Rol rol, List<ItemMenu> listItemSelec, List<ItemMenu> listItemMenu);
+	
+	public abstract List<ItemMenu> getListaItemMenu();
+	
+	public abstract List<ItemMenu> getListaMenuItem(Long idMenu, Long idRol);
+
+}

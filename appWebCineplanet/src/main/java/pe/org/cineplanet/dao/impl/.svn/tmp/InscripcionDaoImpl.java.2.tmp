@@ -1,0 +1,291 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.InscripcionDao;
+import gob.servir.desempenio.model.AsignacionGerenteV;
+import gob.servir.desempenio.model.Campania;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.PuestoTipoV;
+import gob.servir.desempenio.model.Usuario;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Repository
+public class InscripcionDaoImpl implements InscripcionDao {
+	@PersistenceContext
+	private EntityManager em;
+
+	public Inscripcion find(InscripcionPK id) {
+		try {
+			return em.find(Inscripcion.class, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Inscripcion save(Inscripcion obj) {
+		try {
+			em.persist(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Inscripcion edit(Inscripcion obj) {
+		try {
+			return em.merge(obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Inscripcion> getListaInscripcion() {
+		Query q = null;
+		q = (Query) em
+				.createQuery("select t from Inscripcion t where t.estado =:estado ");
+		q.setParameter("estado", "A");
+
+		try {
+			return q.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Inscripcion> getListaGerentePublico(Long idCampania) {
+		Query q = null;
+		q = (Query) em
+				.createQuery("SELECT i.campania.idCampania, i.asignacionGerenteV.cod_gerente, i.asignacionGerenteV.nombres, i.asignacionGerenteV.ap_paterno, i.asignacionGerenteV.ap_materno, i.asignacionGerenteV.dni, i.puestoTipoV.id_puesto_tipo "
+						+ "FROM Inscripcion i WHERE i.id.idCampania =:idCampania AND i.estado =:estado ORDER BY i.asignacionGerenteV.ap_paterno ASC ");
+		q.setParameter("idCampania", idCampania);
+		q.setParameter("estado", "A");
+
+		try {
+
+			List<Object[]> lista = q.getResultList();
+			List<Inscripcion> listaRetorno = new ArrayList<Inscripcion>();
+
+			for (Object[] row : lista) {
+				Campania campania = new Campania();
+				campania.setIdCampania((Long) row[0]);
+
+				AsignacionGerenteV gerente = new AsignacionGerenteV();
+				gerente.setCod_gerente((String) row[1]);
+				gerente.setNombres((String) row[2]);
+				gerente.setAp_paterno((String) row[3]);
+				gerente.setAp_materno((String) row[4]);
+				gerente.setDni((String) row[5]);
+
+				PuestoTipoV puestoTipo = new PuestoTipoV();
+				puestoTipo.setId_puesto_tipo((Long) row[6]);
+
+				Inscripcion inscripcion = new Inscripcion();
+				inscripcion.setId(new InscripcionPK(campania.getIdCampania(),
+						gerente.getCod_gerente()));
+				inscripcion.setCampania(campania);
+				inscripcion.setPuestoTipoV(puestoTipo);
+				inscripcion.setAsignacionGerenteV(gerente);
+				listaRetorno.add(inscripcion);
+			}
+			return listaRetorno;
+
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Inscripcion> getListaInscripcion(Long idCampania, int opcion) {
+		Query q = null;
+
+		if (opcion == 0) {
+			q = (Query) em
+					.createQuery("select i from Inscripcion i where i.id.idCampania =:idCampania and i.estado =:estado ");
+			q.setParameter("idCampania", idCampania);
+			q.setParameter("estado", "A");
+
+		}
+
+		if (opcion == 1) {// Registro metas gp
+			q = (Query) em
+					.createQuery("select i from Inscripcion i where i.id.idCampania =:idCampania  and i.estadoMetas <>:estadoMeta and i.estado =:estado ");
+			q.setParameter("idCampania", idCampania);
+			q.setParameter("estadoMeta", "P");
+			q.setParameter("estado", "A");
+		}
+
+		if (opcion == 2) {// Registro evaluacion inicial gp
+			q = (Query) em
+					.createQuery("select i from Inscripcion i where i.id.idCampania =:idCampania and i.estadoEvaInicial =:estadoEvaInicial and i.estado =:estado ");
+			q.setParameter("idCampania", idCampania);
+			q.setParameter("estadoEvaInicial", "R");
+			q.setParameter("estado", "A");
+		}
+
+		if (opcion == 3) {// Registro evaluacion inicial gp
+			q = (Query) em
+					.createQuery("select i from Inscripcion i where i.id.idCampania =:idCampania and (i.estadoMetas =:estadoMeta1 or i.estadoMetas =:estadoMeta2) and i.estado =:estado ");
+			q.setParameter("idCampania", idCampania);
+			q.setParameter("estadoMeta1", "A");
+			q.setParameter("estadoMeta2", "D");
+			q.setParameter("estado", "A");
+		}
+
+		if (opcion == 4) {// Registro evaluacion inicial gp
+			q = (Query) em
+					.createQuery("select i from Inscripcion i where (i.estadoMetas =:estadoMeta1 or i.estadoMetas =:estadoMeta2) and i.estado =:estado ");
+			q.setParameter("estadoMeta1", "A");
+			q.setParameter("estadoMeta2", "D");
+			q.setParameter("estado", "A");
+		}
+
+		try {
+			return q.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Inscripcion> getListaInscripcion(Long idCampania,
+			String valorBusqueda) {
+		Query q = null;
+
+		q = (Query) em
+				.createQuery("select i from Inscripcion i where i.id.idCampania =:idCampania and i.estado =:estado and ( UPPER(i.asignacionGerenteV.ap_paterno) like :valorBusqueda or UPPER(i.asignacionGerenteV.nombres) like :valorBusqueda or UPPER(i.asignacionGerenteV.dni) like :valorBusqueda ) ");
+		q.setParameter("idCampania", idCampania);
+		q.setParameter("valorBusqueda", "%" + valorBusqueda.toUpperCase() + "%");
+		q.setParameter("estado", "A");
+
+		try {
+			return q.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Inscripcion> getListaInscripcion2(Long idCampania,
+			String valorBusqueda) {
+		Query q = null;
+
+		q = (Query) em
+				.createQuery("select i from Inscripcion i where i.id.idCampania =:idCampania and i.estado =:estado and (i.estadoMetas =:estadoMeta1 or i.estadoMetas =:estadoMeta2) and ( UPPER(i.asignacionGerenteV.ap_paterno) like :valorBusqueda or UPPER(i.asignacionGerenteV.nombres) like :valorBusqueda or UPPER(i.asignacionGerenteV.dni) like :valorBusqueda ) ");
+		q.setParameter("idCampania", idCampania);
+		q.setParameter("valorBusqueda", "%" + valorBusqueda.toUpperCase() + "%");
+		q.setParameter("estado", "A");
+		q.setParameter("estadoMeta1", "A");
+		q.setParameter("estadoMeta2", "D");
+
+		try {
+			return q.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public boolean delete(InscripcionPK inscripcionPK) {
+		try {
+			Inscripcion inscripcion2 = em
+					.find(Inscripcion.class, inscripcionPK);
+			em.remove(inscripcion2);
+			// em.flush();
+		} catch (Exception e) {
+			System.out.println("error al guadar flujo");
+			e.printStackTrace();
+			return false;
+
+		}
+		return true;
+	}
+
+	public Inscripcion getInscripcionUsuario(Usuario usuario) {
+
+		Query q = null;
+
+		try {
+
+			q = (Query) em
+					.createQuery("SELECT i.campania.idCampania, i.campania.denominacion,i.campania.anio,i.campania.postAnio, "
+							+ "i.asignacionGerenteV.cod_gerente, i.asignacionGerenteV.nombres, i.asignacionGerenteV.ap_paterno, i.asignacionGerenteV.ap_materno, "
+							+ "i.puestoTipoV.id_puesto_tipo,i.puestoTipoV.dsc_puesto_tipo "
+							+ "FROM Inscripcion i "
+							+ "WHERE i.campania.estadoCampania =:estadoCampania AND i.estado =:estado  AND UPPER(i.asignacionGerenteV.ap_paterno) LIKE :apPaterno "
+							+ "AND UPPER(i.asignacionGerenteV.ap_materno) LIKE :apMaterno AND UPPER(i.asignacionGerenteV.nombres) LIKE :nombre AND i.asignacionGerenteV.dni LIKE :dni");
+
+			q.setParameter("apPaterno", "%"
+					+ usuario.getApPaterno().toUpperCase() + "%");
+			q.setParameter("apMaterno", "%"
+					+ usuario.getApMaterno().toUpperCase() + "%");
+			q.setParameter("nombre", "%" + usuario.getNombre().toUpperCase()
+					+ "%");
+			q.setParameter("dni", "%" + usuario.getDni() + "%");
+			q.setParameter("estado", "A");
+			q.setParameter("estadoCampania", "Activo");
+
+			Object[] row = (Object[]) q.getSingleResult();
+
+			Inscripcion inscripcion = new Inscripcion();
+
+			if (row != null) {
+
+				Campania campania = new Campania();
+				campania.setIdCampania((Long) row[0]);
+				campania.setDenominacion((String) row[1]);
+				campania.setAnio((String) row[2]);
+				campania.setPostAnio((String) row[3]);
+				inscripcion.setCampania(campania);
+
+				AsignacionGerenteV gerente = new AsignacionGerenteV();
+				gerente.setCod_gerente((String) row[4]);
+				gerente.setNombres((String) row[5]);
+				gerente.setAp_paterno((String) row[6]);
+				gerente.setAp_materno((String) row[7]);
+				inscripcion.setAsignacionGerenteV(gerente);
+
+				PuestoTipoV puestoTipo = new PuestoTipoV();
+				puestoTipo.setId_puesto_tipo((Long) row[8]);
+				puestoTipo.setDsc_puesto_tipo((String) row[9]);
+				inscripcion.setPuestoTipoV(puestoTipo);
+
+				InscripcionPK id = new InscripcionPK(campania.getIdCampania(), gerente.getCod_gerente());
+				inscripcion.setId(id);
+
+			}
+
+			return inscripcion;
+
+		} catch (Exception as) {
+			as.getMessage();
+			return null;
+		}
+
+	}
+
+}

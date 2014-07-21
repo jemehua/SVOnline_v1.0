@@ -1,0 +1,269 @@
+package gob.servir.desempenio.model;
+
+import java.io.Serializable;
+import java.util.Calendar;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+
+@Entity
+@NamedQueries({
+		@NamedQuery(name = "DetalleInscripcion.getAllListaInscripcionDetalle", query = "SELECT t FROM DetalleInscripcion t WHERE t.estado =:estado"),
+		@NamedQuery(name = "DetalleInscripcion.getListaInscripcionDetalle", query = "SELECT t "
+				+ "FROM DetalleInscripcion t "
+				+ "WHERE t.estado =:estado AND t.id.idCampania =:idCampania"),
+		@NamedQuery(name = "DetalleInscripcion.getListaInscripcion", query = "SELECT d.inscripcion.asignacionGerenteV.cod_gerente, "
+				+ " CONCAT(d.inscripcion.asignacionGerenteV.nombres ||' '||d.inscripcion.asignacionGerenteV.ap_paterno ||' '||d.inscripcion.asignacionGerenteV.ap_materno), "
+				+ " d.inscripcion.fechaCreacion, "
+				+ " d.entidadDestinoV.id_ed, "
+				+ " d.entidadDestinoV.desc_ed, "
+				+ " d.entidadDestinoV.te_numero_documento, "
+				+ " CONCAT(d.entidadDestinoV.te_nombres ||' '||d.entidadDestinoV.te_apellido_paterno ||' '||d.entidadDestinoV.te_apellido_materno), "
+				+ " d.jefeInmediatoV.id_jefe_inmediato, "
+				+ " d.jefeInmediato.dni, "
+				+ " d.id.idDetalleInsc, "
+				+ " d.titularEntidad.nroDocTE, "
+				+ " d.inscripcion.puestoTipoV.id_puesto_tipo "
+				+ " FROM DetalleInscripcion d WHERE d.inscripcion.campania.idCampania =:idCampania and d.estado =:estado "),
+		@NamedQuery(name = "DetalleInscripcion.getInscripcionCampañaJi", query = "SELECT e.inscripcion.id, e.inscripcion.asignacionGerenteV.cod_gerente, e.inscripcion.puestoTipoV.id_puesto_tipo, e.inscripcion.campania.id "
+				+ "FROM DetalleInscripcion e LEFT JOIN e.jefeInmediatoV j "
+				+ "WHERE e.inscripcion.campania.idCampania =:idCampania AND e.estado =:estado "
+				+ "AND ( j.numero_documento=:dni or  e.jefeInmediato.dni=:dni) "),
+		@NamedQuery(name = "DetalleInscripcion.getInscripcionCampañaTe", query = "SELECT e.inscripcion.id, e.inscripcion.asignacionGerenteV.cod_gerente, e.inscripcion.puestoTipoV.id_puesto_tipo, e.inscripcion.campania.id "
+				+ "FROM DetalleInscripcion e "
+				+ "where e.inscripcion.campania.idCampania =:idCampania and e.estado =:estado and (e.entidadDestinoV.te_numero_documento=:dni or e.titularEntidad.nroDocTE=:dni)"),
+		@NamedQuery(name = "DetalleInscripcion.getListaDetalleInscripcion", query = "SELECT e "
+				+ "FROM DetalleInscripcion e "
+				+ "WHERE e.id.idCampania =:idCampania AND e.id.idGerentePublico =:codGerente AND e.estado =:estado "),
+		@NamedQuery(name = "DetalleInscripcion.getListaDetalleInscripcionCampaniaAndGerente", query = "SELECT d "
+				+ "FROM DetalleInscripcion d "
+				+ "WHERE d.id.idCampania =:idCampania AND d.id.idGerentePublico =:codGerente AND d.estado =:estado "),
+		@NamedQuery(name = "DetalleInscripcion.getListaDetalleInscripcionJiAndTe", query = "SELECT d.jefeInmediato.dni, d.jefeInmediatoV.id_jefe_inmediato, d.entidadDestinoV.id_ed, d.titularEntidad.nroDocTE "
+				+ "FROM DetalleInscripcion d "
+				+ "WHERE d.id.idCampania =:idCampania AND d.id.idGerentePublico =:idGerentePublico AND d.estado =:estado "),
+		@NamedQuery(name = "DetalleInscripcion.getInscripcionCampañaJiUsuario", query = "SELECT CONCAT(e.inscripcion.asignacionGerenteV.cod_gerente ||'  '|| e.inscripcion.asignacionGerenteV.nombres ||' '||e.inscripcion.asignacionGerenteV.ap_paterno ||' '||e.inscripcion.asignacionGerenteV.ap_materno) "
+				+ "FROM DetalleInscripcion e LEFT JOIN e.jefeInmediatoV j "
+				+ "WHERE e.inscripcion.campania.idCampania =:idCampania AND e.estado =:estado "
+				+ "AND ( j.numero_documento=:dni or  e.jefeInmediato.dni=:dni) "),
+		@NamedQuery(name = "DetalleInscripcion.getInscripcionCampañaTeUsuario", query = "SELECT CONCAT(e.inscripcion.asignacionGerenteV.cod_gerente ||'  '|| e.inscripcion.asignacionGerenteV.nombres ||' '||e.inscripcion.asignacionGerenteV.ap_paterno ||' '||e.inscripcion.asignacionGerenteV.ap_materno) "
+				+ "FROM DetalleInscripcion e "
+				+ "where e.inscripcion.campania.idCampania =:idCampania and e.estado =:estado and (e.entidadDestinoV.te_numero_documento=:dni or e.titularEntidad.nroDocTE=:dni)"),
+		@NamedQuery(name = "DetalleInscripcion.getInscripcionCampañaJiAndTeUsuario", query = "SELECT CONCAT(e.inscripcion.asignacionGerenteV.cod_gerente ||'  '|| e.inscripcion.asignacionGerenteV.nombres ||' '||e.inscripcion.asignacionGerenteV.ap_paterno ||' '||e.inscripcion.asignacionGerenteV.ap_materno) "
+				+ "FROM DetalleInscripcion e LEFT JOIN e.jefeInmediatoV j "
+				+ "where e.inscripcion.campania.idCampania =:idCampania and e.estado =:estado and ( (e.entidadDestinoV.te_numero_documento=:dni or e.titularEntidad.nroDocTE=:dni) OR ( j.numero_documento=:dni or  e.jefeInmediato.dni=:dni) )"),
+		@NamedQuery(name = "DetalleInscripcion.getInscripcionCampañaJiAndTe", query = "SELECT e.inscripcion.id, e.inscripcion.asignacionGerenteV.cod_gerente, e.inscripcion.puestoTipoV.id_puesto_tipo, e.inscripcion.campania.id "
+				+ "FROM DetalleInscripcion e LEFT JOIN e.jefeInmediatoV j "
+				+ "where e.inscripcion.campania.idCampania =:idCampania and e.estado =:estado and ( (e.entidadDestinoV.te_numero_documento=:dni or e.titularEntidad.nroDocTE=:dni) OR ( j.numero_documento=:dni or  e.jefeInmediato.dni=:dni) )")
+
+})
+public class DetalleInscripcion implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@EmbeddedId
+	private DetalleInscripcionPK id;
+	@Column
+	private String usuarioRegistra;
+	@Column
+	private String usuarioModifica;
+	@Column
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date fechaCreacion;
+	@Column
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date fechaModificacion;
+	@Column
+	private String estado;
+	@Transient
+	private boolean ji;
+	@Transient
+	private boolean te;
+
+	@JoinColumn(name = "dni")
+	@ManyToOne(optional = true)
+	private JefeInmediato jefeInmediato;
+
+	@ManyToOne(optional = true)
+	@JoinColumn(name = "id_jefe_inmediato")
+	private JefeInmediatoV jefeInmediatoV;
+
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumns({
+			@JoinColumn(name = "idCampania", referencedColumnName = "idCampania", insertable = false, updatable = false),
+			@JoinColumn(name = "idGerentePublico", referencedColumnName = "idGerentePublico", insertable = false, updatable = false) })
+	private Inscripcion inscripcion;
+
+	@JoinColumn(name = "id_ed", referencedColumnName = "id_ed")
+	@ManyToOne(optional = false)
+	private EntidadDestinoV entidadDestinoV;
+
+	@ManyToOne(optional = true)
+	@JoinColumn(name = "nroDocTE")
+	private TitularEntidad titularEntidad;
+
+	public DetalleInscripcion() {
+		super();
+	}
+
+	public TitularEntidad getTitularEntidad() {
+		return titularEntidad;
+	}
+
+	public void setTitularEntidad(TitularEntidad titularEntidad) {
+		this.titularEntidad = titularEntidad;
+	}
+
+	public JefeInmediatoV getJefeInmediatoV() {
+		return jefeInmediatoV;
+	}
+
+	public void setJefeInmediatoV(JefeInmediatoV jefeInmediatoV) {
+		this.jefeInmediatoV = jefeInmediatoV;
+	}
+
+	public DetalleInscripcionPK getId() {
+		return id;
+	}
+
+	public void setId(DetalleInscripcionPK id) {
+		this.id = id;
+	}
+
+	public String getUsuarioRegistra() {
+		return usuarioRegistra;
+	}
+
+	public void setUsuarioRegistra(String usuarioRegistra) {
+		this.usuarioRegistra = usuarioRegistra;
+	}
+
+	public String getUsuarioModifica() {
+		return usuarioModifica;
+	}
+
+	public void setUsuarioModifica(String usuarioModifica) {
+		this.usuarioModifica = usuarioModifica;
+	}
+
+	public Date getFechaCreacion() {
+		return fechaCreacion;
+	}
+
+	public void setFechaCreacion(Date fechaCreacion) {
+		this.fechaCreacion = fechaCreacion;
+	}
+
+	public Date getFechaModificacion() {
+		return fechaModificacion;
+	}
+
+	public void setFechaModificacion(Date fechaModificacion) {
+		this.fechaModificacion = fechaModificacion;
+	}
+
+	public String getEstado() {
+		return estado;
+	}
+
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
+
+	public JefeInmediato getJefeInmediato() {
+		return jefeInmediato;
+	}
+
+	public void setJefeInmediato(JefeInmediato jefeInmediato) {
+		this.jefeInmediato = jefeInmediato;
+	}
+
+	public Inscripcion getInscripcion() {
+		return inscripcion;
+	}
+
+	public void setInscripcion(Inscripcion inscripcion) {
+		this.inscripcion = inscripcion;
+	}
+
+	public EntidadDestinoV getEntidadDestinoV() {
+		return entidadDestinoV;
+	}
+
+	public void setEntidadDestinoV(EntidadDestinoV entidadDestinoV) {
+		this.entidadDestinoV = entidadDestinoV;
+	}
+
+	public boolean isJi() {
+		return ji;
+	}
+
+	public void setJi(boolean ji) {
+		this.ji = ji;
+	}
+
+	public boolean isTe() {
+		return te;
+	}
+
+	public void setTe(boolean te) {
+		this.te = te;
+	}
+
+	@PrePersist
+	private void putFechaCreacion() {
+		setFechaCreacion(new Date(Calendar.getInstance().getTime().getTime()));
+	}
+
+	@PreUpdate
+	private void putFechaModificacion() {
+		setFechaModificacion(new Date(Calendar.getInstance().getTime()
+				.getTime()));
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DetalleInscripcion other = (DetalleInscripcion) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("DetalleInscripcion [id=");
+		builder.append(id);
+		builder.append("]");
+		return builder.toString();
+	}
+
+}

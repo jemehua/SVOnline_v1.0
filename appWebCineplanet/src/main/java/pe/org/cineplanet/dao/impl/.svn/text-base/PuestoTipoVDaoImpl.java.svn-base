@@ -1,0 +1,80 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.PuestoTipoVDao;
+import gob.servir.desempenio.model.PuestoTipoV;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.faces.model.SelectItem;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+
+import org.springframework.stereotype.Repository;
+
+/**
+ * 
+ * @author Hever Pumallihua García
+ */
+@Repository
+public class PuestoTipoVDaoImpl implements PuestoTipoVDao {
+
+	@PersistenceContext
+	private EntityManager em;
+
+	public PuestoTipoV find(Long id) {
+		try {
+			return em.find(PuestoTipoV.class, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			if (em != null) {
+				em.close();
+			}
+		}
+	}
+
+	public List<PuestoTipoV> getListaPuestoView() {
+
+		TypedQuery<PuestoTipoV> tq = em.createNamedQuery(
+				"PuestoTipoV.getAllListaPuestoView", PuestoTipoV.class);
+
+		try {
+
+			return tq.getResultList();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			if (em != null) {
+				em.close();
+			}
+		}
+	}
+
+	public List<SelectItem> getComboPuestoTipo() {
+
+		List<SelectItem> listaCombo = new ArrayList<SelectItem>();
+		List<PuestoTipoV> lista = new ArrayList<PuestoTipoV>();
+		try {
+			lista = getListaPuestoView();
+		} catch (Exception e) {
+			e.printStackTrace();
+			SelectItem fila = new SelectItem(0L, "Seleccione Puesto Tipo");
+			listaCombo.add(fila);
+			return listaCombo;
+		}
+		SelectItem fila = new SelectItem(0L, "Seleccione Puesto Tipo");
+		listaCombo.add(fila);
+
+		for (PuestoTipoV tipo : lista) {
+			fila = new SelectItem(tipo.getId_puesto_tipo(),
+					tipo.getDsc_puesto_tipo());
+			listaCombo.add(fila);
+		}
+		return listaCombo;
+	}
+
+}

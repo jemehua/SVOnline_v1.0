@@ -1,0 +1,477 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+	<h:outputStylesheet name="css/cssContent.css" />
+	<script type="text/javascript">
+		function showStatus1() {
+			statusDialog.show();
+		}
+		function hideStatus1() {
+			statusDialog.hide();
+		}
+	</script>
+</h:head>
+<h:body>
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datos" header="Inscripción de Gerentes Públicos">
+		<p:focus context="datos" />
+		<table cellpadding="2" cellspacing="4">
+			<tr>
+				<td>#{messages.lblCampania}<h:outputText value="*"
+						styleClass="obligatorio" /></td>
+				<td><p:selectOneMenu id="comboCampania"
+						value="#{inscripcionController.campaniaSelec}"
+						style="width:280px;" tabindex="1">
+						<f:selectItems value="#{inscripcionController.comboCampania}" />
+						<p:ajax update="btnBuscarGerente,btnBuscarGerente2,dtLista3,link"
+							event="change" process="comboCampania" action="#{inscripcionController.buscarListaInscripciones}"/>
+					</p:selectOneMenu></td>
+			</tr>
+			<tr>
+				<td>#{messages.lblGerentePublico}<h:outputText value="*"
+						styleClass="obligatorio" /></td>
+				<td><p:inputText id="publico" tabindex="1"
+						value="#{inscripcionController.asigGerenteSelec} "
+						style=" width : 270px;" readonly="true" /> <p:spacer width="5" />
+					<p:commandButton value="Buscar" icon="ui-icon-search"					    
+						id="btnBuscarGerente" update=":frm:pnlEdit2"
+						disabled="#{inscripcionController.swBtnBuscar}"
+						oncomplete="editDialog2.show()" style="height:25px;">
+					</p:commandButton> <p:spacer width="5" /> <p:commandButton value="Agregar varios"
+						icon="ui-icon-search"
+						actionListener="#{inscripcionController.borrarSeleccionados}"
+						id="btnBuscarGerente2" update="pnlGerente"
+						disabled="#{inscripcionController.swBtnBuscar}"
+						oncomplete="editDialogVarios.show()" style="height:25px;">
+					</p:commandButton></td>
+			</tr>
+		</table>
+
+		<p:separator id="separator1" />
+		<p:commandButton value="Guardar" id="btnGuardarIns"
+			action="#{inscripcionController.guardar}" icon="ui-icon-disk"
+			update="dtLista3,messages,publico,btnGuardarIns"
+			disabled="#{inscripcionController.asigGerenteSelec eq null ? true : false}">
+		</p:commandButton>
+		<p:spacer width="5" />
+		<p:commandButton value="Cancelar" icon="ui-icon-close"
+			action="#{inscripcionController.limpiarTodo}"
+			update="datos,:frm:btnGuardarIns" />
+		<p:spacer width="20" />
+		<h:commandLink 
+			onclick="PrimeFaces.monitorDownload(showStatus1,hideStatus1)" disabled="#{inscripcionController.swBtnBuscar}" id="link">
+			<p:graphicImage value="./images/export1.png" width="25" height="25"/>
+			<p:dataExporter type="xls" target="dtLista3" fileName="inscripciones"
+				postProcessor="#{inscripcionController.postProcessXLS}" />
+		</h:commandLink>
+
+		<p:dialog modal="true" widgetVar="statusDialog" header="Status"
+			draggable="false" closable="true">
+			<p:graphicImage value="./images/ajax-loader.gif" />
+		</p:dialog>
+
+		<p:spacer width="5" />
+
+		<p:separator id="separator2" />
+
+		<p:dataTable var="inscripciones"
+			value="#{inscripcionController.listaInscripciones}" id="dtLista3"		
+			scrollable="true" scrollHeight="331" paginator="true" rows="15"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			emptyMessage="#{messages.msgEmptyMessage}">
+
+			<f:facet name="header">    
+            	Lista de inscripciones
+            	</f:facet>
+			<p:column style="width:7%; white-space: normal" filterStyle="width:30px" filterBy="#{inscripciones.codGerente}">
+				<f:facet name="header">
+					<h:outputText value="Código" />
+				</f:facet>
+				<h:outputText value="#{inscripciones.codGerente}" />
+			</p:column>
+			<p:column style="width:15%; white-space: normal" filterStyle="width:80px" filterBy="#{inscripciones.nombreGerente}" >
+				<f:facet name="header">
+					<h:outputText value="Gerente Público" />
+				</f:facet>
+				<h:outputText value="#{inscripciones.nombreGerente}" />
+			</p:column>
+			<p:column style="width:16%; white-space: normal" filterStyle="width:80px" filterBy="#{inscripciones.puestoTipo}">
+				<f:facet name="header">
+					<h:outputText value="Puesto Tipo" />
+				</f:facet>
+				<h:outputText value="#{inscripciones.puestoTipo}"/>
+			</p:column>
+			<p:column style="width:15%; white-space: normal;" filterStyle="width:80px" filterBy="#{inscripciones.nombreEntidad}">
+				<f:facet name="header">
+					<h:outputText value="Entidad Destino" />
+				</f:facet>
+				<h:outputText value="#{inscripciones.nombreEntidad}" />
+			</p:column>
+			<p:column style="width:9%; white-space: normal;text-align: left;">
+				<f:facet name="header">
+					<h:outputText value="Inscripción" />
+				</f:facet>
+				<h:outputText value="#{inscripciones.fechaInscripcion}">
+					<f:convertDateTime pattern="dd/MM/yyyy" />
+				</h:outputText>
+			</p:column>			
+			<p:column style="width:13%; white-space: normal" filterStyle="width:70px" filterBy="#{inscripciones.nombreJefe}">
+				<f:facet name="header">
+					<h:outputText value="Jefe Inmediato" />
+				</f:facet>
+				<h:outputText value="#{inscripciones.nombreJefe}" />
+			</p:column>
+			<p:column headerText="Titular Entidad" filterStyle="width:70px" filterBy="#{inscripciones.nombreTitular}"
+				style="width:13%; white-space: normal">
+				<f:facet name="header">
+					<h:outputText value="Titular Entidad" />
+				</f:facet>
+				<h:outputText value="#{inscripciones.nombreTitular}" />
+			</p:column>
+
+			<p:column headerText="Opciones"
+				style="width:12%; white-space: normal" exportable="false">
+				<p:commandButton value="" id="editAcJI" icon="ui-icon-refresh"
+					update=":frm:dtLista3,:frm:messages"
+					actionListener="#{inscripcionController.actualizarJI(inscripciones)}">
+				</p:commandButton>
+				<pe:tooltip for="editAcJI" value="Actualizar Información"
+					showEffect="fadeIn" hideEffect="fadeIn" atPosition="top center"
+					myPosition="bottom center" />
+
+				<p:commandButton value="" id="deleteInscripcion"
+					icon="ui-icon-trash" update=":frm:dtLista3,:frm:messages"
+					actionListener="#{inscripcionController.eliminarInscripcion(inscripciones.codGerente)}">
+				</p:commandButton>
+				<pe:tooltip for="deleteInscripcion" value="Eliminar Inscripción"
+					showEffect="fadeIn" hideEffect="fadeIn" atPosition="top center"
+					myPosition="bottom center" />
+
+				<p:commandButton value="" icon="ui-icon-pencil" id="editJI"
+					actionListener="#{inscripcionController.cargarJI(inscripciones)}"
+					update=":frm:pnlEdit"
+					disabled="#{inscripciones.codJefe eq null ? false : true}"
+					oncomplete="editDialog.show();">
+				</p:commandButton>
+				<pe:tooltip for="editJI" value="Editar Jefe Inmediato"
+					showEffect="fadeIn" hideEffect="fadeIn" atPosition="top center"
+					myPosition="bottom center" />
+
+				<p:commandButton value="" icon="ui-icon-pencil" id="editTE"
+					actionListener="#{inscripcionController.cargarTE(inscripciones)}"
+					update=":frm:pnlEditTE"
+					disabled="#{inscripciones.dniTitular eq null ? false : true}"
+					oncomplete="editDialogTE.show();">
+				</p:commandButton>
+				<pe:tooltip for="editTE" value="Editar Titular Entidad"
+					showEffect="fadeIn" hideEffect="fadeIn" atPosition="top center"
+					myPosition="bottom center" />
+
+			</p:column>
+
+		</p:dataTable>
+	</p:panel>
+
+	<p:dialog id="dlgEdit2" header="Buscar Gerente Público"
+		widgetVar="editDialog2" modal="true" resizable="false" width="772"
+		showEffect="clip" closable="true" hideEffect="fold">
+		<p:panel id="pnlEdit2">
+			<p:dataTable var="asigGp"
+				value="#{inscripcionController.listaAsignacion}" id="dtLista2"
+				scrollHeight="235" paginator="true" rows="10"
+				paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				emptyMessage="#{messages.msgEmptyMessage}">
+				<f:facet name="header">    
+            	Lista de Gerentes Públicos
+            	</f:facet>
+				<p:column headerText="#{messages.lblCodigo}" style="width:10%"
+					sortBy="#{asigGp.cod_gerente}" filterBy="#{asigGp.cod_gerente}">
+					<h:outputText value="#{asigGp.cod_gerente}" />
+				</p:column>
+
+				<p:column headerText="#{messages.lblNombre}" sortBy="#{asigGp.nombres}"
+					style="width:20%" filterBy="#{asigGp.nombres}">
+					<h:outputText value="#{asigGp.nombres}" />
+				</p:column>
+				<p:column headerText="Ap.Paterno" filterBy="#{asigGp.ap_paterno}"
+					sortBy="#{asigGp.ap_paterno}" style="width:20%">
+					<h:outputText value="#{asigGp.ap_paterno}" />
+				</p:column>
+				<p:column headerText="Ap.Materno" filterBy="#{asigGp.ap_materno}"
+					sortBy="#{asigGp.ap_materno}" style="width:20%">
+					<h:outputText value="#{asigGp.ap_materno}" />
+				</p:column>
+				<p:column headerText="Dni" sortBy="#{asigGp.dni}"
+					filterBy="#{asigGp.dni}" style="width:20%">
+					<h:outputText value="#{asigGp.dni}" />
+				</p:column>
+				<p:column headerText="Opciones" style="width:10%">
+					<p:commandButton value="" update=":frm:publico,:frm:btnGuardarIns"
+						oncomplete="editDialog2.hide()" icon="ui-icon-check"
+						title="Seleccionar Gerente Público">
+						<f:setPropertyActionListener value="#{asigGp}"
+							target="#{inscripcionController.asigGerenteSelec}" />
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+	</p:dialog>
+
+	<p:dialog id="dlgEditV" header="Buscar Gerentes Públicos"
+		widgetVar="editDialogVarios" modal="true" resizable="false"
+		width="755" showEffect="clip" closable="true" hideEffect="fold">
+		<p:panel id="pnlGerente">
+			<p:dataTable var="entidadGerente"
+				value="#{inscripcionController.dataModelGerentePublico}"
+				id="dtListaV"
+				selection="#{inscripcionController.listaGerentePublicoSelec}"
+				paginator="true" rows="10"
+				paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				emptyMessage="#{messages.msgEmptyMessage}">
+
+				<f:facet name="header">    
+            	    Lista de Gerentes Públicos
+            	    </f:facet>
+
+				<p:column selectionMode="multiple" style="width:30%" />
+
+				<p:column headerText="#{messages.lblCodigo}" style="width:10%"
+					sortBy="#{entidadGerente.cod_gerente}"
+					filterBy="#{entidadGerente.cod_gerente}">
+					<h:outputText value="#{entidadGerente.cod_gerente}" />
+				</p:column>
+				<p:column headerText="Nombres" sortBy="#{entidadGerente.nombres}"
+					style="width:20%" filterBy="#{entidadGerente.nombres}">
+					<h:outputText value="#{entidadGerente.nombres}" />
+				</p:column>
+				<p:column headerText="Ap.Paterno"
+					filterBy="#{entidadGerente.ap_paterno}"
+					sortBy="#{entidadGerente.ap_paterno}" style="width:20%">
+					<h:outputText value="#{entidadGerente.ap_paterno}" />
+				</p:column>
+				<p:column headerText="Ap.Materno"
+					filterBy="#{entidadGerente.ap_materno}"
+					sortBy="#{entidadGerente.ap_materno}" style="width:20%">
+					<h:outputText value="#{entidadGerente.ap_materno}" />
+				</p:column>
+				<p:column headerText="Dni" sortBy="#{entidadGerente.dni}"
+					filterBy="#{entidadGerente.dni}" style="width:10%">
+					<h:outputText value="#{entidadGerente.dni}" />
+				</p:column>
+			</p:dataTable>
+			<f:facet name="footer">
+				<p:commandButton id="multiViewButton" value="Verificar"
+					icon="ui-icon-search" update="displayMulti,btnAceptar"
+					actionListener="#{inscripcionController.verificarGerentesPublicos}"
+					oncomplete="multiCarDialog.show()" />
+				<p:spacer width="5" />
+				<p:commandButton update="dtListaV" value="Cancelar"
+					actionListener="#{inscripcionController.borrarSeleccionados}"
+					icon="ui-icon-close" />
+			</f:facet>
+		</p:panel>
+	</p:dialog>
+
+	<p:dialog id="multiDialog" header="Gerentes Públicos No Registrados"
+		widgetVar="multiCarDialog" showEffect="fade" hideEffect="fold"
+		modal="true" width="510">
+
+		<p:dataList id="displayMulti"
+			value="#{inscripcionController.listaGerentePublicoSelec2}"
+			var="selectedCar" type="definition" paginator="true" rows="30"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			rowsPerPageTemplate="30,40,50" style="width: 100%;"
+			emptyMessage="#{messages.msgEmptyMessage}">
+			<f:facet name="description">
+				<b>#{messages.lblCodigo}: </b>#{selectedCar.cod_gerente},<b> Nombre completo: </b>#{selectedCar.nombres} #{selectedCar.ap_paterno} #{selectedCar.ap_materno} , <b>DNI:
+				</b>#{selectedCar.dni}  
+        	</f:facet>
+		</p:dataList>
+		<f:facet name="footer">
+			<p:commandButton id="btnAceptar" value="Guardar"
+				disabled="#{inscripcionController.swBtnAceptar}"
+				actionListener="#{inscripcionController.aceptarVerificacion}"
+				oncomplete="editDialogVarios.hide(),multiCarDialog.hide()"
+				update=":frm:publico,dtListaV,dtLista3,messages"
+				icon="ui-icon-disk" />
+		</f:facet>
+
+	</p:dialog>
+
+	<p:dialog id="dlgEdit" header="Editar Jefe Inmediato"
+		widgetVar="editDialog" modal="true" resizable="false" width="350"
+		showEffect="clip" closable="true" hideEffect="fold">
+		<p:panel id="pnlEdit">
+			<table>
+				<tr>
+					<td>Nombres<h:outputText value="*" styleClass="obligatorio" /></td>
+					<td><p:inputText
+							value="#{inscripcionController.modificarJefeInmediato.nombres}"
+							maxlength="60" styleClass="txt" tabindex="1"
+							style="text-transform: uppercase;" /></td>
+				</tr>
+				<tr>
+					<td>#{messages.lblApPaterno}<h:outputText value="*"
+							styleClass="obligatorio" /></td>
+					<td><p:inputText
+							value="#{inscripcionController.modificarJefeInmediato.apPaterno}"
+							maxlength="60" styleClass="txt" tabindex="2"
+							style="text-transform: uppercase;" /></td>
+				</tr>
+				<tr>
+					<td>#{messages.lblApMaterno}<h:outputText value="*"
+							styleClass="obligatorio" /></td>
+					<td><p:inputText
+							value="#{inscripcionController.modificarJefeInmediato.apMaterno}"
+							maxlength="60" styleClass="txt" tabindex="3"
+							style="text-transform: uppercase;" /></td>
+				</tr>
+				<tr>
+					<td>Dni<h:outputText value="*" styleClass="obligatorio" /></td>
+					<td><p:inputText
+							value="#{inscripcionController.modificarJefeInmediato.dni}"
+							id="txt_dni" maxlength="8" styleClass="txt" tabindex="4" /> <pe:keyFilter
+							for="txt_dni" regEx="/[0-9]/i" /></td>
+				</tr>
+				<tr>
+					<td>Cargo<h:outputText value="*" styleClass="obligatorio" /></td>
+					<td><p:inputText id="carg"
+							value="#{inscripcionController.modificarJefeInmediato.cargo}"
+							tabindex="5" maxlength="60" styleClass="txt" /></td>
+				</tr>
+				<tr>
+					<td>Celular<h:outputText value="*" styleClass="obligatorio" /></td>
+					<td><p:inputText id="celu"
+							value="#{inscripcionController.modificarJefeInmediato.celular}"
+							tabindex="6" maxlength="60" styleClass="txt" /> <pe:keyFilter
+							for="celu" regEx="/[0-9]/i" /></td>
+				</tr>
+				<tr>
+					<td>Telf. Oficina</td>
+					<td><p:inputText id="tel"
+							value="#{inscripcionController.modificarJefeInmediato.telefOficina}"
+							tabindex="6" maxlength="60" styleClass="txt" />
+							 <pe:keyFilter
+							for="tel" regEx="/[0-9]/i" /></td>
+				</tr>
+				<tr>
+					<td>Correo Trabajo<h:outputText value="*"
+							styleClass="obligatorio" /></td>
+					<td><p:inputText id="email1"
+							value="#{inscripcionController.modificarJefeInmediato.correo1}"
+							tabindex="8" maxlength="60" styleClass="txt" />													
+						</td>
+				</tr>
+				<tr>
+					<td>Correo Personal</td>
+					<td><p:inputText id="co2"
+							value="#{inscripcionController.modificarJefeInmediato.correo2}"
+							tabindex="9" maxlength="60" styleClass="txt" /></td>
+				</tr>
+			</table>
+			<f:facet name="footer">
+				<p:commandButton update="dlgEdit,dtLista3,messages" value="Guardar"
+					actionListener="#{inscripcionController.guardarJefeInmediato}"
+					icon="ui-icon-disk" oncomplete="editDialog.hide();" />
+			</f:facet>
+		</p:panel>
+	</p:dialog>
+
+	<p:dialog id="dlgEditTE" header="Editar Titular Entidad"
+		widgetVar="editDialogTE" modal="true" resizable="false" width="350"
+		showEffect="clip" closable="true" hideEffect="fold">
+		<p:panel id="pnlEditTE">
+			<table>
+				<tr>
+					<td>Nombres<h:outputText value="*" styleClass="obligatorio" /></td>
+					<td><p:inputText
+							value="#{inscripcionController.nuevoTitular.nombres}"
+							maxlength="60" styleClass="txt" tabindex="1"
+							style="text-transform: uppercase;" /></td>
+				</tr>
+				<tr>
+					<td>#{messages.lblApPaterno}<h:outputText value="*"
+							styleClass="obligatorio" /></td>
+					<td><p:inputText
+							value="#{inscripcionController.nuevoTitular.apPaterno}"
+							maxlength="60" styleClass="txt" tabindex="2"
+							style="text-transform: uppercase;" /></td>
+				</tr>
+				<tr>
+					<td>#{messages.lblApMaterno}<h:outputText value="*"
+							styleClass="obligatorio" /></td>
+					<td><p:inputText
+							value="#{inscripcionController.nuevoTitular.apMaterno}"
+							maxlength="60" styleClass="txt" tabindex="3"
+							style="text-transform: uppercase;" /></td>
+				</tr>
+				<tr>
+					<td>Dni<h:outputText value="*" styleClass="obligatorio" /></td>
+					<td><p:inputText
+							value="#{inscripcionController.nuevoTitular.nroDocTE}" id="dniTE"
+							maxlength="8" styleClass="txt" tabindex="4" /> <pe:keyFilter
+							for="dniTE" regEx="/[0-9]/i" /></td>
+				</tr>
+				<tr>
+					<td>Cargo<h:outputText value="*" styleClass="obligatorio" /></td>
+					<td><p:inputText id="cargTE"
+							value="#{inscripcionController.nuevoTitular.cargo}" tabindex="5"
+							maxlength="60" styleClass="txt" /></td>
+				</tr>
+
+				<tr>
+					<td>Celular<h:outputText value="*" styleClass="obligatorio" /></td>
+					<td><p:inputText id="celuTE"
+							value="#{inscripcionController.nuevoTitular.celular}"
+							tabindex="6" maxlength="60" styleClass="txt" /> <pe:keyFilter
+							for="celuTE" regEx="/[0-9]/i" /></td>
+				</tr>
+
+				<tr>
+					<td>Telf. Oficina</td>
+					<td><p:inputText id="telTE"
+							value="#{inscripcionController.nuevoTitular.telefOficina}"
+							tabindex="6" maxlength="60" styleClass="txt" /> <pe:keyFilter
+							for="telTE" regEx="/[0-9]/i" /></td>
+				</tr>
+				<tr>
+					<td>Correo Trabajo<h:outputText value="*"
+							styleClass="obligatorio" /></td>
+					<td><p:inputText
+							value="#{inscripcionController.nuevoTitular.correoTrabajo}"
+							tabindex="8" maxlength="60" styleClass="txt" /></td>
+				</tr>
+				<tr>
+					<td>Correo Personal</td>
+					<td><p:inputText
+							value="#{inscripcionController.nuevoTitular.correoPersonal}"
+							tabindex="9" maxlength="60" styleClass="txt" /></td>
+				</tr>
+
+			</table>
+			<f:facet name="footer">
+				<p:commandButton update="dlgEditTE,dtLista3,messages"
+					value="Guardar"
+					actionListener="#{inscripcionController.guardarTitularEntidad}"
+					icon="ui-icon-disk" oncomplete="editDialogTE.hide();" />
+			</f:facet>
+		</p:panel>
+	</p:dialog>
+
+</h:body>
+<p:ajaxStatus style="width:64px;height:64px;position:fixed;right:5px;bottom:5px" id="ajaxStatusPanel">  
+    <f:facet name="start">  
+        <p:graphicImage value="./images/loading.gif" /> 
+    </f:facet>  
+      
+    <f:facet name="complete">  
+        <h:outputText value="" />  
+    </f:facet>  
+</p:ajaxStatus> 
+</html>

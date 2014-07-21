@@ -1,0 +1,34 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.AsignacionGerenteVDao;
+import gob.servir.desempenio.model.AsignacionGerenteV;
+import gob.servir.desempenio.service.AsignacionGerenteVService;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+/**
+ * 
+ * @author Hever Pumallihua García
+ */
+@Service
+public class AsignacionGerenteVServiceImpl implements AsignacionGerenteVService {
+
+	@Autowired
+	private AsignacionGerenteVDao asignacionGerenteVDao;
+
+	public AsignacionGerenteV find(String codGerente) {
+		return asignacionGerenteVDao.find(codGerente);
+	}
+
+	public List<AsignacionGerenteV> getListaAsignacionGerente() {
+		return asignacionGerenteVDao.getListaAsignacionGerente();
+	}
+	
+	public List<AsignacionGerenteV> getListaAsignacionGerente(String codGerente) {
+		return asignacionGerenteVDao.getListaAsignacionGerente(codGerente);
+	}
+
+}

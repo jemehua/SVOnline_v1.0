@@ -1,0 +1,318 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.DetalleInscripcionDao;
+import gob.servir.desempenio.dao.InscripcionDao;
+import gob.servir.desempenio.model.Campania;
+import gob.servir.desempenio.model.DetalleInscripcion;
+import gob.servir.desempenio.model.DetalleInscripcionPK;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.DetalleInscripcionService;
+import gob.servir.desempenio.service.UsuarioService;
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Repository
+public class InscripcionDaoImpl implements InscripcionDao {
+	@PersistenceContext
+	private EntityManager em;
+
+	@Autowired
+	private UsuarioService usuarioService;
+
+	Usuario usuario = new Usuario();
+
+	public Inscripcion find(InscripcionPK id) {
+		try {
+			return em.find(Inscripcion.class, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Inscripcion save(Inscripcion obj) {
+		try {
+			em.persist(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Inscripcion edit(Inscripcion obj) {
+		try {
+			return em.merge(obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Inscripcion> getListaInscripcion() {
+		Query q = null;
+		q = (Query) em
+				.createQuery("select t from Inscripcion t where t.estado =:estado ");
+		q.setParameter("estado", "A");
+
+		try {
+			return q.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Inscripcion> getListaInscripcion(Long idCampania, int opcion) {
+		Query q = null;
+
+		if (opcion == 0) {
+			q = (Query) em
+					.createQuery("select i from Inscripcion i where i.id.idCampania =:idCampania and i.estado =:estado ");
+			q.setParameter("idCampania", idCampania);
+			q.setParameter("estado", "A");
+
+		}
+
+		if (opcion == 1) {// Registro metas gp
+			q = (Query) em
+					.createQuery("select i from Inscripcion i where i.id.idCampania =:idCampania and i.estado =:estado ");
+			q.setParameter("idCampania", idCampania);
+			//q.setParameter("estadoMeta", "R");
+			q.setParameter("estado", "A");
+		}
+
+		if (opcion == 2) {// Registro evaluacion inicial gp
+			q = (Query) em
+					.createQuery("select i from Inscripcion i where i.id.idCampania =:idCampania and i.estadoEvaInicial =:estadoEvaInicial and i.estado =:estado ");
+			q.setParameter("idCampania", idCampania);
+			q.setParameter("estadoEvaInicial", "R");
+			q.setParameter("estado", "A");
+		}
+
+		if (opcion == 3) {// Registro evaluacion inicial gp
+			q = (Query) em
+					.createQuery("select i from Inscripcion i where i.id.idCampania =:idCampania and (i.estadoMetas =:estadoMeta1 or i.estadoMetas =:estadoMeta2) and i.estado =:estado ");
+			q.setParameter("idCampania", idCampania);
+			q.setParameter("estadoMeta1", "A");
+			q.setParameter("estadoMeta2", "D");
+			q.setParameter("estado", "A");
+		}
+
+		if (opcion == 4) {// Registro evaluacion inicial gp
+			q = (Query) em
+					.createQuery("select i from Inscripcion i where (i.estadoMetas =:estadoMeta1 or i.estadoMetas =:estadoMeta2) and i.estado =:estado ");
+			q.setParameter("estadoMeta1", "A");
+			q.setParameter("estadoMeta2", "D");
+			q.setParameter("estado", "A");
+		}
+
+		try {
+			return q.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public Inscripcion getInscripcionCampaña(Long idCampania, Usuario usuario) {
+
+		Query q = null;
+
+		try {
+
+			q = (Query) em
+					.createQuery("select i from Inscripcion i where i.id.idCampania =:idCampania and i.estado =:estado and UPPER(i.asignacionGerenteV.ap_paterno) like :valorBusqueda1 "
+							+ "and UPPER(i.asignacionGerenteV.ap_materno) like :valorBusqueda2 and UPPER(i.asignacionGerenteV.nombres) like :valorBusqueda3");
+			q.setParameter("idCampania", idCampania);
+			q.setParameter("estado", "A");
+			q.setParameter("valorBusqueda1", "%"
+					+ usuario.getApPaterno().toUpperCase() + "%");
+			q.setParameter("valorBusqueda2", "%"
+					+ usuario.getApMaterno().toUpperCase() + "%");
+			q.setParameter("valorBusqueda3", "%"
+					+ usuario.getNombre().toUpperCase() + "%");
+
+			return (Inscripcion) q.getSingleResult();
+
+		} catch (Exception as) {
+
+			return null;
+		}
+
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Campania> getListaEstadoCampania(String estado) {
+		Query q = null;
+		q = (Query) em
+				.createQuery("select c from Campania c where c.estadoCampania =:estado order by c.idCampania");
+		q.setParameter("estado", estado);
+
+		try {
+			return q.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Inscripcion> getListaInscripcion(Long idCampania,
+			String valorBusqueda) {
+		Query q = null;
+
+		q = (Query) em
+				.createQuery("select i from Inscripcion i where i.id.idCampania =:idCampania and i.estado =:estado and ( UPPER(i.asignacionGerenteV.ap_paterno) like :valorBusqueda or UPPER(i.asignacionGerenteV.nombres) like :valorBusqueda or UPPER(i.asignacionGerenteV.dni) like :valorBusqueda ) ");
+		q.setParameter("idCampania", idCampania);
+		q.setParameter("valorBusqueda", "%" + valorBusqueda.toUpperCase() + "%");
+		q.setParameter("estado", "A");
+
+		try {
+			return q.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Inscripcion> getListaInscripcion2(Long idCampania,
+			String valorBusqueda) {
+		Query q = null;
+
+		q = (Query) em
+				.createQuery("select i from Inscripcion i where i.id.idCampania =:idCampania and i.estado =:estado and (i.estadoMetas =:estadoMeta1 or i.estadoMetas =:estadoMeta2) and ( UPPER(i.asignacionGerenteV.ap_paterno) like :valorBusqueda or UPPER(i.asignacionGerenteV.nombres) like :valorBusqueda or UPPER(i.asignacionGerenteV.dni) like :valorBusqueda ) ");
+		q.setParameter("idCampania", idCampania);
+		q.setParameter("valorBusqueda", "%" + valorBusqueda.toUpperCase() + "%");
+		q.setParameter("estado", "A");
+		q.setParameter("estadoMeta1", "A");
+		q.setParameter("estadoMeta2", "D");
+
+		try {
+			return q.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Long saveTotal(Inscripcion nuevoInscripcion,
+			DetalleInscripcion detalle) {
+
+		try {
+
+			em.persist(nuevoInscripcion);
+
+			if (detalle.getJefeInmediato() != null)
+				em.persist(detalle.getJefeInmediato());
+
+			em.persist(detalle);
+
+		} catch (Exception e) {
+			System.out.println("error al guadar flujo");
+			e.printStackTrace();
+			return 0L;
+
+		}
+
+		return 1L;
+	}
+
+	/*@Transactional
+	public Long saveTotal(Inscripcion inscripcion,
+			DetalleInscripcion nuevoInscripcionDetalle2,
+			DetalleInscripcion nuevoInscripcionDetalle) {
+		/*
+		 * try {
+		 * 
+		 * 
+		 * if(nuevoInscripcionDetalle2.getEntidadDestino()!=null){
+		 * EntidadDestino ed=null; ed=em.find(EntidadDestino.class,
+		 * nuevoInscripcionDetalle2.getEntidadDestino().getIdEntidadDestino());
+		 * if(ed==null)
+		 * em.persist(nuevoInscripcionDetalle2.getEntidadDestino()); }
+		 * if(nuevoInscripcionDetalle2.getJefeInmediato()!=null){ JefeInmediato
+		 * ji=null; ji=em.find(JefeInmediato.class,
+		 * nuevoInscripcionDetalle2.getJefeInmediato().getDni()); if(ji==null)
+		 * em.persist(nuevoInscripcionDetalle2.getJefeInmediato()); }
+		 * if(nuevoInscripcionDetalle2.getTitularEntidad()!=null){
+		 * TitularEntidad ti=null; ti=em.find(TitularEntidad.class,
+		 * nuevoInscripcionDetalle2.getTitularEntidad().getNumeroDocumento());
+		 * if(ti==null)
+		 * em.persist(nuevoInscripcionDetalle2.getTitularEntidad()); }
+		 * 
+		 * em.merge(nuevoInscripcionDetalle);
+		 * 
+		 * em.persist(nuevoInscripcionDetalle2);
+		 * 
+		 * 
+		 * 
+		 * } catch (Exception e) { System.out.println("error al guadar flujo");
+		 * e.printStackTrace(); return 0L;
+		 * 
+		 * }
+		 
+
+		return 1L;
+	}*/
+
+	@Transactional
+	public boolean delete(InscripcionPK inscripcionPK) {
+		try{
+			Inscripcion inscripcion2 = em.find(Inscripcion.class, inscripcionPK);	
+			em.remove(inscripcion2); 
+//			em.flush();		 
+		  } catch (Exception e) {
+				System.out.println("error al guadar flujo");
+				e.printStackTrace();
+				return false;
+
+			}
+		return true;
+	}
+	
+//	@Transactional
+//	public Long saveTotal(Inscripcion nuevoInscripcion,
+//			DetalleInscripcion detalle) {
+//
+//		try {
+//
+//			em.persist(nuevoInscripcion);
+//
+//			if (detalle.getJefeInmediato() != null)
+//				em.persist(detalle.getJefeInmediato());
+//
+//			em.persist(detalle);
+//
+//		} catch (Exception e) {
+//			System.out.println("error al guadar flujo");
+//			e.printStackTrace();
+//			return 0L;
+//
+//		}
+//
+//		return 1L;
+//	}
+
+
+}

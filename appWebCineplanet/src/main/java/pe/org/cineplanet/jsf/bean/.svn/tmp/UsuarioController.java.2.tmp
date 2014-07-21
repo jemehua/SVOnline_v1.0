@@ -1,0 +1,506 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.CampaniaService;
+import gob.servir.desempenio.service.DetalleInscripcionService;
+import gob.servir.desempenio.service.RolService;
+import gob.servir.desempenio.service.UsuarioService;
+import gob.servir.desempenio.util.Constantes;
+import gob.servir.desempenio.util.Message;
+import gob.servir.desempenio.util.Seguridad;
+import gob.servir.desempenio.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Component("usuarioController")
+@Scope("session")
+public class UsuarioController {
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(UsuarioController.class);
+
+	@Autowired
+	private LoginController loginController;
+	@Autowired
+	private UsuarioService usuarioService;
+	@Autowired
+	private RolService rolService;
+	@Autowired
+	private CampaniaService campaniaService;
+	@Autowired
+	private DetalleInscripcionService detalleInscripcionService;
+
+	private Usuario nuevo = new Usuario();
+	private Usuario modifica = new Usuario();
+	private Usuario usuarioSelec = null;
+
+	private List<Usuario> list = new ArrayList<Usuario>();
+	private List<SelectItem> comboCampania = new ArrayList<SelectItem>();
+	private Long campaniaSelec = 0L;
+	private List<SelectItem> comboRol = new ArrayList<SelectItem>();
+	private List<SelectItem> comboEstado = new ArrayList<SelectItem>();
+	private Long rolSelec = 0L;
+	private Long rolSelecM = 0L;
+	private String confirmarClave = "";
+
+	private Usuario userSesion = null;
+
+	private List<Usuario> filteredUser;
+
+	private Message message = new Message();
+
+	public UsuarioController() {
+
+	}
+
+	public List<SelectItem> getComboCampania() {
+		comboCampania = campaniaService.getComboCampania();
+		return comboCampania;
+	}
+
+	public void setComboCampania(List<SelectItem> comboCampania) {
+		this.comboCampania = comboCampania;
+	}
+
+	public Long getCampaniaSelec() {
+		return campaniaSelec;
+	}
+
+	public void setCampaniaSelec(Long campaniaSelec) {
+		this.campaniaSelec = campaniaSelec;
+	}
+
+	public Long getRolSelecM() {
+		return rolSelecM;
+	}
+
+	public void setRolSelecM(Long rolSelecM) {
+		this.rolSelecM = rolSelecM;
+	}
+
+	public String getConfirmarClave() {
+		return confirmarClave;
+	}
+
+	public void setConfirmarClave(String confirmarClave) {
+		this.confirmarClave = confirmarClave;
+	}
+
+	public List<Usuario> getFilteredUser() {
+		return filteredUser;
+	}
+
+	public void setFilteredUser(List<Usuario> filteredUser) {
+		this.filteredUser = filteredUser;
+	}
+
+	public Long getRolSelec() {
+		return rolSelec;
+	}
+
+	public void setRolSelec(Long rolSelec) {
+		this.rolSelec = rolSelec;
+	}
+
+	public Usuario getModifica() {
+		return modifica;
+	}
+
+	public void setModifica(Usuario modifica) {
+		this.modifica = modifica;
+	}
+
+	public Usuario getNuevo() {
+		return nuevo;
+	}
+
+	public void setNuevo(Usuario nuevo) {
+		this.nuevo = nuevo;
+	}
+
+	public Usuario getUsuarioSelec() {
+		return usuarioSelec;
+	}
+
+	public void setUsuarioSelec(Usuario usuarioSelec) {
+		this.usuarioSelec = usuarioSelec;
+	}
+
+	public List<Usuario> getList() {
+		return list = usuarioService.getListaUsuario(rolSelec, campaniaSelec);
+	}
+
+	public void setList(List<Usuario> list) {
+		this.list = list;
+	}
+
+	public List<SelectItem> getComboRol() {
+		comboRol = rolService.getComboRol();
+		return comboRol;
+	}
+
+	public void setComboRol(List<SelectItem> comboRol) {
+		this.comboRol = comboRol;
+	}
+
+	public List<SelectItem> getComboEstado() {
+		comboEstado = new ArrayList<SelectItem>();
+		SelectItem item = null;
+		item = new SelectItem(Constantes.ACTIVO, "Activo");
+		comboEstado.add(item);
+		item = new SelectItem(Constantes.INACTIVO, "Inactivo");
+		comboEstado.add(item);
+
+		return comboEstado;
+	}
+
+	public void setComboEstado(List<SelectItem> comboEstado) {
+		this.comboEstado = comboEstado;
+	}
+
+	public void guardar() {
+
+		validarSesion();
+
+		if (!validarDatos())
+			return;
+
+		try {
+
+			nuevo.setIdUsuario(usuarioService.getIdMax());
+			nuevo.setRol(rolService.find(rolSelec));
+			nuevo.setUsuarioRegistra(userSesion.getUsuario());
+<<<<<<< .mine
+			nuevo.setPassword(Seguridad.encrypt(nuevo.getClave()));
+			// nuevo.setClave(nuevo.getClave());
+=======
+			// nuevo.setFechaCreacion(new Date());
+			// nuevo.setUsuarioModifica(userSesion.getUsuario());
+			// nuevo.setFechaModificacion(new Date());
+			// nuevo.setClave(Seguridad.encriptar(nuevo.getClave()));
+			nuevo.setClave(nuevo.getClave());
+>>>>>>> .r1658
+
+			nuevo.setEstado(Constantes.ACTIVO);
+
+			if (rolSelec == Constantes.ROL_GP || rolSelec == Constantes.ROL_JI
+					|| rolSelec == Constantes.ROL_TE) {
+				nuevo.setIdCampania(campaniaSelec);
+			}
+
+			usuarioService.save(nuevo);
+
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+							message.getMessage("msgRegistrar")));
+			limpiar();
+		} catch (Exception e) {
+			logger.info("ERRROR AL REGISTRAR USUARIO");
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+							message.getMessage("msgRegistrarError")));
+		}
+	}
+
+	public void modificar() {
+
+		validarSesion();
+
+		try {
+
+			if (!validarModificar())
+				return;
+
+			modifica.setUsuarioModifica(userSesion.getUsuario());
+			// modifica.setFechaModificacion(new Date());
+			modifica.setRol(rolService.find(rolSelecM));
+			usuarioService.edit(modifica);
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+							message.getMessage("msgModificar")));
+
+			limpiar();
+		} catch (Exception e) {
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+							message.getMessage("msgModificarError")));
+		}
+	}
+
+	public boolean validarModificar() {
+
+		String txtObligatorio = message.getMessage("msgTxtObligatorio");
+
+		if (modifica.getNombre().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+
+		if (modifica.getApPaterno().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+
+		if (modifica.getCorreo().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+
+		if (!StringUtils.isValidEmail(modifica.getCorreo())) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+							"Ingrese correo electrónico valido"));
+			return false;
+		}
+
+		if (rolSelecM.equals(0L)) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							message.getMessage("msgSelecRol")));
+			return false;
+		}
+
+		return true;
+
+	}
+
+	public void limpiar() {
+		nuevo = new Usuario();
+		modifica = new Usuario();
+		rolSelec = 0L;
+		// cargarUsuarios();
+	}
+
+	public void validarSesion() {
+		FacesContext context = FacesContext.getCurrentInstance();
+
+		userSesion = (Usuario) context.getExternalContext().getSessionMap()
+				.get(loginController.getUsername());
+
+		if (userSesion == null) {
+			String ctxPath = context.getExternalContext()
+					.getRequestContextPath();
+			try {
+				context.getExternalContext().redirect(ctxPath + "/login.jsf");
+			} catch (Exception e) {
+				// e.printStackTrace();
+			}
+		}
+	}
+
+	public boolean validarDatos() {
+
+		String txtObligatorio = message.getMessage("msgTxtObligatorio");
+
+		if (nuevo.getNombre().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+		if (nuevo.getApPaterno().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+
+		if (nuevo.getDni().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		} else if (nuevo.getDni().trim().length() != 8) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"El Dni tiene que tener 8 caracteres"));
+			return false;
+		}
+
+		if (nuevo.getCorreo().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+
+		if (!StringUtils.isValidEmail(nuevo.getCorreo())) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+							"Ingrese correo electrónico valido"));
+			return false;
+		}
+
+		if (nuevo.getUsuario().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+
+		if (nuevo.getClave().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+
+		if (rolSelec.equals(0L)) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							message.getMessage("msgSelecRol")));
+			return false;
+		}
+
+		if (validarUsuario(nuevo.getUsuario())) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							message.getMessage("msgUsernameExiste")));
+			return false;
+		}
+
+		if (!nuevo.getClave().trim().equalsIgnoreCase(confirmarClave)) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							message.getMessage("msgConfirmarClave")));
+			return false;
+		}
+
+		if (StringUtils.validarClave(nuevo.getClave())) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							message.getMessage("msgClaveError")));
+			return false;
+		}
+
+		if (validarCampania()) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Seleccione Campaña de Evaluación"));
+			return false;
+		}
+
+		if (rolSelec == Constantes.ROL_GP || rolSelec == Constantes.ROL_JI
+				|| rolSelec == Constantes.ROL_TE) {
+			if (validarDniCampañaRol()) {
+
+				FacesContext.getCurrentInstance().addMessage(
+						null,
+						new FacesMessage(FacesMessage.SEVERITY_WARN,
+								"ADVERTENCIA", "usuario ya existe"));
+				return false;
+
+			}
+		}
+
+		return true;
+	}
+
+	public boolean validarCampania() {
+		if (rolSelec == Constantes.ROL_ADM || rolSelec == Constantes.ROL_EVA)
+			return false;
+		else if (campaniaSelec == 0L)
+			return true;
+		else
+			return false;
+	}
+
+	public boolean validarUsuario(String username) {
+
+		Usuario user = usuarioService.findByUsername(username);
+
+		if (user != null)
+			return true;
+		else
+			return false;
+	}
+
+	public boolean validarDniCampañaRol() {
+		Usuario user = null;
+		user = usuarioService.findByDniAndCampaniaAndRol(nuevo.getDni(),
+				rolSelec, campaniaSelec);
+
+		if (user != null) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public void resetClave() {
+
+		if (modifica.getDni() == null)
+			return;
+
+<<<<<<< .mine
+		try {
+			modifica.setPassword(Seguridad.encrypt((modifica.getDni())));
+			usuarioService.edit(modifica);
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+							"Se ha reseteado la clave de usuario"));
+		} catch (Exception e) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Ha ocurrido un error"));
+		}
+=======
+		// modifica.setClave(Seguridad.encriptar(modifica.getDni()));
+		modifica.setClave(modifica.getDni());
+
+		usuarioService.edit(modifica);
+		FacesContext.getCurrentInstance().addMessage(
+				null,
+				new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+						"Se ha reseteado la clave de usuario"));
+>>>>>>> .r1658
+	}
+
+}

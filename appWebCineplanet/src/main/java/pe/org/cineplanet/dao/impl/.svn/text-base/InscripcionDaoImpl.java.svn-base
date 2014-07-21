@@ -1,0 +1,746 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.InscripcionDao;
+import gob.servir.desempenio.dto.Monitoreo;
+import gob.servir.desempenio.dto.Resultado;
+import gob.servir.desempenio.model.AsignacionGerenteV;
+import gob.servir.desempenio.model.Campania;
+import gob.servir.desempenio.model.DetalleFlujo;
+import gob.servir.desempenio.model.DetalleFlujoPK;
+import gob.servir.desempenio.model.DetalleInscripcion;
+import gob.servir.desempenio.model.EvaluacionCompetencias;
+import gob.servir.desempenio.model.EvaluacionMetas;
+import gob.servir.desempenio.model.Flujo;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.PuestoTipoV;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.AsignacionGerenteVService;
+import gob.servir.desempenio.service.CampaniaService;
+import gob.servir.desempenio.service.DetalleFlujoService;
+import gob.servir.desempenio.service.EvaluacionCompetenciasService;
+import gob.servir.desempenio.service.EvaluacionMetasService;
+import gob.servir.desempenio.service.FlujoService;
+import gob.servir.desempenio.service.NotificacionService;
+import gob.servir.desempenio.service.PuestoTipoVService;
+import gob.servir.desempenio.util.Constantes;
+import gob.servir.desempenio.util.Evaluacion;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Repository
+public class InscripcionDaoImpl implements InscripcionDao {
+	@PersistenceContext
+	private EntityManager em;
+
+	@Autowired
+	private FlujoService flujoService;
+	@Autowired
+	private EvaluacionMetasService evaMetasService;
+	@Autowired
+	private EvaluacionCompetenciasService evaCompetenciasService;
+	@Autowired
+	private DetalleFlujoService detalleFlujoService;
+	@Autowired
+	private NotificacionService notificacionService;
+	@Autowired
+	private CampaniaService campaniaService;
+	@Autowired
+	private PuestoTipoVService puestoTipoVService;
+	@Autowired
+	private AsignacionGerenteVService asignacionGerenteVService;
+
+	public Inscripcion find(InscripcionPK id) {
+		try {
+			return em.find(Inscripcion.class, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Inscripcion save(Inscripcion obj) {
+		try {
+			em.persist(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Inscripcion edit(Inscripcion obj) {
+		try {
+			return em.merge(obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Inscripcion> getListaInscripcion() {
+		Query q = null;
+
+		q = em.createNamedQuery("Inscripcion.getAllListaInscripcion");
+
+		q.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+			return q.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Inscripcion> getListaGerentePublico(Long idCampania) {
+		Query q = null;
+
+		q = em.createNamedQuery("Inscripcion.getListaGerentePublico");
+
+		q.setParameter("idCampania", idCampania);
+		q.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+
+			List<Object[]> lista = q.getResultList();
+			List<Inscripcion> listaRetorno = new ArrayList<Inscripcion>();
+
+			for (Object[] row : lista) {
+				Campania campania = new Campania();
+				campania.setIdCampania((Long) row[0]);
+
+				AsignacionGerenteV gerente = new AsignacionGerenteV();
+				gerente.setCod_gerente((String) row[1]);
+				gerente.setNombres((String) row[2]);
+				gerente.setAp_paterno((String) row[3]);
+				gerente.setAp_materno((String) row[4]);
+				gerente.setDni((String) row[5]);
+
+				PuestoTipoV puestoTipo = new PuestoTipoV();
+				puestoTipo.setId_puesto_tipo((Long) row[6]);
+				puestoTipo.setDsc_puesto_tipo((String) row[7]);
+
+				Inscripcion inscripcion = new Inscripcion();
+				inscripcion.setId(new InscripcionPK(campania.getIdCampania(),
+						gerente.getCod_gerente()));
+				inscripcion.setCampania(campania);
+				inscripcion.setPuestoTipoV(puestoTipo);
+				inscripcion.setAsignacionGerenteV(gerente);
+				listaRetorno.add(inscripcion);
+			}
+			return listaRetorno;
+
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Inscripcion> getListaInscripcion(Long idCampania, int opcion) {
+		Query q = null;
+
+		if (opcion == 0) {
+
+			q = em.createNamedQuery("Inscripcion.getListaInscripcion0");
+
+			q.setParameter("idCampania", idCampania);
+			q.setParameter("estado", Constantes.ACTIVO);
+
+		}
+
+		if (opcion == 1) {// Registro metas gp
+
+			q = em.createNamedQuery("Inscripcion.getListaInscripcion1");
+
+			q.setParameter("idCampania", idCampania);
+			q.setParameter("estadoMeta", Constantes.PENDIENTE);
+			q.setParameter("estado", Constantes.ACTIVO);
+		}
+
+		if (opcion == 2) {// Registro evaluacion inicial gp
+
+			q = em.createNamedQuery("Inscripcion.getListaInscripcion2");
+
+			q.setParameter("idCampania", idCampania);
+			q.setParameter("estadoEvaInicial", Constantes.REGISTRADO);
+			q.setParameter("estado", Constantes.ACTIVO);
+		}
+
+		if (opcion == 3) {// Registro evaluacion inicial gp
+
+			q = em.createNamedQuery("Inscripcion.getListaInscripcion3");
+
+			q.setParameter("idCampania", idCampania);
+			q.setParameter("estadoMeta1", Constantes.ACTIVO);
+			q.setParameter("estadoMeta2", Constantes.DESAPROBADO);
+			q.setParameter("estado", Constantes.ACTIVO);
+		}
+
+		if (opcion == 4) {// Registro evaluacion inicial gp
+
+			q = em.createNamedQuery("Inscripcion.getListaInscripcion4");
+
+			q.setParameter("estadoMeta1", Constantes.ACTIVO);
+			q.setParameter("estadoMeta2", Constantes.DESAPROBADO);
+			q.setParameter("estado", Constantes.ACTIVO);
+		}
+
+		try {
+
+			List<Object[]> lista = q.getResultList();
+			List<Inscripcion> listaRetorno = new ArrayList<Inscripcion>();
+
+			for (Object[] row : lista) {
+				Campania campania = new Campania();
+				campania.setIdCampania((Long) row[0]);
+
+				AsignacionGerenteV gerente = new AsignacionGerenteV();
+				gerente.setCod_gerente((String) row[1]);
+				gerente.setNombres((String) row[2]);
+				gerente.setAp_paterno((String) row[3]);
+				gerente.setAp_materno((String) row[4]);
+				gerente.setDni((String) row[5]);
+
+				PuestoTipoV puestoTipo = new PuestoTipoV();
+				puestoTipo.setId_puesto_tipo((Long) row[6]);
+				puestoTipo.setDsc_puesto_tipo((String) row[7]);
+
+				Inscripcion inscripcion = new Inscripcion();
+				inscripcion.setId(new InscripcionPK(campania.getIdCampania(),
+						gerente.getCod_gerente()));
+				inscripcion.setCampania(campania);
+				inscripcion.setPuestoTipoV(puestoTipo);
+				inscripcion.setAsignacionGerenteV(gerente);
+				inscripcion.setEstadoMetas((String) row[8]);
+				listaRetorno.add(inscripcion);
+			}
+			return listaRetorno;
+
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Transactional
+	public boolean delete(InscripcionPK inscripcionPK) {
+		try {
+			Inscripcion inscripcion2 = em
+					.find(Inscripcion.class, inscripcionPK);
+			Query q = null;
+
+			q = (Query) em
+					.createQuery("select d from DetalleInscripcion d where d.id.idCampania =:idCampania and d.id.idGerentePublico =:idGerentePublico");
+			q.setParameter("idCampania", inscripcionPK.getIdCampania());
+			q.setParameter("idGerentePublico",
+					inscripcionPK.getIdGerentePublico());
+			List<DetalleInscripcion> detalleInscripcions = q.getResultList();
+			for (DetalleInscripcion detalleInscripcion : detalleInscripcions) {
+				em.remove(detalleInscripcion);
+			}
+
+			Query qFlujo = null;
+
+			qFlujo = (Query) em
+					.createQuery("select f from Flujo f where f.id.idCampania =:idCampania and f.id.idGerentePublico =:idGerentePublico and f.estado =:estado");
+			qFlujo.setParameter("idCampania", inscripcionPK.getIdCampania());
+			qFlujo.setParameter("idGerentePublico",
+					inscripcionPK.getIdGerentePublico());
+			qFlujo.setParameter("estado", Constantes.PENDIENTE);
+			List<Flujo> flujos = qFlujo.getResultList();
+			for (Flujo flujo : flujos) {
+				em.remove(flujo);
+			}
+
+			em.remove(inscripcion2);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+
+		}
+		return true;
+	}
+
+	public Inscripcion getInscripcionUsuario(Usuario usuario) {
+
+		Query q = null;
+
+		try {
+
+			q = em.createNamedQuery("Inscripcion.getInscripcionUsuario");
+
+			q.setParameter("dni", usuario.getDni());
+			q.setParameter("idCampania", usuario.getIdCampania());
+			q.setParameter("estado", Constantes.ACTIVO);
+			q.setParameter("estadoCampania", Constantes.CAMPAÑA_ACTIVO);
+
+			Object[] row = (Object[]) q.getSingleResult();
+
+			Inscripcion inscripcion = new Inscripcion();
+
+			if (row != null) {
+
+				Campania campania = new Campania();
+				campania.setIdCampania((Long) row[0]);
+				campania.setDenominacion((String) row[1]);
+				campania.setAnio((String) row[2]);
+				campania.setPostAnio((String) row[3]);
+				inscripcion.setCampania(campania);
+
+				AsignacionGerenteV gerente = new AsignacionGerenteV();
+				gerente.setCod_gerente((String) row[4]);
+				gerente.setNombres((String) row[5]);
+				gerente.setAp_paterno((String) row[6]);
+				gerente.setAp_materno((String) row[7]);
+				inscripcion.setAsignacionGerenteV(gerente);
+
+				PuestoTipoV puestoTipo = new PuestoTipoV();
+				puestoTipo.setId_puesto_tipo((Long) row[8]);
+				puestoTipo.setDsc_puesto_tipo((String) row[9]);
+				inscripcion.setPuestoTipoV(puestoTipo);
+
+				InscripcionPK id = new InscripcionPK(campania.getIdCampania(),
+						gerente.getCod_gerente());
+				inscripcion.setId(id);
+
+			}
+
+			return inscripcion;
+
+		} catch (Exception as) {
+			as.getMessage();
+			return null;
+		}
+	}
+
+	public String validarInscripcion(InscripcionPK id) {
+
+		List<Flujo> listaFlujo = flujoService.getListaFlujo(id,
+				Constantes.CANCELADO);
+		Query q = null;
+
+		if (listaFlujo.size() == 0) {
+
+			q = em.createNamedQuery("Inscripcion.validarInscripcion");
+
+			q.setParameter("idCampania", id.getIdCampania());
+			q.setParameter("codGerente", id.getIdGerentePublico());
+			q.setParameter("estado", Constantes.ACTIVO);
+
+			try {
+				return (String) q.getSingleResult();
+			} catch (Exception as) {
+				return null;
+			}
+		} else
+			return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Inscripcion> getListaInscripcionActivo(String codGerente) {
+		Query q = null;
+
+		q = em.createNamedQuery("Inscripcion.getListaInscripcionActivo");
+
+		q.setParameter("codGerente", codGerente);
+		q.setParameter("estadoCampania", Constantes.CAMPAÑA_ACTIVO);
+		q.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+
+			List<Object[]> listaObjetos = new ArrayList<Object[]>();
+
+			listaObjetos = q.getResultList();
+
+			List<Inscripcion> listaInscripcion = new ArrayList<Inscripcion>();
+
+			for (Object[] row : listaObjetos) {
+
+				Inscripcion inscripcion = new Inscripcion();
+
+				inscripcion.setId((InscripcionPK) row[0]);
+
+				listaInscripcion.add(inscripcion);
+			}
+
+			return listaInscripcion;
+
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Inscripcion> getListGpEvaCulminado(Long idCampania,
+			Long idPuesto, Long idEntidad) {
+		
+		Query q = null;
+		q = em.createNamedQuery("Inscripcion.getListGpEvaCulminado");
+
+		q.setParameter("idCampania", idCampania);
+		q.setParameter("idPuesto", idPuesto);
+		q.setParameter("idEntidad", idEntidad);
+		q.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+
+			List<Object[]> lista = q.getResultList();
+			List<Inscripcion> listaRetorno = new ArrayList<Inscripcion>();
+
+			for (Object[] row : lista) {
+				Inscripcion inscripcion = new Inscripcion();
+				inscripcion.setId((InscripcionPK) row[0]);
+
+				AsignacionGerenteV gerente = new AsignacionGerenteV();
+				gerente.setCod_gerente((String) row[1]);
+				gerente.setNombres((String) row[2]);
+				gerente.setAp_paterno((String) row[3]);
+				gerente.setAp_materno((String) row[4]);
+				gerente.setDni((String) row[5]);
+				inscripcion.setAsignacionGerenteV(gerente);
+
+				PuestoTipoV puestoTipoV = new PuestoTipoV();
+				puestoTipoV.setId_puesto_tipo((Long) row[6]);
+				puestoTipoV.setDsc_puesto_tipo((String) row[7]);
+				inscripcion.setPuestoTipoV(puestoTipoV);
+
+				Campania campania = new Campania();
+				campania.setDenominacion((String) row[8]);
+				campania.setAnio((String) row[9]);
+				campania.setPostAnio((String) row[10]);
+				inscripcion.setCampania(campania);
+
+				List<EvaluacionMetas> listEvaMetas = evaMetasService
+						.getListaNotasEvaMetas(inscripcion.getId());
+
+				List<EvaluacionCompetencias> listEvaComp = evaCompetenciasService
+						.getListaSoloEvaCompetencias(inscripcion.getId());
+
+				Resultado resultado = Evaluacion.procesarEvaluacion(
+						listEvaMetas, listEvaComp);
+
+				inscripcion.setPromedioMetas(resultado.getPromedioMetas());
+				inscripcion
+						.setPromedioComp(resultado.getPromedioCompetencias());
+				inscripcion.setPromedioFinal(resultado.getPromedioFinal());
+				if (resultado.getPromedioFinal() > 100
+						&& resultado.getPromedioFinal() <= 120) {
+					inscripcion.setInterpretacion(Constantes.SUPERO_OBJETIVO);
+				} else if (resultado.getPromedioFinal() > 90
+						&& resultado.getPromedioFinal() <= 100) {
+					inscripcion.setInterpretacion(Constantes.CUMPLIO_OBJETIVO);
+				} else if (resultado.getPromedioFinal() > 80
+						&& resultado.getPromedioFinal() <= 90) {
+					inscripcion.setInterpretacion(Constantes.CUMPLIO_EN_PARTE);
+				} else if (resultado.getPromedioFinal() > 50
+						&& resultado.getPromedioFinal() <= 80) {
+					inscripcion.setInterpretacion(Constantes.NO_CUMPLIO);
+				} else
+					inscripcion.setInterpretacion(Constantes.OTRO);
+
+				listaRetorno.add(inscripcion);
+			}
+
+			return listaRetorno;
+
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<Monitoreo> getListaMonitoreo(Long idCampania) {
+
+		List<Monitoreo> listRetorno = new ArrayList<Monitoreo>();
+		List<Inscripcion> listInscripcions = getListaGerentePublico(idCampania);
+
+		for (Inscripcion row : listInscripcions) {
+			Monitoreo monitoreo = new Monitoreo();
+
+			monitoreo.setIdCampania(idCampania);
+			monitoreo.setCodGerente(row.getId().getIdGerentePublico());
+			monitoreo.setNombres(row.getAsignacionGerenteV().getNombres());
+			monitoreo.setApPaterno(row.getAsignacionGerenteV().getAp_paterno());
+			monitoreo.setApMaterno(row.getAsignacionGerenteV().getAp_materno());
+
+			List<DetalleFlujo> listDetalleFlujos = detalleFlujoService
+					.getListaMonitoreoFlujo(new InscripcionPK(idCampania, row
+							.getId().getIdGerentePublico()));
+
+			for (DetalleFlujo detalle : listDetalleFlujos) {
+
+				DetalleFlujoPK id00;
+				DetalleFlujo detalleFlujo;
+
+				if (detalle.getId().getIdProceso() == Constantes.PROCESO1) {
+					if (detalle.getId().getIdActividad() == Constantes.P1_RECIBIR_NOTIFICACION) {
+
+						if (detalle.getEstado().equalsIgnoreCase(
+								Constantes.ATENDIDO)) {
+							monitoreo.setAct1(detalle.getEstado());
+							monitoreo.setColor1("atendido");
+						} else {
+							id00 = detalle.getId();
+							id00.setIdActividad(id00.getIdActividad() - 1);
+							detalleFlujo = detalleFlujoService.find(id00);
+							StringBuffer sb = new StringBuffer();
+							sb.append(detalle.getEstado());
+							if (detalleFlujo.getNroEnvios() != null) {
+								sb.append("(");
+								sb.append(detalleFlujo.getNroEnvios()
+										.toString());
+								sb.append(")");
+							}
+							monitoreo.setAct1(sb.toString());
+							monitoreo.setColor1("enespera");
+						}
+					} else if (detalle.getId().getIdActividad() == Constantes.P1_APROBACION_METAS) {
+						monitoreo.setAct2(detalle.getEstado());
+						if (detalle.getEstado().equalsIgnoreCase(
+								Constantes.ATENDIDO))
+							monitoreo.setColor2("atendido");
+						else
+							monitoreo.setColor2("enespera");
+					} else if (detalle.getId().getIdActividad() == Constantes.P1_NOTIFICAR_ME) {
+						monitoreo.setAct3(detalle.getEstado());
+						if (detalle.getEstado().equalsIgnoreCase(
+								Constantes.ATENDIDO))
+							monitoreo.setColor3("atendido");
+						else
+							monitoreo.setColor3("enespera");
+					} else if (detalle.getId().getIdActividad() == Constantes.P1_VB) {
+						monitoreo.setAct4(detalle.getEstado());
+						if (detalle.getEstado().equalsIgnoreCase(
+								Constantes.ATENDIDO))
+							monitoreo.setColor4("atendido");
+						else
+							monitoreo.setColor4("enespera");
+					} else if (detalle.getId().getIdActividad() == Constantes.P1_RECIBIR_NOTIFICACION2) {
+						if (detalle.getEstado().equalsIgnoreCase(
+								Constantes.ATENDIDO)) {
+							monitoreo.setAct5(detalle.getEstado());
+							monitoreo.setColor5("atendido");
+						} else {
+							id00 = detalle.getId();
+							id00.setIdActividad(id00.getIdActividad() - 1);
+							detalleFlujo = detalleFlujoService.find(id00);
+							StringBuffer st = new StringBuffer();
+							st.append(detalle.getEstado());
+							if (detalleFlujo.getNroEnvios() != null) {
+								st.append("(");
+								st.append(detalleFlujo.getNroEnvios()
+										.toString());
+								st.append(")");
+							}
+							monitoreo.setAct5(st.toString());
+							monitoreo.setColor5("enespera");
+						}
+					} else if (detalle.getId().getIdActividad() == Constantes.P1_PLAN_COMPETENCIAS) {
+						monitoreo.setAct6(detalle.getEstado());
+						if (detalle.getEstado().equalsIgnoreCase(
+								Constantes.ATENDIDO))
+							monitoreo.setColor6("atendido");
+						else
+							monitoreo.setColor6("enespera");
+					} else if (detalle.getId().getIdActividad() == Constantes.P1_PLAN_METAS) {
+						monitoreo.setAct7(detalle.getEstado());
+						if (detalle.getEstado().equalsIgnoreCase(
+								Constantes.ATENDIDO))
+							monitoreo.setColor7("atendido");
+						else
+							monitoreo.setColor7("enespera");
+					} else if (detalle.getId().getIdActividad() == Constantes.P1_NOTIFICAR_ME2) {
+						monitoreo.setAct8(detalle.getEstado());
+						if (detalle.getEstado().equalsIgnoreCase(
+								Constantes.ATENDIDO))
+							monitoreo.setColor8("atendido");
+						else
+							monitoreo.setColor8("enespera");
+					} else if (detalle.getId().getIdActividad() == Constantes.P1_MODIFICAR_PLANES) {
+						monitoreo.setAct9(detalle.getEstado());
+						if (detalle.getEstado().equalsIgnoreCase(
+								Constantes.ATENDIDO))
+							monitoreo.setColor9("atendido");
+						else
+							monitoreo.setColor9("enespera");
+					}
+				}
+
+				if (detalle.getId().getIdProceso() == Constantes.PROCESO2) {
+					if (detalle.getId().getIdActividad() == Constantes.P2_RECIBIR_NOTIFICACION) {
+						if (detalle.getEstado().equalsIgnoreCase(
+								Constantes.ATENDIDO)) {
+							monitoreo.setAct10(detalle.getEstado());
+							monitoreo.setColor10("atendido");
+						} else {
+							id00 = detalle.getId();
+							id00.setIdActividad(id00.getIdActividad() - 1);
+							detalleFlujo = detalleFlujoService.find(id00);
+							StringBuffer sb = new StringBuffer();
+							sb.append(detalle.getEstado());
+							if (detalleFlujo.getNroEnvios() != null) {
+								sb.append("(");
+								sb.append(detalleFlujo.getNroEnvios()
+										.toString());
+								sb.append(")");
+							}
+							monitoreo.setAct10(sb.toString());
+							monitoreo.setColor10("enespera");
+						}
+					}
+					if (detalle.getId().getIdActividad() == Constantes.P2_CUALITATIVA_COMPETENCIAS) {
+						monitoreo.setAct11(detalle.getEstado());
+						if (detalle.getEstado().equalsIgnoreCase(
+								Constantes.ATENDIDO))
+							monitoreo.setColor11("atendido");
+						else
+							monitoreo.setColor11("enespera");
+					}
+					if (detalle.getId().getIdActividad() == Constantes.P2_CUALITATIVA_METAS) {
+						monitoreo.setAct12(detalle.getEstado());
+						if (detalle.getEstado().equalsIgnoreCase(
+								Constantes.ATENDIDO))
+							monitoreo.setColor12("atendido");
+						else
+							monitoreo.setColor12("enespera");
+					}
+				}
+
+				if (detalle.getId().getIdProceso() == Constantes.PROCESO3) {
+					if (detalle.getId().getIdActividad() == Constantes.P3_RECIBIR_NOTIFICACION_GP) {
+						if (detalle.getEstado().equalsIgnoreCase(
+								Constantes.ATENDIDO)) {
+							monitoreo.setAct13(detalle.getEstado());
+							monitoreo.setColor13("atendido");
+						} else {
+							id00 = detalle.getId();
+							id00.setIdActividad(id00.getIdActividad() - 1);
+							Integer cantidad = notificacionService
+									.getCountByReceptor(id00,
+											Constantes.GERENTE_PUBLICO);
+							monitoreo.setAct13(detalle.getEstado() + "("
+									+ cantidad.toString() + ")");
+							monitoreo.setColor13("enespera");
+						}
+					}
+					if (detalle.getId().getIdActividad() == Constantes.P3_CUANTITATIVA_COMPETENCIAS) {
+						monitoreo.setAct14(detalle.getEstado());
+						if (detalle.getEstado().equalsIgnoreCase(
+								Constantes.ATENDIDO))
+							monitoreo.setColor14("atendido");
+						else
+							monitoreo.setColor14("enespera");
+					}
+					if (detalle.getId().getIdActividad() == Constantes.P3_CUANTITATIVA_METAS) {
+						monitoreo.setAct15(detalle.getEstado());
+						if (detalle.getEstado().equalsIgnoreCase(
+								Constantes.ATENDIDO))
+							monitoreo.setColor15("atendido");
+						else
+							monitoreo.setColor15("enespera");
+					}
+					if (detalle.getId().getIdActividad() == Constantes.P3_RECIBIR_NOTIFICACION_JI) {
+						if (detalle.getEstado().equalsIgnoreCase(
+								Constantes.ATENDIDO)) {
+							monitoreo.setAct16(detalle.getEstado());
+							monitoreo.setColor16("atendido");
+						} else {
+							id00 = detalle.getId();
+							id00.setIdActividad(id00.getIdActividad() - 4);
+							Integer cantidad = notificacionService
+									.getCountByReceptor(id00,
+											Constantes.JEFE_INMEDIATO);
+							monitoreo.setAct16(detalle.getEstado() + "("
+									+ cantidad.toString() + ")");
+							monitoreo.setColor16("enespera");
+						}
+					}
+					if (detalle.getId().getIdActividad() == Constantes.P3_CUANTITATIVA_COMPETENCIAS_JI) {
+						monitoreo.setAct17(detalle.getEstado());
+						if (detalle.getEstado().equalsIgnoreCase(
+								Constantes.ATENDIDO))
+							monitoreo.setColor17("atendido");
+						else
+							monitoreo.setColor17("enespera");
+					}
+					if (detalle.getId().getIdActividad() == Constantes.P3_CUANTITATIVA_METAS_JI) {
+						monitoreo.setAct18(detalle.getEstado());
+						if (detalle.getEstado().equalsIgnoreCase(
+								Constantes.ATENDIDO))
+							monitoreo.setColor18("atendido");
+						else
+							monitoreo.setColor18("enespera");
+					}
+					if (detalle.getId().getIdActividad() == Constantes.P3_RECIBIR_NOTIFICACION_TE) {
+						if (detalle.getEstado().equalsIgnoreCase(
+								Constantes.ATENDIDO)) {
+							monitoreo.setAct19(detalle.getEstado());
+							monitoreo.setColor19("atendido");
+						} else {
+							id00 = detalle.getId();
+							id00.setIdActividad(id00.getIdActividad() - 7);
+							Integer cantidad = notificacionService
+									.getCountByReceptor(id00,
+											Constantes.JEFE_INMEDIATO);
+							monitoreo.setAct19(detalle.getEstado() + "("
+									+ cantidad.toString() + ")");
+							monitoreo.setColor19("enespera");
+						}
+					}
+					if (detalle.getId().getIdActividad() == Constantes.P3_CUANTITATIVA_COMPETENCIAS_TE) {
+						monitoreo.setAct20(detalle.getEstado());
+						if (detalle.getEstado().equalsIgnoreCase(
+								Constantes.ATENDIDO))
+							monitoreo.setColor20("atendido");
+						else
+							monitoreo.setColor20("enespera");
+					}
+				}
+			}
+
+			List<EvaluacionMetas> listEvaMetas = evaMetasService
+					.getListaNotasEvaMetas(new InscripcionPK(idCampania, row
+							.getId().getIdGerentePublico()));
+
+			List<EvaluacionCompetencias> listEvaComp = evaCompetenciasService
+					.getListaSoloEvaCompetencias(new InscripcionPK(idCampania,
+							row.getId().getIdGerentePublico()));
+
+			Resultado resultado = Evaluacion.procesarEvaluacion(listEvaMetas,
+					listEvaComp);
+
+			monitoreo.setPromedioMetas(resultado.getPromedioMetas());
+			monitoreo.setPromedioCompetencias(resultado
+					.getPromedioCompetencias());
+			monitoreo.setPromedioFinal(resultado.getPromedioFinal());
+			monitoreo.setDescripcion(resultado.getDescripcion());
+
+			listRetorno.add(monitoreo);
+
+		}
+
+		return listRetorno;
+	}
+}

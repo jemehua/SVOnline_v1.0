@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+	<h:outputStylesheet name="css/cssContent.css" />
+</h:head>
+<h:body>
+	<script type="text/javascript" src="./resources/js/calendario.js"></script>
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datos" header="Campaña de Evaluación">
+		<p:focus context="datos" />
+		<p:panelGrid styleClass="panelGrid">
+			<p:row>
+				<p:column>#{messages.lblDenominacion} <h:outputText
+						value="*" styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<p:inputText id="nombre"
+						value="#{campaniaController.nuevoCampania.denominacion}"
+						tabindex="1" maxlength="500" styleClass="txt"
+						style="width:300px;text-transform: uppercase;" />
+						&nbsp;&nbsp;
+					<p:inputText id="anio"
+						value="#{campaniaController.nuevoCampania.anio}" tabindex="1"
+						maxlength="4" styleClass="txt" style="width:50px;" />
+					<pe:keyFilter for="anio" regEx="/[0-9]/i" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblFechaInicio} <h:outputText
+						value="*" styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<p:calendar id="desde" locale="es"
+						value="#{campaniaController.nuevoCampania.fechaInicio}"
+						showOn="button" navigator="true" tabindex="2" pattern="dd/MM/yyyy" />
+				</p:column>
+			</p:row>
+
+			<p:row>
+				<p:column>#{messages.lblFechaFin} <h:outputText value="*"
+						styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<p:calendar id="hasta" locale="es"
+						value="#{campaniaController.nuevoCampania.fechaFin}"
+						showOn="button" navigator="true" tabindex="3" pattern="dd/MM/yyyy" />
+				</p:column>
+			</p:row>
+
+		</p:panelGrid>
+		<p:separator id="s1" />
+		<table>
+			<tr>
+				<td><p:commandButton value="#{messages.btnGuardar}"
+						action="#{campaniaController.guardar}"
+						update="datos,dtList,messages" icon="ui-icon-disk" tabindex="4" /></td>
+				<td><p:commandButton value="#{messages.btnCancelar}"
+						update="datos,messages" action="#{campaniaController.limpiar}"
+						icon="ui-icon-close" tabindex="5" /></td>
+			</tr>
+		</table>
+		<p:separator id="s2" />
+		<p:dataTable var="row" value="#{campaniaController.listaCampania}"
+			id="dtList" paginator="true" rows="10" scrollable="true"
+			scrollHeight="227"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			emptyMessage="#{messages.msgEmptyMessage}">
+			<f:facet name="header">  
+            Lista de Campañas de Evaluación 
+        </f:facet>
+
+			<p:column headerText="#{messages.lblCodigo}" style="width:8%">
+				<h:outputText value="#{row.idCampania}" />
+			</p:column>
+			<p:column headerText="#{messages.lblDenominacion}" style="width:35%">
+				<h:outputText value="#{row}" />
+			</p:column>
+			<p:column headerText="#{messages.lblFechaInicio}" style="width:15%">
+				<h:outputText value="#{row.fechaInicio}">
+					<f:convertDateTime pattern="dd/MM/yyyy" locale="es"/>
+				</h:outputText>
+			</p:column>
+			<p:column headerText="#{messages.lblFechaFin}" style="width:15%">
+				<h:outputText value="#{row.fechaFin}">
+					<f:convertDateTime pattern="dd/MM/yyyy" locale="es" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Condición" style="width:12%">
+				<h:outputText value="#{row.estadoCampania}" />
+			</p:column>
+			<p:column headerText="Estado" style="width:7%">
+				<h:outputText value="#{row.estado}" />
+			</p:column>
+			<p:column headerText="#{messages.lblOpciones}" style="width:8%">
+				<p:commandButton value="" icon="ui-icon-pencil"
+					update=":frm:pnlEdit" oncomplete="editDialog.show()" title="Editar"
+					disabled="#{row.estadoCampania.equals('Creado')?'False':'True'}">
+					<f:setPropertyActionListener value="#{row}"
+						target="#{campaniaController.modificaCampania}" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+	</p:panel>
+
+	<p:dialog id="dlgEdit" header="Modificar Campaña de Evaluación"
+		widgetVar="editDialog" modal="true" resizable="false" width="450"
+		showEffect="clip" closable="true" hideEffect="fold">
+		<p:panel id="pnlEdit">
+			<p:focus context="pnlEdit" />
+
+			<p:panelGrid styleClass="panelGrid">
+				<p:row>
+					<p:column>
+						<h:outputText value="#{messages.lblCodigo}" />
+					</p:column>
+					<p:column>
+						<h:outputText
+							value="#{campaniaController.modificaCampania.idCampania}" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>#{messages.lblDenominacion} <h:outputText
+							value="*" styleClass="obligatorio" />
+					</p:column>
+					<p:column>
+						<p:inputText
+							value="#{campaniaController.modificaCampania.denominacion}"
+							maxlength="60" styleClass="txt" tabindex="1" />&nbsp;&nbsp;
+						<p:inputText id="anioMod"
+							value="#{campaniaController.modificaCampania.anio}" maxlength="4"
+							styleClass="txt" tabindex="2" style="width:50px;" readonly="true" />
+
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>#{messages.lblFechaInicio} <h:outputText
+							value="*" styleClass="obligatorio" />
+					</p:column>
+					<p:column>
+						<p:calendar id="desdeM"
+							value="#{campaniaController.modificaCampania.fechaInicio}"
+							showOn="button" navigator="true" tabindex="2" locale="es"
+							pattern="dd/MM/yyyy">
+						</p:calendar>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>#{messages.lblFechaFin} <h:outputText
+							value="*" styleClass="obligatorio" />
+					</p:column>
+					<p:column>
+						<p:calendar id="hastaM"
+							value="#{campaniaController.modificaCampania.fechaFin}"
+							showOn="button" navigator="true" tabindex="3" locale="es"
+							pattern="dd/MM/yyyy">
+						</p:calendar>
+					</p:column>
+				</p:row>
+
+				<p:row>
+					<p:column>
+						<h:outputText value="#{messages.lblEstado}" />
+					</p:column>
+					<p:column>
+						<p:selectOneMenu
+							value="#{campaniaController.modificaCampania.estado}"
+							style="width:210px;" tabindex="4">
+							<f:selectItems value="#{campaniaController.comboEstado}" />
+						</p:selectOneMenu>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+			<f:facet name="footer">
+				<p:commandButton update="datos,dtList,messages"
+					value="#{messages.btnModificar}"
+					actionListener="#{campaniaController.modificar}"
+					icon="ui-icon-check" oncomplete="editDialog.hide()" />
+			</f:facet>
+		</p:panel>
+	</p:dialog>
+</h:body>
+<p:ajaxStatus
+	style="width:64px;height:64px;position:fixed;right:5px;bottom:5px"
+	id="ajaxStatusPanel">
+	<f:facet name="start">
+		<p:graphicImage value="./images/loading.gif" />
+	</f:facet>
+
+	<f:facet name="complete">
+		<h:outputText value="" />
+	</f:facet>
+</p:ajaxStatus>
+</html>

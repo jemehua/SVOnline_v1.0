@@ -1,0 +1,80 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.InscripcionDao;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.DetalleInscripcion;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.InscripcionService;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Service
+public class InscripcionServiceImpl implements InscripcionService {
+
+	@Autowired
+	private InscripcionDao inscripcionDao;
+
+	public Inscripcion find(InscripcionPK id) {
+		return inscripcionDao.find(id);
+	}
+
+	@Transactional
+	public Inscripcion save(Inscripcion obj) {
+		return inscripcionDao.save(obj);
+	}
+
+	@Transactional
+	public Inscripcion edit(Inscripcion obj) {
+		return inscripcionDao.edit(obj);
+
+	}
+
+	public List<Inscripcion> getListaInscripcion() {
+		return inscripcionDao.getListaInscripcion();
+	}
+	
+	public List<Inscripcion> getListaInscripcion(Long idCampania, int opcion) {
+		return inscripcionDao.getListaInscripcion(idCampania, opcion);
+	}
+	
+	public List<Inscripcion> getListaInscripcion(Long idCampania, String valorBusqueda) {
+		return inscripcionDao.getListaInscripcion(idCampania, valorBusqueda); 
+	}
+	
+	public List<Inscripcion> getListaInscripcion2(Long idCampania, String valorBusqueda) {
+		return inscripcionDao.getListaInscripcion2(idCampania, valorBusqueda); 
+	}
+
+	@Transactional
+	public Long saveTotal(Inscripcion nuevoInscripcion,
+			DetalleInscripcion nuevoInscripcionDetalle) {		
+		return inscripcionDao.saveTotal(nuevoInscripcion, nuevoInscripcionDetalle);
+	}
+    
+	/*@Transactional
+	public Long saveTotal(Inscripcion inscripcion,
+			DetalleInscripcion nuevoInscripcionDetalle2,
+			DetalleInscripcion nuevoInscripcionDetalle) {
+		return inscripcionDao.saveTotal(inscripcion, nuevoInscripcionDetalle2,nuevoInscripcionDetalle);		
+	}*/
+	
+	public Inscripcion getInscripcionCampaña(Long idCampania, Usuario usuario){
+		
+		return inscripcionDao.getInscripcionCampaña(idCampania,usuario);
+	}
+
+	@Transactional
+	public boolean delete(InscripcionPK inscripcionPK) {
+		return inscripcionDao.delete(inscripcionPK);
+	}
+
+}

@@ -1,0 +1,115 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.TipoCompetenciaDao;
+import gob.servir.desempenio.model.TipoCompetencia;
+import gob.servir.desempenio.util.Constantes;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.faces.model.SelectItem;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Cristhian Munguia Martinez
+ */
+@Repository
+public class TipoCompetenciaDaoImpl implements TipoCompetenciaDao {
+
+	@PersistenceContext
+	private EntityManager em;
+
+	@Transactional
+	public TipoCompetencia save(TipoCompetencia obj) {
+		try {
+			em.persist(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			if (em != null) {
+				em.close();
+			}
+		}
+	}
+
+	@Transactional
+	public TipoCompetencia edit(TipoCompetencia obj) {
+		try {
+			em.persist(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			if (em != null) {
+				em.close();
+			}
+		}
+	}
+
+	public TipoCompetencia find(Long id) {
+		try {
+			return em.find(TipoCompetencia.class, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			if (em != null) {
+				em.close();
+			}
+		}
+	}
+
+	public List<TipoCompetencia> getListaCompetencia() {
+
+		TypedQuery<TipoCompetencia> tq = em
+				.createNamedQuery("TipoCompetencia.getAllListaCompetencia",
+						TipoCompetencia.class);
+
+		tq.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+
+			return tq.getResultList();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			if (em != null) {
+				em.close();
+			}
+		}
+	}
+
+	public List<SelectItem> getComboCompetencia() {
+
+		List<SelectItem> listaCombo = new ArrayList<SelectItem>();
+		List<TipoCompetencia> lista = new ArrayList<TipoCompetencia>();
+		try {
+			lista = getListaCompetencia();
+		} catch (Exception e) {
+			e.printStackTrace();
+			SelectItem fila = new SelectItem(0L, "Seleccione Competencia");
+			listaCombo.add(fila);
+			return listaCombo;
+		}
+		SelectItem fila = new SelectItem(0L, "Seleccione Competencia");
+		listaCombo.add(fila);
+
+		for (TipoCompetencia tipo : lista) {
+			fila = new SelectItem(tipo.getIdCompetencia(),
+					tipo.getDenominacion());
+			listaCombo.add(fila);
+		}
+		return listaCombo;
+	}
+
+}

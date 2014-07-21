@@ -1,0 +1,203 @@
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/repservir/!svn/ver/1527/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service
+END
+EvaluacionInicialService.java
+K 25
+svn:wc:ra_dav:version-url
+V 129
+/repservir/!svn/ver/1644/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/EvaluacionInicialService.java
+END
+FlujoService.java
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/repservir/!svn/ver/1421/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/FlujoService.java
+END
+InscripcionService.java
+K 25
+svn:wc:ra_dav:version-url
+V 123
+/repservir/!svn/ver/1521/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/InscripcionService.java
+END
+EvaluacionMetasService.java
+K 25
+svn:wc:ra_dav:version-url
+V 127
+/repservir/!svn/ver/1113/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/EvaluacionMetasService.java
+END
+ParametroSistemaService.java
+K 25
+svn:wc:ra_dav:version-url
+V 128
+/repservir/!svn/ver/1130/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/ParametroSistemaService.java
+END
+EvaluacionCompetenciasService.java
+K 25
+svn:wc:ra_dav:version-url
+V 134
+/repservir/!svn/ver/1113/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/EvaluacionCompetenciasService.java
+END
+PlanDesarrolloService.java
+K 25
+svn:wc:ra_dav:version-url
+V 125
+/repservir/!svn/ver/997/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/PlanDesarrolloService.java
+END
+MensajeService.java
+K 25
+svn:wc:ra_dav:version-url
+V 119
+/repservir/!svn/ver/1052/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/MensajeService.java
+END
+TipoCompetenciaService.java
+K 25
+svn:wc:ra_dav:version-url
+V 126
+/repservir/!svn/ver/331/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/TipoCompetenciaService.java
+END
+PlanMetasService.java
+K 25
+svn:wc:ra_dav:version-url
+V 120
+/repservir/!svn/ver/997/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/PlanMetasService.java
+END
+JavaMailService.java
+K 25
+svn:wc:ra_dav:version-url
+V 119
+/repservir/!svn/ver/487/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/JavaMailService.java
+END
+EntidadDestinoVService.java
+K 25
+svn:wc:ra_dav:version-url
+V 127
+/repservir/!svn/ver/1337/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/EntidadDestinoVService.java
+END
+UsuarioService.java
+K 25
+svn:wc:ra_dav:version-url
+V 119
+/repservir/!svn/ver/1663/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/UsuarioService.java
+END
+ActividadService.java
+K 25
+svn:wc:ra_dav:version-url
+V 121
+/repservir/!svn/ver/1234/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/ActividadService.java
+END
+CronogramaService.java
+K 25
+svn:wc:ra_dav:version-url
+V 122
+/repservir/!svn/ver/1649/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/CronogramaService.java
+END
+RolService.java
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/repservir/!svn/ver/287/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/RolService.java
+END
+PuestoTipoVService.java
+K 25
+svn:wc:ra_dav:version-url
+V 122
+/repservir/!svn/ver/440/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/PuestoTipoVService.java
+END
+JefeInmediatoService.java
+K 25
+svn:wc:ra_dav:version-url
+V 124
+/repservir/!svn/ver/354/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/JefeInmediatoService.java
+END
+CampaniaService.java
+K 25
+svn:wc:ra_dav:version-url
+V 120
+/repservir/!svn/ver/1649/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/CampaniaService.java
+END
+DetalleFlujoService.java
+K 25
+svn:wc:ra_dav:version-url
+V 124
+/repservir/!svn/ver/1394/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/DetalleFlujoService.java
+END
+ProcesoService.java
+K 25
+svn:wc:ra_dav:version-url
+V 118
+/repservir/!svn/ver/324/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/ProcesoService.java
+END
+DetalleInscripcionService.java
+K 25
+svn:wc:ra_dav:version-url
+V 130
+/repservir/!svn/ver/1622/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/DetalleInscripcionService.java
+END
+AsignacionGerenteVService.java
+K 25
+svn:wc:ra_dav:version-url
+V 129
+/repservir/!svn/ver/446/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/AsignacionGerenteVService.java
+END
+UltimaCampaniaGpService.java
+K 25
+svn:wc:ra_dav:version-url
+V 128
+/repservir/!svn/ver/1130/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/UltimaCampaniaGpService.java
+END
+TitularEntidadService.java
+K 25
+svn:wc:ra_dav:version-url
+V 125
+/repservir/!svn/ver/602/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/TitularEntidadService.java
+END
+EvaluacionCualitativaService.java
+K 25
+svn:wc:ra_dav:version-url
+V 132
+/repservir/!svn/ver/545/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/EvaluacionCualitativaService.java
+END
+DetalleTipoCompetenciaService.java
+K 25
+svn:wc:ra_dav:version-url
+V 134
+/repservir/!svn/ver/1302/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/DetalleTipoCompetenciaService.java
+END
+TemporizadorService.java
+K 25
+svn:wc:ra_dav:version-url
+V 123
+/repservir/!svn/ver/459/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/TemporizadorService.java
+END
+MetaService.java
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/repservir/!svn/ver/1418/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/MetaService.java
+END
+CompetenciaService.java
+K 25
+svn:wc:ra_dav:version-url
+V 123
+/repservir/!svn/ver/1218/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/CompetenciaService.java
+END
+JefeInmediatoVService.java
+K 25
+svn:wc:ra_dav:version-url
+V 125
+/repservir/!svn/ver/609/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/JefeInmediatoVService.java
+END
+GerentePublicoVService.java
+K 25
+svn:wc:ra_dav:version-url
+V 126
+/repservir/!svn/ver/554/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/GerentePublicoVService.java
+END
+NotificacionService.java
+K 25
+svn:wc:ra_dav:version-url
+V 124
+/repservir/!svn/ver/1394/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/service/NotificacionService.java
+END

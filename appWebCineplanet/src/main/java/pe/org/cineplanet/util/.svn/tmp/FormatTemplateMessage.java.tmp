@@ -1,0 +1,68 @@
+package gob.servir.desempenio.util;
+
+import gob.servir.desempenio.model.DetalleFlujoPK;
+import gob.servir.desempenio.model.Usuario;
+
+public class FormatTemplateMessage {
+	
+	public static String textMessage(String cuerpoMensaje,DetalleFlujoPK dfPK,Usuario user,String urlReq)
+	{
+		String textoMensaje="<p>Usuario: {USUARIO_PATERNO}</p><p>Password: {USUARIO_CONTRASENIA}</p><p>URL: {URL}<br/></p>";
+		
+		//String url="<a href='"+message.getMessage("urlServer")+message.getMessage("pathPageRequest")+"?cod_gerente="+dfPK.getIdGerentePublico()
+//		String url="<a href='"+urlReq+"?cod_gerente="+dfPK.getIdGerentePublico()
+//					+"&campania="+dfPK.getIdCampania()+"&proceso="+dfPK.getIdProceso()+"&act_temporizada="+dfPK.getIdActividad()+"' target='_blank'>";
+//		url+="Haga clic aqui";
+//		url+="</a>";
+		
+<<<<<<< .mine
+		String plainText="";
+		try {
+			plainText = Seguridad.decrypt(user.getPassword());
+		} catch (Exception e) {
+		}
+		
+=======
+		String url = "<a href='" + urlReq + "?param1="
+				+ dfPK.getIdGerentePublico() + "&param2="
+				+ dfPK.getIdCampania() + "&param3=" + dfPK.getIdProceso()
+				+ "&param4=" + dfPK.getIdActividad() + "' target='_blank'>";
+		url += "Haga clic aqui";
+		url += "</a>";        
+	
+>>>>>>> .r1653
+		textoMensaje=textoMensaje.replace("{USUARIO_PATERNO}", user.getUsuario());
+		textoMensaje=textoMensaje.replace("{USUARIO_CONTRASENIA}", plainText);
+		textoMensaje=textoMensaje.replace("{URL}", url);
+		
+		textoMensaje=cuerpoMensaje+textoMensaje;
+		
+		return textoMensaje;
+	}
+	
+	public static String getMensajeME(String cuerpoMensaje,DetalleFlujoPK dfPK,String nombreGerente)
+	{
+		String textoMensaje = "<p>Gerente Público: {CODIGO_GERENTE} - {NOMBRE_GERENTE}</p>";
+		
+		textoMensaje=textoMensaje.replace("{CODIGO_GERENTE}", dfPK.getIdGerentePublico());
+		textoMensaje=textoMensaje.replace("{NOMBRE_GERENTE}", nombreGerente);
+		
+		textoMensaje=cuerpoMensaje+textoMensaje;
+		
+		return textoMensaje;
+	}
+	
+	/*public static void main(String argv[]) {
+		
+		DetalleFlujoPK dt=new DetalleFlujoPK(1L,"He",1L,1L);
+		//Usuario us=new Usuario();
+		//us.setDni("2656");
+		//us.setApPaterno("565656");
+		
+		
+		String msg= getMensajeME("Este es el cuerpo de mi mensaje", dt, "nombre completo");
+		
+		System.out.println(":: \n"+msg);
+		
+	}*/
+}

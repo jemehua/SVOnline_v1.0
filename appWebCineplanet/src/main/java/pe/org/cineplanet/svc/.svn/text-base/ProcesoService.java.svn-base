@@ -1,0 +1,25 @@
+package gob.servir.desempenio.service;
+
+import gob.servir.desempenio.model.Proceso;
+
+import java.util.List;
+
+import javax.faces.model.SelectItem;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+public interface ProcesoService {
+	
+	public abstract Proceso find(Long id);
+	
+	public abstract Proceso save(Proceso obj);
+	
+	public abstract Proceso edit(Proceso obj);
+	
+	public abstract List<Proceso> getListaProceso();
+	
+	public abstract List<SelectItem> getComboProceso();
+
+}

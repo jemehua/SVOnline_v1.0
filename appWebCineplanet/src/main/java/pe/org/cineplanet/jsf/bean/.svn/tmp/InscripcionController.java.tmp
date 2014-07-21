@@ -1,0 +1,1499 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.bean.DataModelGerentePublico;
+import gob.servir.desempenio.dto.InscripcionGerente;
+import gob.servir.desempenio.model.AsignacionGerenteV;
+import gob.servir.desempenio.model.Campania;
+import gob.servir.desempenio.model.DetalleInscripcion;
+import gob.servir.desempenio.model.DetalleInscripcionPK;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.JefeInmediato;
+import gob.servir.desempenio.model.JefeInmediatoV;
+import gob.servir.desempenio.model.TitularEntidad;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.AsignacionGerenteVService;
+import gob.servir.desempenio.service.CampaniaService;
+import gob.servir.desempenio.service.DetalleInscripcionService;
+import gob.servir.desempenio.service.EntidadDestinoVService;
+import gob.servir.desempenio.service.InscripcionService;
+import gob.servir.desempenio.service.JefeInmediatoService;
+import gob.servir.desempenio.service.JefeInmediatoVService;
+import gob.servir.desempenio.service.PuestoTipoVService;
+import gob.servir.desempenio.service.RolService;
+import gob.servir.desempenio.service.TitularEntidadService;
+import gob.servir.desempenio.service.UsuarioService;
+import gob.servir.desempenio.util.Message;
+import gob.servir.desempenio.util.StringUtils;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
+
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import com.lowagie.text.HeaderFooter;
+import com.lowagie.text.Phrase;
+
+/**
+ * 
+ * @author Hever Pumallihua Garcia
+ */
+@Component("inscripcionController")
+@Scope("session")
+public class InscripcionController {
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(InscripcionController.class);
+
+	private Message message = new Message();
+
+	@Autowired
+	private AsignacionGerenteVService asignacionGerenteVService;
+	@Autowired
+	private JefeInmediatoVService jefeInmediatoVService;
+	@Autowired
+	private DetalleInscripcionService detalleInsService;
+	@Autowired
+	private PuestoTipoVService puestoTipoVService;
+	@Autowired
+	private EntidadDestinoVService entidadDestinoService;
+	@Autowired
+	private TitularEntidadService titularEntidadService;
+	@Autowired
+	private UsuarioService usuarioService;
+	@Autowired
+	private CampaniaService campaniaService;
+	@Autowired
+	private InscripcionService inscripcionService;
+	@Autowired
+	private JefeInmediatoService jefeInmediatoService;
+	@Autowired
+	private RolService rolService;
+
+	private AsignacionGerenteV asigGerenteSelec = null;
+	private Usuario userSesion = null;
+
+	private Long campaniaSelec = 0L;
+
+	private List<InscripcionGerente> listaInscripciones = new ArrayList<InscripcionGerente>();
+
+	// 1GP
+	private List<AsignacionGerenteV> listaAsignacion = new ArrayList<AsignacionGerenteV>();
+	private boolean swBtnBuscar = true;
+	// + de 1 GP
+	private DataModelGerentePublico dataModelGerentePublico = null;
+	private List<AsignacionGerenteV> listaGerentePublicoSelec = new ArrayList<AsignacionGerenteV>();
+	private List<AsignacionGerenteV> listaGerentePublicoSelec2 = new ArrayList<AsignacionGerenteV>();
+	private boolean swBtnAceptar = true;
+	private boolean swGuardarVar = true;
+
+	// datos de la ins selec
+	private InscripcionGerente inscripcionSelec = null;
+
+	// JI
+	private JefeInmediato modificarJefeInmediato = new JefeInmediato();
+	private boolean swEditarJefe = false;// true:modificar false:nuevo
+
+	// TE
+	private TitularEntidad nuevoTitular = new TitularEntidad();
+	private boolean swEditarTitular = false;// true:modificar false:nuevo
+
+	public InscripcionController() {
+
+	}
+
+	public AsignacionGerenteV getAsigGerenteSelec() {
+		return asigGerenteSelec;
+	}
+
+	public void setAsigGerenteSelec(AsignacionGerenteV asigGerenteSelec) {
+		this.asigGerenteSelec = asigGerenteSelec;
+	}
+
+	public List<AsignacionGerenteV> getListaAsignacion() {
+		listaAsignacion.clear();
+		listaAsignacion = asignacionGerenteVService.getListaAsignacionGerente();
+		return listaAsignacion;
+	}
+
+	public void setListaAsignacion(List<AsignacionGerenteV> listaAsignacion) {
+		this.listaAsignacion = listaAsignacion;
+	}
+
+	public TitularEntidad getNuevoTitular() {
+		return nuevoTitular;
+	}
+
+	public void setNuevoTitular(TitularEntidad nuevoTitular) {
+		this.nuevoTitular = nuevoTitular;
+	}
+
+	public boolean isSwGuardarVar() {
+		return swGuardarVar;
+	}
+
+	public void setSwGuardarVar(boolean swGuardarVar) {
+		this.swGuardarVar = swGuardarVar;
+	}
+
+	public boolean isSwBtnAceptar() {
+		return swBtnAceptar;
+	}
+
+	public void setSwBtnAceptar(boolean swBtnAceptar) {
+		this.swBtnAceptar = swBtnAceptar;
+	}
+
+	public List<AsignacionGerenteV> getListaGerentePublicoSelec() {
+		return listaGerentePublicoSelec;
+	}
+
+	public void setListaGerentePublicoSelec(
+			List<AsignacionGerenteV> listaGerentePublicoSelec) {
+		this.listaGerentePublicoSelec = listaGerentePublicoSelec;
+	}
+
+	public List<AsignacionGerenteV> getListaGerentePublicoSelec2() {
+		return listaGerentePublicoSelec2;
+	}
+
+	public void setListaGerentePublicoSelec2(
+			List<AsignacionGerenteV> listaGerentePublicoSelec2) {
+		this.listaGerentePublicoSelec2 = listaGerentePublicoSelec2;
+	}
+
+	public DataModelGerentePublico getDataModelGerentePublico() {
+		List<AsignacionGerenteV> listaGerentePublicoDM = asignacionGerenteVService
+				.getListaAsignacionGerente();
+		dataModelGerentePublico = new DataModelGerentePublico(
+				listaGerentePublicoDM);
+		return dataModelGerentePublico;
+	}
+
+	public void setDataModelGerentePublico(
+			DataModelGerentePublico dataModelGerentePublico) {
+		this.dataModelGerentePublico = dataModelGerentePublico;
+	}
+
+	public boolean isSwBtnBuscar() {
+		if (campaniaSelec != 0L)
+			swBtnBuscar = false;
+		else
+			swBtnBuscar = true;
+		return swBtnBuscar;
+	}
+
+	public void setSwBtnBuscar(boolean swBtnBuscar) {
+		this.swBtnBuscar = swBtnBuscar;
+	}
+
+	public JefeInmediato getModificarJefeInmediato() {
+		return modificarJefeInmediato;
+	}
+
+	public void setModificarJefeInmediato(JefeInmediato modificarJefeInmediato) {
+		this.modificarJefeInmediato = modificarJefeInmediato;
+	}
+
+	// mod hever
+	public List<InscripcionGerente> getListaInscripciones() {
+		listaInscripciones.clear();
+
+		if (campaniaSelec != 0L)
+			listaInscripciones = detalleInsService
+					.getListaInscripcion(campaniaSelec);
+
+		return listaInscripciones;
+	}
+
+	public void setListaInscripciones(
+			List<InscripcionGerente> listaInscripciones) {
+		this.listaInscripciones = listaInscripciones;
+	}
+
+	public Long getCampaniaSelec() {
+		return campaniaSelec;
+	}
+
+	public void setCampaniaSelec(Long campaniaSelec) {
+		this.campaniaSelec = campaniaSelec;
+	}
+
+	public List<SelectItem> getComboCampania() {
+		return campaniaService.getComboCampania();
+	}
+
+	public void setComboCampania(List<SelectItem> comboCampania) {
+	}
+
+	public void guardar() {
+		if (swGuardarVar == true)
+			guardarInsGp();
+		else {
+			guardarInscripciones();
+		}
+	}
+
+	public void guardarInsGp() {
+
+		validarSesion();
+
+		if (!validarDatos())
+			return;
+
+		try {
+			// Inscripcion
+			InscripcionPK inscripcionPK = new InscripcionPK(campaniaSelec,
+					asigGerenteSelec.getCod_gerente());
+
+			Inscripcion nuevaInscripcion = new Inscripcion();
+			nuevaInscripcion.setId(inscripcionPK);
+
+			if (asigGerenteSelec.getId_puesto_tipo_principal() != null)
+				nuevaInscripcion.setPuestoTipoV(puestoTipoVService
+						.find(asigGerenteSelec.getId_puesto_tipo_principal()));
+
+			nuevaInscripcion.setEstadoEvaInicial("P");
+			nuevaInscripcion.setEstadoMetas("P");
+			nuevaInscripcion.setEstadoPlanes("P");
+			nuevaInscripcion.setEstadoModificacionPlan(false);
+			nuevaInscripcion.setEstado("A");
+			nuevaInscripcion.setFechaCreacion(new Date());
+			nuevaInscripcion.setUsuarioRegistra(userSesion.getUsuario());
+
+			nuevaInscripcion.setAsignacionGerenteV(asigGerenteSelec);
+			nuevaInscripcion.setIdAsignacion(asigGerenteSelec
+					.getId_asignacion());
+
+			DetalleInscripcionPK id = new DetalleInscripcionPK(
+					detalleInsService.getMaxId(), campaniaSelec,
+					asigGerenteSelec.getCod_gerente());
+
+			// DetalleInsc
+			DetalleInscripcion detalle = new DetalleInscripcion();
+			detalle.setId(id);
+
+			// Jefe Inmediato
+			if (asigGerenteSelec.getId_jefe_inmediato() != null) {
+				JefeInmediatoV ji = jefeInmediatoVService.find(asigGerenteSelec
+						.getId_jefe_inmediato());
+				if (ji != null)
+					detalle.setJefeInmediatoV(ji);
+			}
+
+			// Entidad Destino
+			if (asigGerenteSelec.getId_ed() != null)
+				detalle.setEntidadDestinoV(entidadDestinoService
+						.find(asigGerenteSelec.getId_ed()));
+
+			detalle.setEstado("A");
+			detalle.setFechaCreacion(new Date());
+			detalle.setUsuarioRegistra(userSesion.getUsuario());
+
+			detalle.setInscripcion(nuevaInscripcion);
+
+			detalleInsService.saveTotal(detalle);
+
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+							"Registro exitoso"));
+
+			limpiar();
+
+		} catch (Exception e) {
+			logger.info("ERRROR AL REGISTRAR USUARIO");
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "ERROR",
+							"Error al registrar"));
+		}
+
+	}
+
+	public void guardarInscripciones() {
+
+		validarSesion();
+
+		try {
+
+			for (AsignacionGerenteV asignacionGerenteV : listaGerentePublicoSelec2) {
+
+				// Inscripcion
+				InscripcionPK inscripcionPK = new InscripcionPK(campaniaSelec,
+						asignacionGerenteV.getCod_gerente());
+
+				Inscripcion nuevaInscripcion = new Inscripcion();
+				nuevaInscripcion.setId(inscripcionPK);
+
+				if (asignacionGerenteV.getId_puesto_tipo_principal() != null)
+					nuevaInscripcion.setPuestoTipoV(puestoTipoVService
+							.find(asignacionGerenteV
+									.getId_puesto_tipo_principal()));
+
+				nuevaInscripcion.setEstadoEvaInicial("P");
+				nuevaInscripcion.setEstadoMetas("P");
+				nuevaInscripcion.setEstadoPlanes("P");
+				nuevaInscripcion.setEstadoModificacionPlan(false);
+				nuevaInscripcion.setEstado("A");
+				nuevaInscripcion.setFechaCreacion(new Date());
+				nuevaInscripcion.setUsuarioRegistra(userSesion.getUsuario());
+
+				nuevaInscripcion.setAsignacionGerenteV(asignacionGerenteV);
+				nuevaInscripcion.setIdAsignacion(asignacionGerenteV
+						.getId_asignacion());
+
+				DetalleInscripcionPK id = new DetalleInscripcionPK(
+						detalleInsService.getMaxId(), campaniaSelec,
+						asignacionGerenteV.getCod_gerente());
+
+				// DetalleInsc
+				DetalleInscripcion detalle = new DetalleInscripcion();
+				detalle.setId(id);
+
+				// Jefe Inmediato
+				if (asignacionGerenteV.getId_jefe_inmediato() != null) {
+					JefeInmediatoV ji = jefeInmediatoVService
+							.find(asignacionGerenteV.getId_jefe_inmediato());
+					if (ji != null)
+						detalle.setJefeInmediatoV(ji);
+				}
+
+				// Entidad Destino
+				if (asignacionGerenteV.getId_ed() != null)
+					detalle.setEntidadDestinoV(entidadDestinoService
+							.find(asignacionGerenteV.getId_ed()));
+
+				detalle.setEstado("A");
+				detalle.setFechaCreacion(new Date());
+				detalle.setUsuarioRegistra(userSesion.getUsuario());
+
+				detalle.setInscripcion(nuevaInscripcion);
+
+				detalleInsService.saveTotal(detalle);
+			}
+
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+							"Registro exitoso"));
+
+			limpiar();
+
+		} catch (Exception e) {
+			logger.info("ERRROR AL REGISTRAR USUARIO");
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "ERROR",
+							"Error al registrar"));
+		}
+
+	}
+
+	public void limpiar() {
+
+		modificarJefeInmediato = new JefeInmediato();
+		nuevoTitular = new TitularEntidad();
+		inscripcionSelec = null;
+		asigGerenteSelec = null;
+		swGuardarVar = true;
+	}
+
+	public void limpiarTodo() {
+		campaniaSelec = 0L;
+		swGuardarVar = true;
+		asigGerenteSelec = null;
+		inscripcionSelec = null;
+	}
+
+	public void validarSesion() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		userSesion = (Usuario) context.getExternalContext().getSessionMap()
+				.get("userSesion");
+
+		if (userSesion == null) {
+			String ctxPath = context.getExternalContext()
+					.getRequestContextPath();
+			try {
+				context.getExternalContext().redirect(ctxPath + "/login.jsf");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public boolean validarDatos() {
+
+		if (campaniaSelec.equals(0L)) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Seleccione Campaña de Evaluación"));
+			return false;
+		}
+
+		if (asigGerenteSelec == null) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Seleccione Gerente Público"));
+			return false;
+		}
+
+		/*
+		 * if (inscripcionService.find(new InscripcionPK(campaniaSelec,
+		 * asigGerenteSelec.getCod_gerente())) != null) {
+		 * FacesContext.getCurrentInstance().addMessage( null, new
+		 * FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+		 * "El Gerente Público ya esta registrado")); return false; }
+		 */
+
+		if (verificarInscripcionGp()) {
+			FacesContext
+					.getCurrentInstance()
+					.addMessage(
+							null,
+							new FacesMessage(FacesMessage.SEVERITY_WARN,
+									"ADVERTENCIA",
+									"El Gerente Público ya se encuentra inscrito en una campaña activia"));
+			return false;
+		}
+
+		return true;
+	}
+
+	public boolean verificarInscripcionGp() {
+		boolean rpta = false;
+		List<Campania> listCampaniaActiva = campaniaService
+				.getListaEstadoCampania("Activo");
+
+		for (Campania row : listCampaniaActiva) {
+			if (inscripcionService.find(new InscripcionPK(row.getIdCampania(),
+					asigGerenteSelec.getCod_gerente())) != null) {
+				rpta = true;
+				break;
+			}
+		}
+
+		return rpta;
+	}
+
+	// verificar
+	public void verificarGerentesPublicos() {
+		boolean swverificar = false;
+		listaGerentePublicoSelec2.clear();
+		try {
+			for (AsignacionGerenteV gerente : listaGerentePublicoSelec) {
+				List<Campania> listCampaniaActiva = campaniaService
+						.getListaEstadoCampania("Activo");
+				for (Campania row : listCampaniaActiva) {
+					Inscripcion objInscripcion = inscripcionService
+							.find(new InscripcionPK(row.getIdCampania(), gerente
+									.getCod_gerente()));
+					if (objInscripcion == null) {
+						swverificar = true;
+					}else{
+						swverificar = false;
+						break;
+					}	
+				}
+				
+				if(swverificar)
+					listaGerentePublicoSelec2.add(gerente);
+			}
+		} catch (Exception e) {
+		}
+
+		if (listaGerentePublicoSelec2.size() > 0)
+			swBtnAceptar = false;
+		else
+			swBtnAceptar = true;
+	}
+
+	// limpiar seleccion varios GP
+	public void borrarSeleccionados() {
+
+		listaGerentePublicoSelec.clear();
+		swBtnAceptar = true;
+		swGuardarVar = true;
+
+	}
+
+	public void aceptarVerificacion() {
+		listaGerentePublicoSelec.clear();
+		swBtnAceptar = true;
+		swGuardarVar = false;
+		asigGerenteSelec = null;
+
+		FacesContext
+				.getCurrentInstance()
+				.addMessage(
+						null,
+						new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+								"Se cargo gerentes publicos Seleccionados, click en Guardar"));
+
+	}
+
+	// by hever
+	public void actualizarJI(InscripcionGerente insGerente) {
+
+		validarSesion();
+
+		DetalleInscripcion detInscripcion;
+		DetalleInscripcionPK detInscripcionPK;
+		String dniTE = null;
+		Usuario usuario = null;
+		try {
+
+			AsignacionGerenteV asignacion = asignacionGerenteVService
+					.find(insGerente.getCodGerente());
+
+			if (asignacion == null)
+				return;
+
+			// caso: JI -> null
+			if (insGerente.getCodJefe() == null
+					&& insGerente.getDniJefe2() == null) {
+
+				if (asignacion.getId_jefe_inmediato() != null) {// JI
+					JefeInmediatoV ji = jefeInmediatoVService.find(asignacion
+							.getId_jefe_inmediato());
+					if (ji != null) {
+						detInscripcionPK = new DetalleInscripcionPK(
+								insGerente.getIdDetalleIns(),
+								insGerente.getIdCamapnia(),
+								insGerente.getCodGerente());
+						detInscripcion = detalleInsService
+								.find(detInscripcionPK);
+
+						if (detInscripcion == null)
+							return;
+						detInscripcion.setFechaModificacion(new Date());
+						detInscripcion.setUsuarioModifica(userSesion
+								.getUsuario());
+
+						detInscripcion.setJefeInmediatoV(ji);
+						detalleInsService.edit(detInscripcion);
+
+						// crear usuario JI
+						if (usuarioService.findByUserAndPwAndRol(ji
+								.getApellido_paterno().toLowerCase(), ji
+								.getNumero_documento(), 4L) == null) {
+							usuario = new Usuario();
+							usuario.setIdUsuario(usuarioService.getIdMax());
+							usuario.setApPaterno(ji.getApellido_paterno()
+									.toUpperCase());
+							usuario.setApMaterno(ji.getApellido_materno()
+									.toUpperCase());
+							usuario.setNombre(ji.getNombres().toUpperCase());
+							usuario.setUsuario(ji.getApellido_paterno()
+									.toLowerCase());
+							usuario.setClave(ji.getNumero_documento());
+							usuario.setEstado("A");
+							usuario.setFechaCreacion(new Date());
+							usuario.setUsuarioRegistra(userSesion.getUsuario());
+							usuario.setDni(ji.getNumero_documento());
+							usuario.setRol(rolService.find(4L));
+							usuarioService.save(usuario);
+						}
+
+						// crear usuario TE
+						if (detInscripcion.getEntidadDestinoV()
+								.getTe_numero_documento() != null
+								&& detInscripcion.getEntidadDestinoV()
+										.getTe_apellido_paterno() != null) {
+							if (usuarioService.findByUserAndPwAndRol(
+									detInscripcion.getEntidadDestinoV()
+											.getTe_apellido_paterno()
+											.toLowerCase(), detInscripcion
+											.getEntidadDestinoV()
+											.getTe_numero_documento(), 5L) == null) {
+								usuario = new Usuario();
+								usuario.setIdUsuario(usuarioService.getIdMax());
+								usuario.setApPaterno(detInscripcion
+										.getEntidadDestinoV()
+										.getTe_apellido_paterno());
+								usuario.setApMaterno(detInscripcion
+										.getEntidadDestinoV()
+										.getTe_apellido_materno());
+								usuario.setNombre(detInscripcion
+										.getEntidadDestinoV().getTe_nombres());
+								usuario.setUsuario(detInscripcion
+										.getEntidadDestinoV()
+										.getTe_apellido_paterno().toLowerCase());
+								usuario.setClave(detInscripcion
+										.getEntidadDestinoV()
+										.getTe_numero_documento());
+								usuario.setEstado("A");
+								usuario.setFechaCreacion(new Date());
+								usuario.setUsuarioRegistra(userSesion
+										.getUsuario());
+								usuario.setDni(detInscripcion
+										.getEntidadDestinoV()
+										.getTe_numero_documento());
+								usuario.setRol(rolService.find(5L));
+								usuarioService.save(usuario);
+							}
+						}
+
+						FacesContext
+								.getCurrentInstance()
+								.addMessage(
+										null,
+										new FacesMessage(
+												FacesMessage.SEVERITY_INFO,
+												"EXITO",
+												"Se ha actualizado los datos del Gerente Público"));
+						return;
+					}
+				}
+			}
+
+			// caso: JI != null (bd GP)
+			else if (insGerente.getCodJefe() != null
+					&& insGerente.getDniJefe2() == null) {
+
+				if (insGerente.getCodJefe() != asignacion
+						.getId_jefe_inmediato()) {
+					// si cambio de JI
+					detInscripcionPK = new DetalleInscripcionPK(
+							insGerente.getIdDetalleIns(),
+							insGerente.getIdCamapnia(),
+							insGerente.getCodGerente());
+					detInscripcion = detalleInsService.find(detInscripcionPK);
+					detInscripcion.setEstado("I");
+
+					if (detInscripcion.getTitularEntidad() != null) {
+						dniTE = detInscripcion.getTitularEntidad()
+								.getNroDocTE();
+					}
+
+					detalleInsService.edit(detInscripcion);
+
+					detInscripcionPK = new DetalleInscripcionPK(
+							detalleInsService.getMaxId(),
+							insGerente.getIdCamapnia(),
+							insGerente.getCodGerente());
+					detInscripcion = new DetalleInscripcion();
+					detInscripcion.setId(detInscripcionPK);
+					detInscripcion.setEstado("A");
+					detInscripcion.setFechaCreacion(new Date());
+					detInscripcion.setUsuarioRegistra(userSesion.getUsuario());
+
+					// Jefe Inmediato
+					if (asignacion.getId_jefe_inmediato() != null) {
+						JefeInmediatoV ji = jefeInmediatoVService
+								.find(asignacion.getId_jefe_inmediato());
+						if (ji != null) {
+							detInscripcion.setJefeInmediatoV(ji);
+							// crear usuario JI
+							if (usuarioService.findByUserAndPwAndRol(ji
+									.getApellido_paterno().toLowerCase(), ji
+									.getNumero_documento(), 4L) == null) {
+								usuario = new Usuario();
+								usuario.setIdUsuario(usuarioService.getIdMax());
+								usuario.setApPaterno(ji.getApellido_paterno()
+										.toUpperCase());
+								usuario.setApMaterno(ji.getApellido_materno()
+										.toUpperCase());
+								usuario.setNombre(ji.getNombres().toUpperCase());
+								usuario.setUsuario(ji.getApellido_paterno()
+										.toLowerCase());
+								usuario.setClave(ji.getNumero_documento());
+								usuario.setEstado("A");
+								usuario.setFechaCreacion(new Date());
+								usuario.setUsuarioRegistra(userSesion
+										.getUsuario());
+								usuario.setDni(ji.getNumero_documento());
+								usuario.setRol(rolService.find(4L));
+								usuarioService.save(usuario);
+							}
+						}
+					}
+
+					// Entidad Destino
+					if (asignacion.getId_ed() != null)
+						detInscripcion.setEntidadDestinoV(entidadDestinoService
+								.find(asignacion.getId_ed()));
+					// Entidad Titular
+					if (detInscripcion.getEntidadDestinoV()
+							.getTe_numero_documento() != null
+							&& detInscripcion.getEntidadDestinoV()
+									.getTe_apellido_paterno() != null) {
+						// crear usuario TE
+						if (detInscripcion.getEntidadDestinoV()
+								.getTe_numero_documento() != null
+								&& detInscripcion.getEntidadDestinoV()
+										.getTe_apellido_paterno() != null) {
+							if (usuarioService.findByUserAndPwAndRol(
+									detInscripcion.getEntidadDestinoV()
+											.getTe_apellido_paterno()
+											.toLowerCase(), detInscripcion
+											.getEntidadDestinoV()
+											.getTe_numero_documento(), 5L) == null) {
+								usuario = new Usuario();
+								usuario.setIdUsuario(usuarioService.getIdMax());
+								usuario.setApPaterno(detInscripcion
+										.getEntidadDestinoV()
+										.getTe_apellido_paterno());
+								usuario.setApMaterno(detInscripcion
+										.getEntidadDestinoV()
+										.getTe_apellido_materno());
+								usuario.setNombre(detInscripcion
+										.getEntidadDestinoV().getTe_nombres());
+								usuario.setUsuario(detInscripcion
+										.getEntidadDestinoV()
+										.getTe_apellido_paterno().toLowerCase());
+								usuario.setClave(detInscripcion
+										.getEntidadDestinoV()
+										.getTe_numero_documento());
+								usuario.setEstado("A");
+								usuario.setFechaCreacion(new Date());
+								usuario.setUsuarioRegistra(userSesion
+										.getUsuario());
+								usuario.setDni(detInscripcion
+										.getEntidadDestinoV()
+										.getTe_numero_documento());
+								usuario.setRol(rolService.find(5L));
+								usuarioService.save(usuario);
+							}
+						}
+					} else {
+						detInscripcion.setTitularEntidad(titularEntidadService
+								.find(dniTE));
+					}
+
+					detalleInsService.save(detInscripcion);
+
+					FacesContext
+							.getCurrentInstance()
+							.addMessage(
+									null,
+									new FacesMessage(
+											FacesMessage.SEVERITY_INFO,
+											"EXITO",
+											"Se ha actualizado los datos de Gerente Público"));
+					return;
+
+				} else {
+					FacesContext
+							.getCurrentInstance()
+							.addMessage(
+									null,
+									new FacesMessage(
+											FacesMessage.SEVERITY_WARN,
+											"EXITO",
+											"Los datos del JI para el GP no han cambiado"));
+					return;
+				}
+			}
+			// caso: tiene JI y esta en bdd local
+			else if (insGerente.getCodJefe() == null
+					&& insGerente.getDniJefe2() != null) {
+
+				// Jefe Inmediato
+				if (asignacion.getId_jefe_inmediato() != null) {
+					JefeInmediatoV ji = jefeInmediatoVService.find(asignacion
+							.getId_jefe_inmediato());
+					if (ji != null) {
+
+						detInscripcionPK = new DetalleInscripcionPK(
+								insGerente.getIdDetalleIns(),
+								insGerente.getIdCamapnia(),
+								insGerente.getCodGerente());
+						detInscripcion = detalleInsService
+								.find(detInscripcionPK);
+						detInscripcion.setEstado("I");
+
+						if (detInscripcion.getTitularEntidad() != null) {
+							dniTE = detInscripcion.getTitularEntidad()
+									.getNroDocTE();
+						}
+						detalleInsService.edit(detInscripcion);
+
+						detInscripcionPK = new DetalleInscripcionPK(
+								detalleInsService.getMaxId(),
+								insGerente.getIdCamapnia(),
+								insGerente.getCodGerente());
+						detInscripcion = new DetalleInscripcion();
+						detInscripcion.setId(detInscripcionPK);
+						detInscripcion.setEstado("A");
+						detInscripcion.setFechaCreacion(new Date());
+						detInscripcion.setUsuarioRegistra(userSesion
+								.getUsuario());
+
+						// Jefe Inmediato
+						detInscripcion.setJefeInmediatoV(ji);
+
+						// crear usuario JI
+						if (usuarioService.findByUserAndPwAndRol(ji
+								.getApellido_paterno().toLowerCase(), ji
+								.getNumero_documento(), 4L) == null) {
+							usuario = new Usuario();
+							usuario.setIdUsuario(usuarioService.getIdMax());
+							usuario.setApPaterno(ji.getApellido_paterno()
+									.toUpperCase());
+							usuario.setApMaterno(ji.getApellido_materno()
+									.toUpperCase());
+							usuario.setNombre(ji.getNombres().toUpperCase());
+							usuario.setUsuario(ji.getApellido_paterno()
+									.toLowerCase());
+							usuario.setClave(ji.getNumero_documento());
+							usuario.setEstado("A");
+							usuario.setFechaCreacion(new Date());
+							usuario.setUsuarioRegistra(userSesion.getUsuario());
+							usuario.setDni(ji.getNumero_documento());
+							usuario.setRol(rolService.find(4L));
+							usuarioService.save(usuario);
+						}
+
+						// Entidad Destino
+						if (asignacion.getId_ed() != null)
+							detInscripcion
+									.setEntidadDestinoV(entidadDestinoService
+											.find(asignacion.getId_ed()));
+						// Entidad Titular
+						if (detInscripcion.getEntidadDestinoV()
+								.getTe_numero_documento() != null
+								&& detInscripcion.getEntidadDestinoV()
+										.getTe_apellido_paterno() != null) {
+							// crear usuario TE
+							if (detInscripcion.getEntidadDestinoV()
+									.getTe_numero_documento() != null
+									&& detInscripcion.getEntidadDestinoV()
+											.getTe_apellido_paterno() != null) {
+								if (usuarioService.findByUserAndPwAndRol(
+										detInscripcion.getEntidadDestinoV()
+												.getTe_apellido_paterno()
+												.toLowerCase(), detInscripcion
+												.getEntidadDestinoV()
+												.getTe_numero_documento(), 5L) == null) {
+									usuario = new Usuario();
+									usuario.setIdUsuario(usuarioService
+											.getIdMax());
+									usuario.setApPaterno(detInscripcion
+											.getEntidadDestinoV()
+											.getTe_apellido_paterno());
+									usuario.setApMaterno(detInscripcion
+											.getEntidadDestinoV()
+											.getTe_apellido_materno());
+									usuario.setNombre(detInscripcion
+											.getEntidadDestinoV()
+											.getTe_nombres());
+									usuario.setUsuario(detInscripcion
+											.getEntidadDestinoV()
+											.getTe_apellido_paterno()
+											.toLowerCase());
+									usuario.setClave(detInscripcion
+											.getEntidadDestinoV()
+											.getTe_numero_documento());
+									usuario.setEstado("A");
+									usuario.setFechaCreacion(new Date());
+									usuario.setUsuarioRegistra(userSesion
+											.getUsuario());
+									usuario.setDni(detInscripcion
+											.getEntidadDestinoV()
+											.getTe_numero_documento());
+									usuario.setRol(rolService.find(5L));
+									usuarioService.save(usuario);
+								}
+							}
+						} else {
+							detInscripcion
+									.setTitularEntidad(titularEntidadService
+											.find(dniTE));
+						}
+
+						detalleInsService.save(detInscripcion);
+
+						FacesContext
+								.getCurrentInstance()
+								.addMessage(
+										null,
+										new FacesMessage(
+												FacesMessage.SEVERITY_INFO,
+												"EXITO",
+												"Se ha actualizado los datos de Gerente Publico"));
+						return;
+
+					} else {
+
+						FacesContext
+								.getCurrentInstance()
+								.addMessage(
+										null,
+										new FacesMessage(
+												FacesMessage.SEVERITY_WARN,
+												"EXITO",
+												"No hay JI en la bdd gp para actualizar"));
+						return;
+
+					}
+
+				} else {
+
+					FacesContext.getCurrentInstance().addMessage(
+							null,
+							new FacesMessage(FacesMessage.SEVERITY_WARN,
+									"EXITO",
+									"No hay JI en la bdd gp para actualizar"));
+					return;
+
+				}
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "ERROR",
+							message.getMessage("msgModificarError")));
+		}
+	}
+
+	// by hever
+	public void cargarJI(InscripcionGerente insGerente) {
+
+		inscripcionSelec = insGerente;
+
+		// JI
+		if (inscripcionSelec.getDniJefe2() != null) {
+			modificarJefeInmediato = jefeInmediatoService.find(inscripcionSelec
+					.getDniJefe2());
+			swEditarJefe = true;
+		} else {
+			modificarJefeInmediato = new JefeInmediato();
+			swEditarJefe = false;
+		}
+
+	}
+
+	// by hever
+	public void cargarTE(InscripcionGerente insGerente) {
+		inscripcionSelec = insGerente;
+		// TE
+		if (inscripcionSelec.getDniTitular2() != null) {
+			nuevoTitular = titularEntidadService.find(inscripcionSelec
+					.getDniTitular2());
+			swEditarTitular = true;
+
+		} else {
+			nuevoTitular = new TitularEntidad();
+			swEditarTitular = false;
+		}
+	}
+
+	public void eliminarInscripcion(String codGerente){
+		
+		if(campaniaSelec != 0L && codGerente != null){
+			InscripcionPK inscripcionPK = new InscripcionPK(campaniaSelec, codGerente);
+			inscripcionService.delete(inscripcionPK);
+		} 
+		
+	}
+	
+	// by hever
+	public void guardarJefeInmediato() {
+
+		validarSesion();
+
+		if (!validarDatosJefeIn())
+			return;
+		Usuario usuario = null;
+		try {
+
+			DetalleInscripcionPK detalleInscripcionPK = new DetalleInscripcionPK(
+					inscripcionSelec.getIdDetalleIns(),
+					inscripcionSelec.getIdCamapnia(),
+					inscripcionSelec.getCodGerente());
+
+			DetalleInscripcion detalleInscripcion = detalleInsService
+					.find(detalleInscripcionPK);
+
+			if (detalleInscripcion != null) {
+
+				if (swEditarJefe) {
+
+					if (detalleInscripcion.getJefeInmediato().getDni()
+							.equalsIgnoreCase(modificarJefeInmediato.getDni())) {
+						modificarJefeInmediato.setUsuarioModifica(userSesion
+								.getUsuario());
+						modificarJefeInmediato.setFechaModificacion(new Date());
+						jefeInmediatoService.edit(modificarJefeInmediato);
+						FacesContext.getCurrentInstance().addMessage(
+								null,
+								new FacesMessage(FacesMessage.SEVERITY_INFO,
+										"EXITO", message
+												.getMessage("msgModificar")));
+						return;
+					} else {
+
+						JefeInmediato jefeInmediato = jefeInmediatoService
+								.find(modificarJefeInmediato.getDni());
+						if (jefeInmediato == null) {
+							modificarJefeInmediato
+									.setUsuarioRegistra(userSesion.getUsuario());
+							modificarJefeInmediato.setFechaCreacion(new Date());
+							modificarJefeInmediato.setEstado("A");
+							jefeInmediatoService.save(modificarJefeInmediato);
+
+							// crear usuario
+							if (usuarioService.findByUserAndPwAndRol(
+									StringUtils.unAccent(modificarJefeInmediato.getApPaterno())
+											.toLowerCase(),
+									modificarJefeInmediato.getDni(), 4L) == null) {
+								usuario = new Usuario();
+								usuario.setIdUsuario(usuarioService.getIdMax());
+								usuario.setApPaterno(modificarJefeInmediato
+										.getApPaterno().toUpperCase());
+								usuario.setApMaterno(modificarJefeInmediato
+										.getApMaterno().toUpperCase());
+								usuario.setNombre(modificarJefeInmediato
+										.getNombres().toUpperCase());
+								usuario.setUsuario(modificarJefeInmediato
+										.getApPaterno().toLowerCase());
+								usuario.setClave(modificarJefeInmediato
+										.getDni());
+								usuario.setEstado("A");
+								usuario.setFechaCreacion(new Date());
+								usuario.setUsuarioRegistra(userSesion
+										.getUsuario());
+								usuario.setDni(modificarJefeInmediato.getDni());
+								usuario.setRol(rolService.find(4L));
+								usuarioService.save(usuario);
+							}
+
+							detalleInscripcion
+									.setJefeInmediato(modificarJefeInmediato);
+						} else {
+							detalleInscripcion.setJefeInmediato(jefeInmediato);
+						}
+
+						detalleInsService.edit(detalleInscripcion);
+						FacesContext.getCurrentInstance().addMessage(
+								null,
+								new FacesMessage(FacesMessage.SEVERITY_INFO,
+										"EXITO", "Registro exitoso"));
+						return;
+
+					}
+				} else {// nuevo
+
+					JefeInmediato jefeInmediato = jefeInmediatoService
+							.find(modificarJefeInmediato.getDni());
+
+					if (jefeInmediato == null) {
+						modificarJefeInmediato.setUsuarioRegistra(userSesion
+								.getUsuario());
+						modificarJefeInmediato.setFechaCreacion(new Date());
+						modificarJefeInmediato.setEstado("A");
+						jefeInmediatoService.save(modificarJefeInmediato);
+
+						// crear usuario
+						if (usuarioService.findByUserAndPwAndRol(StringUtils.unAccent(
+								modificarJefeInmediato.getApPaterno())
+										.toLowerCase(), modificarJefeInmediato
+										.getDni(), 4L) == null) {
+							usuario = new Usuario();
+							usuario.setIdUsuario(usuarioService.getIdMax());
+							usuario.setApPaterno(modificarJefeInmediato
+									.getApPaterno().toUpperCase());
+							usuario.setApMaterno(modificarJefeInmediato
+									.getApMaterno().toUpperCase());
+							usuario.setNombre(modificarJefeInmediato
+									.getNombres().toUpperCase());
+							usuario.setUsuario(modificarJefeInmediato
+									.getApPaterno().toLowerCase());
+							usuario.setClave(modificarJefeInmediato.getDni());
+							usuario.setEstado("A");
+							usuario.setFechaCreacion(new Date());
+							usuario.setUsuarioRegistra(userSesion.getUsuario());
+							usuario.setDni(modificarJefeInmediato.getDni());
+							usuario.setRol(rolService.find(4L));
+							usuarioService.save(usuario);
+						}
+
+						detalleInscripcion
+								.setJefeInmediato(modificarJefeInmediato);
+					} else {
+						detalleInscripcion.setJefeInmediato(jefeInmediato);
+					}
+
+					detalleInsService.edit(detalleInscripcion);
+					FacesContext.getCurrentInstance().addMessage(
+							null,
+							new FacesMessage(FacesMessage.SEVERITY_INFO,
+									"EXITO", "Registro exitoso"));
+					return;
+				}
+			}
+
+			limpiar();
+		} catch (Exception e) {
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "ERROR",
+							message.getMessage("msgModificarError")));
+		}
+	}
+
+	// by hever
+	public boolean validarDatosJefeIn() {
+
+		String txtObligatorio = message.getMessage("msgTxtObligatorio");
+
+		if (inscripcionSelec == null) {
+			return false;
+		}
+
+		if (modificarJefeInmediato.getNombres().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+		if (modificarJefeInmediato.getApPaterno().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+
+		if (modificarJefeInmediato.getApMaterno().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+
+		if (modificarJefeInmediato.getDni().trim().equalsIgnoreCase("")
+				|| (modificarJefeInmediato.getDni().trim().length() < 8)) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+
+		if (modificarJefeInmediato.getCargo().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+
+		if (modificarJefeInmediato.getCorreo1().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+
+		if (modificarJefeInmediato.getCelular().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+
+		return true;
+	}
+
+	// by hever
+	public void guardarTitularEntidad() {
+
+		validarSesion();
+
+		if (!validarDatosTE())
+			return;
+		Usuario usuario = null;
+		try {
+
+			DetalleInscripcionPK detalleInscripcionPK = new DetalleInscripcionPK(
+					inscripcionSelec.getIdDetalleIns(),
+					inscripcionSelec.getIdCamapnia(),
+					inscripcionSelec.getCodGerente());
+
+			DetalleInscripcion detalleInscripcion = detalleInsService
+					.find(detalleInscripcionPK);
+
+			if (detalleInscripcion != null) {
+
+				if (swEditarTitular) {
+
+					if (detalleInscripcion.getTitularEntidad().getNroDocTE()
+							.equalsIgnoreCase(nuevoTitular.getNroDocTE())) {
+						nuevoTitular
+								.setUsuarioModifica(userSesion.getUsuario());
+						nuevoTitular.setFechaModificacion(new Date());
+						titularEntidadService.edit(nuevoTitular);
+						FacesContext.getCurrentInstance().addMessage(
+								null,
+								new FacesMessage(FacesMessage.SEVERITY_INFO,
+										"EXITO", message
+												.getMessage("msgModificar")));
+						return;
+					} else {
+						TitularEntidad titularEntidad = titularEntidadService
+								.find(nuevoTitular.getNroDocTE());
+
+						if (titularEntidad == null) {
+							nuevoTitular.setUsuarioRegistra(userSesion
+									.getUsuario());
+							nuevoTitular.setFechaCreacion(new Date());
+							nuevoTitular.setEstado("A");
+							titularEntidadService.save(nuevoTitular);
+
+							// crear usuario
+							if (usuarioService.findByUserAndPwAndRol(StringUtils.unAccent(
+									nuevoTitular.getApPaterno()).toLowerCase(),
+									nuevoTitular.getNroDocTE(), 5L) == null) {
+								usuario = new Usuario();
+								usuario.setIdUsuario(usuarioService.getIdMax());
+								usuario.setApPaterno(nuevoTitular
+										.getApPaterno().toUpperCase());
+								usuario.setApMaterno(nuevoTitular
+										.getApMaterno().toUpperCase());
+								usuario.setNombre(nuevoTitular.getNombres()
+										.toUpperCase());
+								usuario.setUsuario(nuevoTitular.getApPaterno()
+										.toLowerCase());
+								usuario.setClave(nuevoTitular.getNroDocTE());
+								usuario.setEstado("A");
+								usuario.setFechaCreacion(new Date());
+								usuario.setUsuarioRegistra(userSesion
+										.getUsuario());
+								usuario.setDni(nuevoTitular.getNroDocTE());
+								usuario.setRol(rolService.find(5L));
+								usuarioService.save(usuario);
+							}
+
+							detalleInscripcion.setTitularEntidad(nuevoTitular);
+						} else {
+							detalleInscripcion
+									.setTitularEntidad(titularEntidad);
+						}
+
+						detalleInsService.edit(detalleInscripcion);
+						FacesContext.getCurrentInstance().addMessage(
+								null,
+								new FacesMessage(FacesMessage.SEVERITY_INFO,
+										"EXITO", "Registro exitoso"));
+						return;
+
+					}
+				} else {// nuevo
+
+					TitularEntidad titularEntidad = titularEntidadService
+							.find(nuevoTitular.getNroDocTE());
+
+					if (titularEntidad == null) {
+						nuevoTitular
+								.setUsuarioRegistra(userSesion.getUsuario());
+						nuevoTitular.setFechaCreacion(new Date());
+						nuevoTitular.setEstado("A");
+						titularEntidadService.save(nuevoTitular);
+						// crear usuario
+						if (usuarioService.findByUserAndPwAndRol(StringUtils.unAccent(nuevoTitular
+								.getApPaterno()).toLowerCase(), nuevoTitular
+								.getNroDocTE(), 5L) == null) {
+							usuario = new Usuario();
+							usuario.setIdUsuario(usuarioService.getIdMax());
+							usuario.setApPaterno(nuevoTitular.getApPaterno()
+									.toUpperCase());
+							usuario.setApMaterno(nuevoTitular.getApMaterno()
+									.toUpperCase());
+							usuario.setNombre(nuevoTitular.getNombres()
+									.toUpperCase());
+							usuario.setUsuario(nuevoTitular.getApPaterno()
+									.toLowerCase());
+							usuario.setClave(nuevoTitular.getNroDocTE());
+							usuario.setEstado("A");
+							usuario.setFechaCreacion(new Date());
+							usuario.setUsuarioRegistra(userSesion.getUsuario());
+							usuario.setDni(nuevoTitular.getNroDocTE());
+							usuario.setRol(rolService.find(5L));
+							usuarioService.save(usuario);
+						}
+						detalleInscripcion.setTitularEntidad(nuevoTitular);
+					} else {
+						detalleInscripcion.setTitularEntidad(titularEntidad);
+					}
+
+					detalleInsService.edit(detalleInscripcion);
+					FacesContext.getCurrentInstance().addMessage(
+							null,
+							new FacesMessage(FacesMessage.SEVERITY_INFO,
+									"EXITO", "Registro exitoso"));
+					return;
+				}
+			}
+
+			limpiar();
+		} catch (Exception e) {
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "ERROR",
+							message.getMessage("msgModificarError")));
+		}
+	}
+
+	// by hever
+	public boolean validarDatosTE() {
+		String txtObligatorio = message.getMessage("msgTxtObligatorio");
+
+		if (inscripcionSelec == null) {
+			return false;
+		}
+
+		if (nuevoTitular.getNombres().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+		if (nuevoTitular.getApPaterno().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+
+		if (nuevoTitular.getApMaterno().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+
+		if (nuevoTitular.getNroDocTE().trim().equalsIgnoreCase("")
+				|| (nuevoTitular.getNroDocTE().trim().length() < 8)) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+
+		if (nuevoTitular.getCargo().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+
+		if (nuevoTitular.getCorreoTrabajo().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+
+		if (nuevoTitular.getCelular().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+
+		return true;
+	}
+
+	public void postProcessXLS(Object document) {
+		HSSFWorkbook wb = (HSSFWorkbook) document;
+		HSSFSheet sheet = wb.getSheetAt(0);
+		HSSFRow header = sheet.getRow(0);
+		HSSFCellStyle cellStyle = wb.createCellStyle();
+		cellStyle.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);
+
+		HSSFFont font = wb.createFont();
+		font.setFontName(HSSFFont.FONT_ARIAL);
+		font.setFontHeightInPoints((short) 8);
+		font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+		font.setColor(HSSFColor.WHITE.index);
+		cellStyle.setFillForegroundColor(IndexedColors.DARK_RED.getIndex());
+		cellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+		cellStyle.setFont(font);
+
+		String tituloHeader[] = { "Cod. Gerente", "Gerente Público",
+				"Fecha inscripción", "Entidad", "Jefe Inmediato",
+				"Titular Entidad" };
+
+		for (int i = 0; i < header.getPhysicalNumberOfCells(); i++) {
+			// if(i < (header.getPhysicalNumberOfCells() - 1)){
+			header.getCell(i).setCellStyle(cellStyle);
+			header.getCell(i).setCellValue(
+					new HSSFRichTextString(tituloHeader[i]));
+			// }else{
+			// header.getCell(i).setCellValue(new HSSFRichTextString(""));
+			// }
+		}
+
+		Iterator<Row> rowIterator = sheet.iterator();
+		while (rowIterator.hasNext()) {
+			Row row = rowIterator.next();
+			sheet.autoSizeColumn(row.getRowNum());
+			// setaer a las valores a las columnas
+			// row.getCell(6).setCellValue(new HSSFRichTextString(""));
+			String codigos = row.getCell(0).getStringCellValue();
+			// System.out.println("codigo recuperado de excel: "+codigos);
+			if (row.getRowNum() > 0) {
+				System.out.println("datos de la data: "
+						+ asignacionGerenteVService.find(codigos).getNombres());
+			}
+		}
+
+	}
+
+	public void preProcessPDF(Object document) {
+		com.lowagie.text.Document pdf = (com.lowagie.text.Document) document;
+		try {
+			HeaderFooter header = new HeaderFooter(new Phrase(
+					"cantida de paginas: "), true);
+			pdf.setHeader(header);
+			;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+}

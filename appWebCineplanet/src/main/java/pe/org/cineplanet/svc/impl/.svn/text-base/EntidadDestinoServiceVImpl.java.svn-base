@@ -1,0 +1,33 @@
+package gob.servir.desempenio.serviceImpl;
+
+import java.util.List;
+
+import javax.faces.model.SelectItem;
+
+import gob.servir.desempenio.dao.EntidadDestinoVDao;
+import gob.servir.desempenio.model.EntidadDestinoV;
+import gob.servir.desempenio.service.EntidadDestinoVService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Service
+public class EntidadDestinoServiceVImpl implements EntidadDestinoVService {
+
+	@Autowired
+	private EntidadDestinoVDao entidadDestinoDao;
+
+	public EntidadDestinoV find(Long id) {
+		return entidadDestinoDao.find(id);
+	}
+	
+	public List<SelectItem> getComboEntidadDestino() {
+		return entidadDestinoDao.getComboEntidadDestino();
+	}
+
+}

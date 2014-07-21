@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+	
+	<p:panel id="pnlAgencia" header="Agencia">
+	<p:growl id="messages" showDetail="true" life="40000" />
+		<p:focus context="pnlAgencia" />
+		<table cellpadding="2" cellspacing="4">
+			<tr>
+				<td>Codigo<h:outputText value="*" styleClass="obligatorio" /></td>
+				<td><p:inputText id="codigo"
+						value="#{agenciaBean.agencia.idAgencia}" tabindex="1"
+						maxlength="16" styleClass="txt" >
+						
+						</p:inputText></td>
+				<td>Nombre<h:outputText value="*" styleClass="obligatorio" /></td>
+				<td><p:inputText id="nombre"
+						value="#{agenciaBean.agencia.nombre}" tabindex="2"
+						maxlength="200" styleClass="txt" /></td>
+				<td><p:commandButton value="Guardar"
+						action="#{agenciaBean.guardar}" update="pnlAgencia, messages"
+						icon="ui-icon-disk" tabindex="3" /></td>
+				<td><p:commandButton value="Limpiar"
+						update="pnlAgencia, messages" action="#{agenciaBean.limpiar}"
+						icon="ui-icon-close" tabindex="4" /></td>
+			</tr>
+		</table>
+		<p:separator id="s1" /> 
+		<p:dataTable var="a" value="#{agenciaBean.listaAgencia}"
+			id="dtListAgencia" scrollable="true" scrollHeight="180"
+			paginator="true" rows="8" 
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			emptyMessage="No hay datos">
+
+			<f:facet name="header">  
+            Lista de Agencias
+        </f:facet>
+			<p:column headerText="Codigo" style="width:20%">
+				<h:outputText value="#{a.idAgencia}" />
+			</p:column>
+			<p:column headerText="Nombre" style="width:50%">
+				<h:outputText value="#{a.nombre}" />
+			</p:column>
+			<p:column headerText="Estado" style="width:15%">
+				<h:outputText value="#{a.estado.equals('A')?'Activo':'Inactivo'}" />
+			</p:column>
+			<p:column headerText="#{messages.lblOpciones}" style="width:15%">
+				<p:commandButton value="" icon="ui-icon-pencil"
+					update=":frm:pnlAgencia" title="Editar">
+					<f:setPropertyActionListener value="#{a}"
+						target="#{agenciaBean.agencia}" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+	</p:panel>
+
+</ui:composition>

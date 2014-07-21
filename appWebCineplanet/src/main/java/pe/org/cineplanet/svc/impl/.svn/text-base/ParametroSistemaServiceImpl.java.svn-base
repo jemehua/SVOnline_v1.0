@@ -1,0 +1,37 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.ParametroSistemaDao;
+import gob.servir.desempenio.model.ParametroSistema;
+import gob.servir.desempenio.service.ParametroSistemaService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Service
+public class ParametroSistemaServiceImpl implements ParametroSistemaService {
+
+	@Autowired
+	private ParametroSistemaDao parametroSistemaDao;
+
+	@Transactional
+	public ParametroSistema find(Long id) {
+		return parametroSistemaDao.find(id);
+	}
+
+	@Transactional
+	public ParametroSistema save(ParametroSistema obj) {
+		return parametroSistemaDao.save(obj);
+	}
+	
+	@Transactional
+	public ParametroSistema edit(ParametroSistema obj) {
+		return parametroSistemaDao.edit(obj);
+		
+	}
+
+}

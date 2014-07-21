@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+
+</h:head>
+<h:body>
+	<h:outputStylesheet name="css/cssContent.css" />
+	<p:panel id="pnlClave" header="Cambio de Contraseña">
+		<h:outputText
+			value="" />
+		<p:spacer height="4" />
+		<h:outputText
+			value="Por su seguridad cambie su contraseña periodicamente"
+			style="color:blue;" />
+		<table cellpadding="2" cellspacing="2">
+			<tr>
+				<td>Ingrese contraseña actual <h:outputText value="*"
+						styleClass="obligatorio" /></td>
+				<td><p:password id="usuario"
+						value="#{cambioClaveController.clave}" tabindex="1" maxlength="8"
+						styleClass="txt" /></td>
+			</tr>
+			<tr>
+				<td>Ingrese contraseña nueva <h:outputText value="*"
+						styleClass="obligatorio" /></td>
+				<td><p:password id="clave"
+						value="#{cambioClaveController.nuevaClave}" tabindex="2"
+						maxlength="8" styleClass="txt" feedback="true"
+						promptLabel="Ingrese contraseña" weakLabel="Debil"
+						goodLabel="Bueno" strongLabel="Fuerte" /></td>
+			</tr>
+			<tr>
+				<td>Confirma la nueva contraseña <h:outputText value="*"
+						styleClass="obligatorio" /></td>
+				<td><p:password id="clave2"
+						value="#{cambioClaveController.confirmarClave}" tabindex="3"
+						maxlength="8" styleClass="txt" /></td>
+			</tr>
+		</table>
+		<p:separator id="s1" />
+		<table>
+			<tr>
+				<td><p:commandButton value="#{messages.btnGuardar}"
+						action="#{cambioClaveController.guardarClave}"
+						update="pnlClave,messages" icon="ui-icon-disk" tabindex="4" /></td>
+				<td><p:commandButton value="#{messages.btnCancelar}"
+						action="#{cambioClaveController.limpiar}" update="pnlClave"
+						icon="ui-icon-close" tabindex="5" /></td>
+			</tr>
+		</table>
+		<p:separator id="s2" />
+	</p:panel>
+</h:body>
+</html>

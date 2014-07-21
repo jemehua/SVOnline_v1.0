@@ -1,0 +1,17 @@
+package gob.servir.desempenio.dao;
+
+import gob.servir.desempenio.model.JefeInmediato;
+
+import java.util.List;
+
+public interface JefeInmediatoDao {
+
+	public abstract JefeInmediato save(JefeInmediato obj);
+
+	public abstract JefeInmediato find(String id);
+
+	public abstract JefeInmediato edit(JefeInmediato obj);
+
+	public abstract List<JefeInmediato> getListaJefeInmediato();
+
+}

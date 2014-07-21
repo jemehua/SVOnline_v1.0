@@ -1,0 +1,500 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.DetalleInscripcionDao;
+import gob.servir.desempenio.dto.InscripcionGerente;
+import gob.servir.desempenio.model.DetalleFlujoPK;
+import gob.servir.desempenio.model.DetalleInscripcion;
+import gob.servir.desempenio.model.DetalleInscripcionPK;
+import gob.servir.desempenio.model.Flujo;
+import gob.servir.desempenio.model.FlujoPK;
+import gob.servir.desempenio.model.JefeInmediato;
+import gob.servir.desempenio.model.JefeInmediatoV;
+import gob.servir.desempenio.model.Rol;
+import gob.servir.desempenio.model.TitularEntidad;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.FlujoService;
+import gob.servir.desempenio.service.GerentePublicoVService;
+import gob.servir.desempenio.service.JefeInmediatoService;
+import gob.servir.desempenio.service.JefeInmediatoVService;
+import gob.servir.desempenio.service.TitularEntidadService;
+import gob.servir.desempenio.service.UsuarioService;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua Garcia
+ */
+@Repository
+public class DetalleInscripcionDaoImpl implements DetalleInscripcionDao {
+	@PersistenceContext
+	private EntityManager em;
+
+	@Autowired
+	private UsuarioService usuarioService;
+	@Autowired
+	private FlujoService flujoService;
+	@Autowired
+	private JefeInmediatoVService jefeInmediatoVService;
+	@Autowired
+	private JefeInmediatoService jefeInmediatoService;
+	@Autowired
+	private TitularEntidadService titularEntidadService;
+	@Autowired
+	private GerentePublicoVService gerentePublicoVService;
+
+	Usuario usuario = null;
+	private static final Long PROCESO1 = 1L;
+	private static final Long VERIFICAR_INGRESO_GP = 1L;
+
+	public DetalleInscripcion find(DetalleInscripcionPK id) {
+		try {
+			return em.find(DetalleInscripcion.class, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public DetalleInscripcion save(DetalleInscripcion obj) {
+		try {
+			em.persist(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public DetalleInscripcion saveTotal(DetalleInscripcion obj) {
+		try {
+
+			em.persist(obj.getInscripcion());
+
+			if (obj.getInscripcion().getAsignacionGerenteV() != null) {// GP
+				
+				if (usuarioService.findByUserAndPwAndRol(obj.getInscripcion()
+						.getAsignacionGerenteV().getAp_paterno().toLowerCase(), obj
+						.getInscripcion().getAsignacionGerenteV().getDni()
+						.toLowerCase(), 3L) == null) {
+					usuario = new Usuario();
+					usuario.setIdUsuario(usuarioService.getIdMax());
+					usuario.setApPaterno(obj.getInscripcion().getAsignacionGerenteV()
+							.getAp_paterno().toUpperCase());
+					usuario.setApMaterno(obj.getInscripcion().getAsignacionGerenteV()
+							.getAp_materno().toUpperCase());
+					usuario.setNombre(obj.getInscripcion().getAsignacionGerenteV()
+							.getNombres().toUpperCase());
+
+					usuario.setUsuario(obj.getInscripcion().getAsignacionGerenteV()
+							.getAp_paterno().toLowerCase());
+
+					usuario.setClave(obj.getInscripcion().getAsignacionGerenteV()
+							.getDni());
+					usuario.setEstado("A");
+					usuario.setFechaCreacion(new Date());
+					usuario.setUsuarioRegistra(obj.getUsuarioRegistra());
+					usuario.setRol(em.find(Rol.class, 3L));
+					usuario.setDni(obj.getInscripcion().getAsignacionGerenteV()
+							.getDni());
+					em.persist(usuario);
+				}
+			}
+
+			if (obj.getJefeInmediatoV() != null) {// JI
+
+				if (usuarioService.findByUserAndPwAndRol(obj
+						.getJefeInmediatoV().getApellido_paterno()
+						.toLowerCase(), obj.getJefeInmediatoV()
+						.getNumero_documento().toLowerCase(), 4L) == null) {
+					usuario = new Usuario();
+					usuario.setIdUsuario(usuarioService.getIdMax());
+					usuario.setApPaterno(obj.getJefeInmediatoV()
+							.getApellido_paterno().toUpperCase());
+					usuario.setApMaterno(obj.getJefeInmediatoV()
+							.getApellido_materno().toUpperCase());
+					usuario.setNombre(obj.getJefeInmediatoV().getNombres()
+							.toUpperCase());
+					usuario.setUsuario(obj.getJefeInmediatoV()
+							.getApellido_paterno().toLowerCase());
+					usuario.setClave(obj.getJefeInmediatoV()
+							.getNumero_documento());
+					usuario.setEstado("A");
+					usuario.setFechaCreacion(new Date());
+					usuario.setUsuarioRegistra(obj.getUsuarioRegistra());
+					usuario.setDni(obj.getJefeInmediatoV()
+							.getNumero_documento());
+					usuario.setRol(em.find(Rol.class, 4L));
+					em.persist(usuario);
+				}
+			}
+
+			if (obj.getEntidadDestinoV().getTe_numero_documento() != null) {
+
+				if (usuarioService.findByUserAndPwAndRol(obj
+						.getEntidadDestinoV().getTe_apellido_paterno()
+						.toLowerCase(), obj.getEntidadDestinoV()
+						.getTe_numero_documento().toLowerCase(), 5L) == null) {
+
+					usuario = new Usuario();
+					usuario.setIdUsuario(usuarioService.getIdMax());
+					usuario.setApPaterno(obj.getEntidadDestinoV()
+							.getTe_apellido_paterno().toUpperCase());
+					usuario.setApMaterno(obj.getEntidadDestinoV()
+							.getTe_apellido_materno().toUpperCase());
+					usuario.setNombre(obj.getEntidadDestinoV().getTe_nombres()
+							.toUpperCase());
+					usuario.setUsuario(obj.getEntidadDestinoV()
+							.getTe_apellido_paterno().toLowerCase());
+					usuario.setClave(obj.getEntidadDestinoV()
+							.getTe_numero_documento());
+					usuario.setEstado("A");
+					usuario.setFechaCreacion(new Date());
+					usuario.setUsuarioRegistra(obj.getUsuarioRegistra());
+					usuario.setRol(em.find(Rol.class, 5L));
+					usuario.setDni(obj.getEntidadDestinoV()
+							.getTe_numero_documento());
+					em.persist(usuario);
+				}
+			}
+
+			em.persist(obj);
+
+			FlujoPK flujoPK = new FlujoPK(obj.getId()
+					.getIdCampania(), obj.getInscripcion().getAsignacionGerenteV()
+					.getCod_gerente(), PROCESO1);
+			
+			Flujo flujo = new Flujo();
+			flujo.setId(flujoPK);
+			flujo.setEstado("P");
+			flujo.setFechaCreacion(new Date());
+			flujo.setUsuarioRegistra(obj.getUsuarioRegistra());
+			
+			em.merge(flujo);
+			
+			
+			
+			/*DetalleFlujoPK detalleFlujoPK = new DetalleFlujoPK(obj.getId()
+					.getIdCampania(), obj.getInscripcion().getAsignacionGerenteV()
+					.getCod_gerente(), PROCESO1, VERIFICAR_INGRESO_GP);
+
+			flujoService.atenderFlujo(detalleFlujoPK, obj.getUsuarioRegistra());*/
+
+		} catch (Exception e) {
+			System.out.println("error al guadar flujo");
+			e.printStackTrace();
+			return null;
+		}
+
+		return obj;
+	}
+
+	@Transactional
+	public DetalleInscripcion saveTotalUpdate(DetalleInscripcion antes,
+			DetalleInscripcion obj) {
+		try {
+
+			em.merge(antes);
+
+			if (obj.getJefeInmediato() != null) {
+				if (em.find(JefeInmediato.class, obj.getJefeInmediato()
+						.getDni()) == null) {
+					em.persist(obj.getJefeInmediato());
+
+					if (usuarioService.findUsuarioByUsername(obj
+							.getJefeInmediato().getDni()) == null) {
+						usuario = new Usuario();
+						usuario.setIdUsuario(usuarioService.getIdMax());
+						usuario.setApPaterno(obj.getJefeInmediato()
+								.getApPaterno().toUpperCase());
+						usuario.setApMaterno(obj.getJefeInmediato()
+								.getApMaterno().toUpperCase());
+						usuario.setNombre(obj.getJefeInmediato().getNombres()
+								.toUpperCase());
+
+						usuario.setUsuario(obj.getJefeInmediato()
+								.getApPaterno().toLowerCase());
+						usuario.setClave(obj.getJefeInmediato().getDni());
+						usuario.setEstado("A");
+						usuario.setFechaCreacion(new Date());
+						usuario.setUsuarioRegistra(obj.getUsuarioRegistra());
+						usuario.setRol(em.find(Rol.class, 4L));
+						em.persist(usuario);
+					}
+				}
+			}
+
+			if (obj.getEntidadDestinoV() != null) {
+				if (obj.getEntidadDestinoV().getTe_numero_documento() != null) {
+					if (usuarioService.findUsuarioByUsername(obj
+							.getEntidadDestinoV().getTe_numero_documento()) == null) {
+
+						usuario = new Usuario();
+						usuario.setIdUsuario(usuarioService.getIdMax());
+						usuario.setApPaterno(obj.getEntidadDestinoV()
+								.getTe_apellido_paterno().toUpperCase());
+						usuario.setApMaterno(obj.getEntidadDestinoV()
+								.getTe_apellido_materno().toUpperCase());
+						usuario.setNombre(obj.getEntidadDestinoV()
+								.getTe_nombres().toUpperCase());
+						//
+						usuario.setUsuario(obj.getEntidadDestinoV()
+								.getTe_apellido_paterno().toLowerCase());
+						usuario.setClave(obj.getEntidadDestinoV()
+								.getTe_numero_documento());
+						usuario.setEstado("A");
+						usuario.setFechaCreacion(new Date());
+						usuario.setUsuarioRegistra(obj.getUsuarioRegistra());
+						usuario.setRol(em.find(Rol.class, 5L));
+						em.persist(usuario);
+					}
+				}
+			}
+
+			em.persist(obj);
+
+		} catch (Exception e) {
+			System.out.println("error al guadar flujo");
+			e.printStackTrace();
+			return null;
+		}
+
+		return obj;
+	}
+
+	@Transactional
+	public DetalleInscripcion edit(DetalleInscripcion obj) {
+		try {
+
+			if (obj.getJefeInmediato() != null) {
+				if (em.find(JefeInmediato.class, obj.getJefeInmediato()
+						.getDni()) == null) {
+					em.persist(obj.getJefeInmediato());
+
+					if (usuarioService.findUsuarioByUsername(obj
+							.getJefeInmediato().getDni()) == null) {
+						usuario = new Usuario();
+						usuario.setIdUsuario(usuarioService.getIdMax());
+						usuario.setApPaterno(obj.getJefeInmediato()
+								.getApPaterno().toUpperCase());
+						usuario.setApMaterno(obj.getJefeInmediato()
+								.getApMaterno().toUpperCase());
+						usuario.setNombre(obj.getJefeInmediato().getNombres()
+								.toUpperCase());
+
+						usuario.setUsuario(obj.getJefeInmediato()
+								.getApPaterno().toLowerCase());
+						usuario.setClave(obj.getJefeInmediato().getDni());
+						usuario.setEstado("A");
+						usuario.setFechaCreacion(new Date());
+						usuario.setUsuarioRegistra(obj.getUsuarioRegistra());
+						usuario.setRol(em.find(Rol.class, 4L));
+						em.persist(usuario);
+					}
+				}
+			}
+
+			return em.merge(obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<DetalleInscripcion> getListaInscripcionDetalle() {
+		Query q = null;
+		q = (Query) em
+				.createQuery("SELECT t FROM DetalleInscripcion t WHERE t.estado =:estado ");
+		q.setParameter("estado", "A");
+
+		try {
+			return q.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public Long getMaxId() {
+		try {
+			return (Long) em.createQuery(
+					"SELECT max(d.id.idDetalleInsc) FROM DetalleInscripcion d")
+					.getSingleResult() + 1L;
+		} catch (Exception e) {
+			return 1L;
+		}
+
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<DetalleInscripcion> getListaInscripcionDetalle(
+			Long campaniaSelec) {
+
+		Query q = null;
+		q = (Query) em
+				.createQuery("select t from DetalleInscripcion t where t.estado =:estado and t.id.idCampania =:idCampania");
+		q.setParameter("estado", "A");
+		q.setParameter("idCampania", campaniaSelec);
+
+		try {
+			return q.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	// by hever
+	public List<InscripcionGerente> getListaInscripcion(Long idCampania) {
+
+		Query q = (Query) em
+				.createQuery("SELECT d.inscripcion.asignacionGerenteV.cod_gerente, "
+						+ " CONCAT(d.inscripcion.asignacionGerenteV.nombres ||' '||d.inscripcion.asignacionGerenteV.ap_paterno ||' '||d.inscripcion.asignacionGerenteV.ap_materno), "
+						+ " d.inscripcion.fechaCreacion, "
+						+ " d.entidadDestinoV.id_ed, "
+						+ " d.entidadDestinoV.desc_ed, "
+						+ " d.entidadDestinoV.te_numero_documento, "
+						+ " CONCAT(d.entidadDestinoV.te_nombres ||' '||d.entidadDestinoV.te_apellido_paterno ||' '||d.entidadDestinoV.te_apellido_materno), "
+						+ " d.jefeInmediatoV.id_jefe_inmediato, "
+						+ " d.jefeInmediato.dni, "
+						+ " d.id.idDetalleInsc, "
+						+ " d.titularEntidad.nroDocTE "
+						+ " FROM DetalleInscripcion d WHERE d.inscripcion.campania.idCampania =:idCampania and d.estado =:estado ");
+		q.setParameter("idCampania", idCampania);
+		q.setParameter("estado", "A");
+		try {
+
+			List<Object[]> clientes = q.getResultList();
+
+			List<InscripcionGerente> lista = new ArrayList<InscripcionGerente>();
+
+			for (Object[] item : clientes) {
+
+				InscripcionGerente inscGerente = new InscripcionGerente();
+
+				inscGerente.setCodGerente((String) item[0]);
+				inscGerente.setNombreGerente((String) item[1]);
+				inscGerente.setFechaInscripcion((Date) item[2]);
+				inscGerente.setCodEntidad((Long) item[3]);
+				inscGerente.setNombreEntidad((String) item[4]);
+				inscGerente.setDniTitular((String) item[5]);
+				inscGerente.setNombreTitular((String) item[6]);
+				inscGerente.setCodJefe((Long) item[7]);
+				inscGerente.setDniJefe2((String) item[8]);
+				inscGerente.setIdDetalleIns((Long) item[9]);
+				inscGerente.setDniTitular2((String) item[10]);
+
+				// JI
+				if (inscGerente.getCodJefe() != null) {
+
+					JefeInmediatoV jefeInmediatoV = jefeInmediatoVService
+							.find(inscGerente.getCodJefe());
+
+					inscGerente.setNombreJefe(jefeInmediatoV.getNombres() + ' '
+							+ jefeInmediatoV.getApellido_paterno() + ' '
+							+ jefeInmediatoV.getApellido_materno());
+
+				} else if (inscGerente.getDniJefe2() != null) {
+
+					JefeInmediato jefeInmediato = jefeInmediatoService
+							.find(inscGerente.getDniJefe2());
+
+					if (jefeInmediato != null)
+						inscGerente.setNombreJefe(jefeInmediato.getNombres()
+								+ ' ' + jefeInmediato.getApPaterno() + ' '
+								+ jefeInmediato.getApMaterno());
+
+				}
+
+				// TE
+				if (inscGerente.getDniTitular() == null
+						&& inscGerente.getDniTitular2() != null) {
+
+					TitularEntidad titularEntidad = titularEntidadService
+							.find(inscGerente.getDniTitular2());
+
+					if (titularEntidad != null)
+						inscGerente.setNombreTitular(titularEntidad.toString());
+
+				}
+
+				inscGerente.setIdCamapnia(idCampania);
+
+				lista.add(inscGerente);
+			}
+
+			return lista;
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<DetalleInscripcion> getInscripcionCampaña(Long idCampania,
+			Usuario usuario) {
+
+		System.out.println("Aqui 2");
+		Query q = null;
+		Query q2 = null;
+
+		// q = (Query) em
+		// .createQuery("select t from DetalleInscripcion t where t.estado =:estado and t.id.idCampania =:idCampania");
+		// q.setParameter("estado", "A");
+		// q.setParameter("idCampania", campaniaSelec);
+		//
+		// try {
+		// return q.getResultList();
+		// } catch (Exception as) {
+		// as.printStackTrace();
+		// return null;
+		// }
+		//SELECT c.name, p.name FROM Country c JOIN c.capital p
+		try {
+
+//			if (idCampania != null) {
+//				q = (Query) em
+//						.createQuery("SELECT e.inscripcion FROM DetalleInscripcion e LEFT outer JOIN e.jefeInmediatoV jiv on e.jefeInmediatoV.id_jefe_inmediato=jiv.id_jefe_inmediato" +
+//								" LEFT outer JOIN e.jefeInmediato ji on e.jefeInmediato.dni=ji.dni  " +
+//								"where e.inscripcion.campania.idCampania =:idCampania and e.estado =:estado and (jiv.numero_documento:=dni or ji.dni:=dni)");
+			q = (Query) em
+			.createQuery("SELECT e FROM DetalleInscripcion e " +
+					"where e.inscripcion.campania.idCampania =:idCampania and e.estado =:estado and (e.jefeInmediatoV.numero_documento=:dni or e.jefeInmediato.dni=:dni)");	
+			
+			
+//				q = (Query) em
+//						.createQuery("SELECT e.inscripcion FROM DetalleInscripcion e, jefeInmediatoV jiv, jefeInmediato ji " +
+//								"where e.jefeInmediatoV.id_jefe_inmediato=e.    e.inscripcion.campania.idCampania =:idCampania and e.estado =:estado and jiv.numero_documento:=dni and ji.dni:=dni");
+				q.setParameter("idCampania", idCampania);
+				q.setParameter("estado", "A");
+				q.setParameter("dni", usuario.getDni());
+				
+
+//			} else {
+//				q = (Query) em
+//						.createQuery("SELECT e.inscripcion FROM DetalleInscripcion e  where e.estado =:estado");
+//				q.setParameter("estado", "A");
+//
+//			}
+
+			return q.getResultList();
+
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+}

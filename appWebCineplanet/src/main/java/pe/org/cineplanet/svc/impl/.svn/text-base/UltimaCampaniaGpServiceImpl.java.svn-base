@@ -1,0 +1,49 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.UltimaCampaniaGpDao;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.UltimaCampaniaGp;
+import gob.servir.desempenio.model.UltimaCampaniaGpPK;
+import gob.servir.desempenio.service.UltimaCampaniaGpService;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Service
+public class UltimaCampaniaGpServiceImpl implements UltimaCampaniaGpService {
+
+	@Autowired
+	private UltimaCampaniaGpDao ultimaCampaniaGpDao;
+
+	@Transactional
+	public UltimaCampaniaGp find(UltimaCampaniaGpPK id) {
+		return ultimaCampaniaGpDao.find(id);
+	}
+
+	@Transactional
+	public UltimaCampaniaGp save(UltimaCampaniaGp obj) {
+		return ultimaCampaniaGpDao.save(obj);
+	}
+	
+	@Transactional
+	public UltimaCampaniaGp edit(UltimaCampaniaGp obj) {
+		return ultimaCampaniaGpDao.edit(obj);
+		
+	}
+
+	public List<UltimaCampaniaGp> getListaUltimaCampaniaGp(InscripcionPK id) {
+		return ultimaCampaniaGpDao.getListaUltimaCampaniaGp(id);
+	}
+	
+	public List<UltimaCampaniaGp> getListaUltimaCampaniaGp(String codGerente) {
+		return ultimaCampaniaGpDao.getListaUltimaCampaniaGp(codGerente);
+	}
+	
+}

@@ -1,0 +1,347 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.model.DetalleFlujo;
+import gob.servir.desempenio.model.DetalleFlujoPK;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.Meta;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.CampaniaService;
+import gob.servir.desempenio.service.DetalleFlujoService;
+import gob.servir.desempenio.service.FlujoService;
+import gob.servir.desempenio.service.InscripcionService;
+import gob.servir.desempenio.service.MetaService;
+import gob.servir.desempenio.util.Constantes;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
+
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+
+@Component("visualizarPlanesController")
+@Scope("session")
+public class VisualizarPlanesController implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private static final Logger logger = LoggerFactory
+			.getLogger(VisualizarPlanesController.class);
+
+	@Autowired
+	private LoginController loginController;
+	@Autowired
+	private CampaniaService campaniaService;
+	@Autowired
+	private InscripcionService inscripcionService;
+	@Autowired
+	private MetaService metaService;
+	@Autowired
+	private FlujoService flujoService;
+	@Autowired
+	private DetalleFlujoService detalleFlujoService;
+
+	private Usuario userSesion = null;
+	// private Message message = new Message();
+	private Long campaniaSelec = 0L;
+
+	private Inscripcion inscripcionSelec = null;
+	private boolean swBtnBuscar = true;
+	private List<Inscripcion> listaGerentePublico = new ArrayList<Inscripcion>();
+	private List<Inscripcion> listaGerentePublicoFiltered = new ArrayList<Inscripcion>();
+	private List<Meta> listaMetas = new ArrayList<Meta>();
+	private List<SelectItem> comboCampania = new ArrayList<SelectItem>();
+
+	private byte[] rawFile = null;
+
+	private StreamedContent fileDesDoc = null;
+
+	private boolean swFlujo = false;
+	private FacesMessage msg = null;
+
+	public VisualizarPlanesController() {
+
+	}
+
+	@PostConstruct
+	public void cargar() {
+		validarSesion();
+		verificarEstadoFlujo();
+
+	}
+
+	/*
+	 * public void cargarData() {
+	 * 
+	 * buscarGerenteInscrito(); }
+	 */
+
+	public void verificarEstadoFlujo() {
+		if (inscripcionSelec != null) {
+			String estado = detalleFlujoService
+					.getEstadoDetalleFlujo(new DetalleFlujoPK(campaniaSelec,
+							inscripcionSelec.getId().getIdGerentePublico(),
+							Constantes.PROCESO1, Constantes.P1_VERIFICAR_METAS));
+			if (estado != null) {
+				if (estado.equalsIgnoreCase(Constantes.ATENDIDO))
+					swFlujo = true;
+				else
+					swFlujo = false;
+			} else
+				swFlujo = true;
+		} else {
+			swFlujo = true;
+		}
+	}
+
+	public boolean isSwFlujo() {
+		return swFlujo;
+	}
+
+	public void setSwFlujo(boolean swFlujo) {
+		this.swFlujo = swFlujo;
+	}
+
+	public StreamedContent getFileDesDoc() {
+		try {
+
+			if (inscripcionSelec != null && campaniaSelec != 0L) {
+
+				Inscripcion inscripcion = inscripcionService
+						.find(inscripcionSelec.getId());
+
+				rawFile = inscripcion.getDocumento();
+
+				if (rawFile != null) {
+					ByteArrayInputStream bai = new ByteArrayInputStream(rawFile);
+
+					String extension = inscripcion.getFileName().substring(
+							inscripcion.getFileName().lastIndexOf(".") + 1);
+
+					InputStream stream = bai;
+					fileDesDoc = new DefaultStreamedContent(stream,
+							"application/" + extension,
+							inscripcion.getFileName());
+
+				} else {
+					return null;
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return fileDesDoc;
+
+	}
+
+	public void setFileDesDoc(StreamedContent fileDesDoc) {
+		this.fileDesDoc = fileDesDoc;
+	}
+
+	public byte[] getRawFile() {
+		return rawFile;
+	}
+
+	public void setRawFile(byte[] rawFile) {
+		this.rawFile = rawFile;
+	}
+
+	public Inscripcion getInscripcionSelec() {
+		return inscripcionSelec;
+	}
+
+	public void setInscripcionSelec(Inscripcion inscripcionSelec) {
+		this.inscripcionSelec = inscripcionSelec;
+	}
+
+	public List<Meta> getListaMetas() {
+		listaMetas.clear();
+		if (inscripcionSelec != null && campaniaSelec != 0L) {
+			listaMetas = metaService.getListaMetasAprobacion(
+					inscripcionSelec.getId(), Constantes.TRUE);
+		}
+		return listaMetas;
+	}
+
+	public void setListaMetas(List<Meta> listaMetas) {
+		this.listaMetas = listaMetas;
+	}
+
+	public void validarSesion() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		
+		userSesion = (Usuario) context.getExternalContext().getSessionMap()
+				.get(loginController.getUsername());
+
+		if (userSesion == null) {
+			String ctxPath = context.getExternalContext()
+					.getRequestContextPath();
+			try {
+				context.getExternalContext().redirect(ctxPath + "/login.jsf");
+			} catch (Exception e) {
+				//e.printStackTrace();
+			}
+		}
+	}
+
+	public List<Inscripcion> getListaGerentePublico() {
+		return listaGerentePublico;
+	}
+
+	public void setListaGerentePublico(List<Inscripcion> listaGerentePublico) {
+		this.listaGerentePublico = listaGerentePublico;
+	}
+
+	public List<Inscripcion> getListaGerentePublicoFiltered() {
+		return listaGerentePublicoFiltered;
+	}
+
+	public void setListaGerentePublicoFiltered(
+			List<Inscripcion> listaGerentePublicoFiltered) {
+		this.listaGerentePublicoFiltered = listaGerentePublicoFiltered;
+	}
+
+	public void buscarGerenteInscrito() {
+		listaGerentePublico.clear();
+		listaGerentePublicoFiltered.clear();
+		try {
+			if (campaniaSelec != 0L) {
+				listaGerentePublico = inscripcionService
+						.getListaGerentePublico(campaniaSelec);
+				listaGerentePublicoFiltered = listaGerentePublico;
+			}
+			/*
+			 * else { limpiar(); }
+			 */
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public boolean isSwBtnBuscar() {
+
+		if (campaniaSelec != 0L)
+			swBtnBuscar = false;
+		else
+			swBtnBuscar = true;
+
+		return swBtnBuscar;
+	}
+
+	public void setSwBtnBuscar(boolean swBtnBuscar) {
+		this.swBtnBuscar = swBtnBuscar;
+	}
+
+	public Long getCampaniaSelec() {
+
+		return campaniaSelec;
+	}
+
+	public void setCampaniaSelec(Long campaniaSelec) {
+		this.campaniaSelec = campaniaSelec;
+	}
+
+	public List<SelectItem> getComboCampania() {
+		comboCampania = campaniaService.getComboCampania();
+		return comboCampania;
+	}
+
+	public void setComboCampania(List<SelectItem> comboCampania) {
+		this.comboCampania = comboCampania;
+	}
+
+	public void atenderFlujo() {
+
+		validarSesion();
+
+		if (!validarAtenderFlujo()) {
+			FacesContext.getCurrentInstance().addMessage(null, msg);
+			return;
+		}
+
+		try {
+			DetalleFlujoPK idDetalle = new DetalleFlujoPK(inscripcionSelec
+					.getId().getIdCampania(), inscripcionSelec.getId()
+					.getIdGerentePublico(), Constantes.PROCESO1,
+					Constantes.P1_VERIFICAR_METAS);
+
+			flujoService.atenderFlujo(idDetalle, userSesion.getUsuario());
+			msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+					"Se ha verificado Metas e Indicadores.");
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+					"Se ha producido un error.");
+		}
+		FacesContext.getCurrentInstance().addMessage(null, msg);
+		// limpiar();
+		verificarEstadoFlujo();
+	}
+
+	public boolean validarAtenderFlujo() {
+
+		if (inscripcionSelec == null) {
+			msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+					"Por favor, salga del sistema e inicie sesión nuevamente.");
+			return false;
+		}
+
+		return true;
+	}
+
+	public void limpiar() {
+		inscripcionSelec = null;
+		// listaMetas.clear();
+		fileDesDoc = null;
+		// listaGerentePublico.clear();
+		// listaGerentePublicoFiltered.clear();
+		rawFile = null;
+
+	}
+
+	public void habilitarCarga() {
+
+		if (inscripcionSelec != null) {
+
+			DetalleFlujoPK id = new DetalleFlujoPK(inscripcionSelec.getId()
+					.getIdCampania(), inscripcionSelec.getId()
+					.getIdGerentePublico(), Constantes.PROCESO1,
+					Constantes.P1_VB);
+
+			DetalleFlujo detalleFlujo = detalleFlujoService.find(id);
+
+			if (detalleFlujo != null) {
+				detalleFlujo.setEstado(Constantes.EN_ESPERA);
+				detalleFlujo.setUsuarioModifica(userSesion.getUsuario());
+				detalleFlujoService.edit(detalleFlujo);
+
+				msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+						"Se habilitó acceso para cargar nuevamente el archivo escaneado.");
+				FacesContext.getCurrentInstance().addMessage(null, msg);
+			}
+		}
+		verificarEstadoFlujo();
+	}
+
+}

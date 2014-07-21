@@ -1,0 +1,46 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.TipoCompetenciaDao;
+import gob.servir.desempenio.model.TipoCompetencia;
+import gob.servir.desempenio.service.TipoCompetenciaService;
+
+import java.util.List;
+
+import javax.faces.model.SelectItem;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Cristhian Munguia Martinez
+ */
+@Service
+public class TipoCompetenciaServiceImpl implements TipoCompetenciaService {
+
+	@Autowired
+	private TipoCompetenciaDao competenciaDao;
+    
+	@Transactional
+	public TipoCompetencia save(TipoCompetencia obj) {
+		return competenciaDao.save(obj);
+	}
+	@Transactional
+	public TipoCompetencia edit(TipoCompetencia obj) {
+		return competenciaDao.edit(obj);
+	}
+
+	public TipoCompetencia find(Long id) {
+		return competenciaDao.find(id);
+	}
+
+	public List<TipoCompetencia> getListaCompetencia() {
+		return competenciaDao.getListaCompetencia();
+	}
+
+	public List<SelectItem> getComboCompetencia() {
+		return competenciaDao.getComboCompetencia();
+	}
+
+}

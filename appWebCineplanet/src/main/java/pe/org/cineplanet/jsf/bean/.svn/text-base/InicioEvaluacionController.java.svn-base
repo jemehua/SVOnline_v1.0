@@ -1,0 +1,367 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.model.DetalleFlujoPK;
+import gob.servir.desempenio.model.DetalleInscripcion;
+import gob.servir.desempenio.model.Flujo;
+import gob.servir.desempenio.model.FlujoPK;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.CampaniaService;
+import gob.servir.desempenio.service.DetalleInscripcionService;
+import gob.servir.desempenio.service.FlujoService;
+import gob.servir.desempenio.service.InscripcionService;
+import gob.servir.desempenio.service.ProcesoService;
+import gob.servir.desempenio.util.Constantes;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Component("inicioEvaluacionController")
+@Scope("session")
+public class InicioEvaluacionController {
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(InicioEvaluacionController.class);
+
+	@Autowired
+	private LoginController loginController;
+	@Autowired
+	private CampaniaService campaniaService;
+	@Autowired
+	private ProcesoService procesoService;
+	@Autowired
+	private FlujoService flujoService;
+	@Autowired
+	private InscripcionService inscripcionService;
+	@Autowired
+	private DetalleInscripcionService detalleInscripcionService;
+
+	private Usuario userSesion = null;
+	// private Message message = new Message();
+
+	private List<SelectItem> comboCampania = new ArrayList<SelectItem>();
+	private Long campaniaSelec = 0L;
+	private List<SelectItem> comboProceso = new ArrayList<SelectItem>();
+	private Long procesoSelec = 0L;
+	private List<SelectItem> comboEstado = new ArrayList<SelectItem>();
+	private String estadoSelec = "%";
+	private Flujo flujoSelec = null;
+
+	private List<Flujo> listaFlujo = new ArrayList<Flujo>();
+
+	private boolean swBtnTodos = false;
+
+	public InicioEvaluacionController() {
+		super();
+	}
+
+	public boolean isSwBtnTodos() {
+
+		if (estadoSelec.equalsIgnoreCase("P") && campaniaSelec != 0L
+				&& procesoSelec != 0L)
+			swBtnTodos = false;
+		else
+			swBtnTodos = true;
+
+		return swBtnTodos;
+	}
+
+	public void setSwBtnTodos(boolean swBtnTodos) {
+		this.swBtnTodos = swBtnTodos;
+	}
+
+	public Flujo getFlujoSelec() {
+		return flujoSelec;
+	}
+
+	public void setFlujoSelec(Flujo flujoSelec) {
+		this.flujoSelec = flujoSelec;
+	}
+
+	public List<SelectItem> getComboEstado() {
+
+		comboEstado.clear();
+
+		SelectItem item = null;
+		item = new SelectItem("%", "Todos");
+		comboEstado.add(item);
+		item = new SelectItem("P", "Pendiente");
+		comboEstado.add(item);
+		item = new SelectItem("I", "Iniciado");
+		comboEstado.add(item);
+		item = new SelectItem("AT", "Terminado");
+		comboEstado.add(item);
+		item = new SelectItem("C", "Cancelado");
+		comboEstado.add(item);
+		return comboEstado;
+	}
+
+	public void setComboEstado(List<SelectItem> comboEstado) {
+		this.comboEstado = comboEstado;
+	}
+
+	public String getEstadoSelec() {
+		return estadoSelec;
+	}
+
+	public void setEstadoSelec(String estadoSelec) {
+		this.estadoSelec = estadoSelec;
+	}
+
+	public List<SelectItem> getComboProceso() {
+		comboProceso = procesoService.getComboProceso();
+		return comboProceso;
+	}
+
+	public void setComboProceso(List<SelectItem> comboProceso) {
+		this.comboProceso = comboProceso;
+	}
+
+	public Long getProcesoSelec() {
+		return procesoSelec;
+	}
+
+	public void setProcesoSelec(Long procesoSelec) {
+		this.procesoSelec = procesoSelec;
+	}
+
+	public List<SelectItem> getComboCampania() {
+		comboCampania = campaniaService.getComboCampania();
+		return comboCampania;
+	}
+
+	public void setComboCampania(List<SelectItem> comboCampania) {
+		this.comboCampania = comboCampania;
+	}
+
+	public Long getCampaniaSelec() {
+		return campaniaSelec;
+	}
+
+	public void setCampaniaSelec(Long campaniaSelec) {
+		this.campaniaSelec = campaniaSelec;
+	}
+
+	public List<Flujo> getListaFlujo() {
+		listaFlujo.clear();
+
+		if (campaniaSelec != 0L && procesoSelec != 0L) {
+			listaFlujo = flujoService.getListaFlujo(campaniaSelec,
+					procesoSelec, estadoSelec);
+		}
+
+		return listaFlujo;
+	}
+
+	public void setListaFlujo(List<Flujo> listaFlujo) {
+		this.listaFlujo = listaFlujo;
+	}
+
+	public void validarSesion() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		
+		userSesion = (Usuario) context.getExternalContext().getSessionMap()
+				.get(loginController.getUsername());
+
+		if (userSesion == null) {
+			String ctxPath = context.getExternalContext()
+					.getRequestContextPath();
+			try {
+				context.getExternalContext().redirect(ctxPath + "/login.jsf");
+			} catch (Exception e) {
+				//e.printStackTrace();
+			}
+		}
+	}
+
+	public void limpiar() {
+		campaniaSelec = 0L;
+		procesoSelec = 0L;
+		estadoSelec = "%";
+		swBtnTodos = true;
+		listaFlujo.clear();
+	}
+
+	public void ejecutarProceso() {
+
+		validarSesion();
+
+		if (!validarAtenderFlujo(flujoSelec.getId()))
+			return;
+
+		try {
+
+			DetalleFlujoPK detalleFlujoPK = new DetalleFlujoPK(flujoSelec
+					.getId().getIdCampania(), flujoSelec.getId()
+					.getIdGerentePublico(), flujoSelec.getId().getIdProceso(),
+					1L);
+
+			flujoService.atenderFlujo(detalleFlujoPK, userSesion.getUsuario());
+
+			if (flujoSelec.getId().getIdProceso() == 1L) {
+
+				FacesContext
+						.getCurrentInstance()
+						.addMessage(
+								null,
+								new FacesMessage(
+										FacesMessage.SEVERITY_INFO,
+										"EXITO",
+										"Ha iniciado el Planeamiento del Desempeño para el Gerente Público seleccionado"));
+			} else if (flujoSelec.getId().getIdProceso() == 2L) {
+				FacesContext
+						.getCurrentInstance()
+						.addMessage(
+								null,
+								new FacesMessage(FacesMessage.SEVERITY_INFO,
+										"EXITO",
+										"Ha iniciado la Evaluación de Medio Año para el Gerente Público seleccionado"));
+			} else if (flujoSelec.getId().getIdProceso() == 3L) {
+				FacesContext
+						.getCurrentInstance()
+						.addMessage(
+								null,
+								new FacesMessage(FacesMessage.SEVERITY_INFO,
+										"EXITO",
+										"Ha iniciado la Evaluación de Fin de Año para el Gerente Público seleccionado"));
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+							"Ha ocurrido un error"));
+		}
+	}
+
+	public boolean validarAtenderFlujo(FlujoPK id) {
+
+		if (id == null) {
+			return false;
+		}
+
+		if (verificarPuestoTipo(id)) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Registre Puesto Tipo para el Gerente Público"));
+			return false;
+		}
+		
+
+			
+				if (verificarJiAndTE(id)) {
+					FacesContext
+							.getCurrentInstance()
+							.addMessage(
+									null,
+									new FacesMessage(
+											FacesMessage.SEVERITY_WARN,
+											"ADVERTENCIA",
+											"Registre Jefe inmediato y Titular de Entidad"));
+					return false;
+				}
+
+		return true;
+	}
+
+	private boolean verificarPuestoTipo(FlujoPK id) {
+
+		Inscripcion inscripcion = inscripcionService.find(new InscripcionPK(id
+				.getIdCampania(), id.getIdGerentePublico()));
+
+		if (inscripcion.getPuestoTipoV() != null)
+			return false;
+		else
+			return true;
+	}
+	
+	private boolean verificarJiAndTE(FlujoPK id) {
+
+		if (procesoSelec == Constantes.PROCESO3){
+			DetalleInscripcion detalleInscripcion = detalleInscripcionService.getDetalleflujoJiAndTe(id.getIdCampania(),id.getIdGerentePublico()); 
+			if (detalleInscripcion.getJefeInmediato()==null && detalleInscripcion.getJefeInmediatoV()==null)
+				return true;
+			if (detalleInscripcion.getTitularEntidad()==null && detalleInscripcion.getEntidadDestinoV().getTe_numero_documento()==null)
+				return true;
+		}	
+				
+		return false;
+	}
+
+	public void ejecutarTodos() {
+
+		validarSesion();
+
+		try {
+			for (Flujo flujo : listaFlujo) {
+
+				if (!verificarPuestoTipo(flujo.getId())) {
+					DetalleFlujoPK detalleFlujoPK = new DetalleFlujoPK(flujo
+							.getId().getIdCampania(), flujo.getId()
+							.getIdGerentePublico(), flujo.getId()
+							.getIdProceso(), 1L);
+
+					flujoService.atenderFlujo(detalleFlujoPK,
+							userSesion.getUsuario());
+				}
+			}
+
+			if (procesoSelec == 1L) {
+
+				FacesContext
+						.getCurrentInstance()
+						.addMessage(
+								null,
+								new FacesMessage(
+										FacesMessage.SEVERITY_INFO,
+										"EXITO",
+										"Ha iniciado el Planeamiento del Desempeño para todos los Gerentes Públicos cuyos competencias han sido confirmados"));
+			} else if (procesoSelec == 2L) {
+				FacesContext
+						.getCurrentInstance()
+						.addMessage(
+								null,
+								new FacesMessage(FacesMessage.SEVERITY_INFO,
+										"EXITO",
+										"Ha iniciado la Evaluación de Medio Año para todos los Gerentes Públicos"));
+			} else if (procesoSelec == 3L) {
+				FacesContext
+						.getCurrentInstance()
+						.addMessage(
+								null,
+								new FacesMessage(FacesMessage.SEVERITY_INFO,
+										"EXITO",
+										"Ha iniciado la Evaluación de Fin de Año para todos los Gerentes Públicos"));
+			}
+		} catch (Exception e) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "EXITO",
+							"Ha ocurrido un error"));
+		}
+
+	}
+
+	public void selectflujo() {
+		flujoSelec = flujoService.find(flujoSelec.getId());
+
+	}
+}

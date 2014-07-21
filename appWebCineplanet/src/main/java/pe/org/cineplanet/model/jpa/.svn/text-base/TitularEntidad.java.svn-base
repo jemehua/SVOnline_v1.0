@@ -1,0 +1,220 @@
+package gob.servir.desempenio.model;
+
+import java.io.Serializable;
+import java.util.Calendar;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+/**
+ * 
+ * @author Hever Pumallihua Garcia
+ */
+@Entity
+public class TitularEntidad implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	private String nroDocTE;
+	@Column
+	private String nombres;
+	@Column
+	private String apPaterno;
+	@Column
+	private String apMaterno;
+	@Column
+	private String cargo;
+	@Column
+	private String celular;
+	@Column
+	private String telefOficina;
+	@Column
+	private String correoTrabajo;
+	@Column
+	private String correoPersonal;
+	@Column
+	private String usuarioRegistra;
+	@Column
+	private String usuarioModifica;
+	@Column
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date fechaCreacion;
+	@Column
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date fechaModificacion;
+	@Column
+	private String estado;
+
+	public TitularEntidad() {
+		super();
+	}
+
+	public String getNroDocTE() {
+		return nroDocTE;
+	}
+
+	public void setNroDocTE(String nroDocTE) {
+		this.nroDocTE = nroDocTE;
+	}
+
+	public String getNombres() {
+		return nombres;
+	}
+
+	public void setNombres(String nombres) {
+		this.nombres = nombres;
+	}
+
+	public String getApPaterno() {
+		return apPaterno;
+	}
+
+	public void setApPaterno(String apPaterno) {
+		this.apPaterno = apPaterno;
+	}
+
+	public String getApMaterno() {
+		return apMaterno;
+	}
+
+	public void setApMaterno(String apMaterno) {
+		this.apMaterno = apMaterno;
+	}
+
+	public String getCargo() {
+		return cargo;
+	}
+
+	public void setCargo(String cargo) {
+		this.cargo = cargo;
+	}
+
+	public String getCelular() {
+		return celular;
+	}
+
+	public void setCelular(String celular) {
+		this.celular = celular;
+	}
+
+	public String getTelefOficina() {
+		return telefOficina;
+	}
+
+	public void setTelefOficina(String telefOficina) {
+		this.telefOficina = telefOficina;
+	}
+
+	public String getCorreoTrabajo() {
+		return correoTrabajo;
+	}
+
+	public void setCorreoTrabajo(String correoTrabajo) {
+		this.correoTrabajo = correoTrabajo;
+	}
+
+	public String getCorreoPersonal() {
+		return correoPersonal;
+	}
+
+	public void setCorreoPersonal(String correoPersonal) {
+		this.correoPersonal = correoPersonal;
+	}
+
+	public String getUsuarioRegistra() {
+		return usuarioRegistra;
+	}
+
+	public void setUsuarioRegistra(String usuarioRegistra) {
+		this.usuarioRegistra = usuarioRegistra;
+	}
+
+	public String getUsuarioModifica() {
+		return usuarioModifica;
+	}
+
+	public void setUsuarioModifica(String usuarioModifica) {
+		this.usuarioModifica = usuarioModifica;
+	}
+
+	public Date getFechaCreacion() {
+		return fechaCreacion;
+	}
+
+	public void setFechaCreacion(Date fechaCreacion) {
+		this.fechaCreacion = fechaCreacion;
+	}
+
+	public Date getFechaModificacion() {
+		return fechaModificacion;
+	}
+
+	public void setFechaModificacion(Date fechaModificacion) {
+		this.fechaModificacion = fechaModificacion;
+	}
+
+	public String getEstado() {
+		return estado;
+	}
+
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
+	
+	@PrePersist
+	private void putFechaCreacion() {
+		setFechaCreacion(new Date(Calendar.getInstance().getTime().getTime()));
+	}
+
+	@PreUpdate
+	private void putFechaModificacion() {
+		setFechaModificacion(new Date(Calendar.getInstance().getTime()
+				.getTime()));
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((nroDocTE == null) ? 0 : nroDocTE.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TitularEntidad other = (TitularEntidad) obj;
+		if (nroDocTE == null) {
+			if (other.nroDocTE != null)
+				return false;
+		} else if (!nroDocTE.equals(other.nroDocTE))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(nombres);
+		builder.append(" ");
+		builder.append(apPaterno);
+		builder.append(" ");
+		builder.append(apMaterno);
+		return builder.toString();
+	}
+
+	
+}

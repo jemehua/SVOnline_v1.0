@@ -1,0 +1,246 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.model.EvaluacionCompetencias;
+import gob.servir.desempenio.model.EvaluacionMetas;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.report.EvaluacionFinalReport;
+import gob.servir.desempenio.service.EvaluacionCompetenciasService;
+import gob.servir.desempenio.service.EvaluacionMetasService;
+import gob.servir.desempenio.service.InscripcionService;
+import gob.servir.desempenio.util.StringUtils;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.faces.context.FacesContext;
+
+import org.primefaces.model.StreamedContent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Component("evaluacionFinalGPController")
+@Scope("session")
+public class EvaluacionFinalGPController implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private static final Logger logger = LoggerFactory
+			.getLogger(EvaluacionFinalGPController.class);
+
+	@Autowired
+	private LoginController loginController;
+	@Autowired
+	private InscripcionService inscripcionService;
+	@Autowired
+	private EvaluacionCompetenciasService evaluacionCompetenciasService;
+	@Autowired
+	private EvaluacionMetasService evaluacionMetasService;
+
+	private Usuario userSesion = null;
+	// private Message message = new Message();
+
+	private Inscripcion inscripcionSelec = null;
+	
+	private EvaluacionMetas evaluacionMetasSelec = null;
+	private EvaluacionCompetencias evaluacionCompetenciasSelec = null;
+	private List<EvaluacionMetas> listaEvaluacionMetas = new ArrayList<EvaluacionMetas>();
+	private List<EvaluacionCompetencias> listaEvaluacioncomptencias = new ArrayList<EvaluacionCompetencias>();
+
+	private Double promedioMetas = 0D;
+	private Double promedioCompetencias = 0D;
+	private Double promedioFinal = 0D;
+	private String descripcion;
+
+	public EvaluacionFinalGPController() {
+		super();
+	}
+
+	@PostConstruct
+	public void init() {
+		validarSesion();
+		getInscripcion();
+		getResultadoEvaluacion();
+	}
+
+	public void getResultadoEvaluacion() {
+
+		if (inscripcionSelec != null) {
+			List<EvaluacionMetas> listEvaMetas = evaluacionMetasService
+					.getListaNotasEvaMetas(inscripcionSelec.getId());
+
+			double sumaMetas = 0;
+
+			for (EvaluacionMetas row : listEvaMetas) {
+				if (row.getPorcentaje() != null)
+					sumaMetas += row.getPorcentaje();
+			}
+
+			List<EvaluacionCompetencias> listEvaComp = evaluacionCompetenciasService
+					.getListaSoloEvaCompetencias(inscripcionSelec.getId());
+
+			double sumaComp = 0;
+
+			for (EvaluacionCompetencias row : listEvaComp) {
+				if (row.getPorcentaje() != null)
+					sumaComp += row.getPorcentaje();
+			}
+
+			if (sumaMetas != 0) {
+				//promedioMetas = (double) sumaMetas / listEvaMetas.size();
+				promedioMetas = StringUtils.redondear(sumaMetas);
+			}
+			if (sumaComp != 0) {
+				promedioCompetencias = (double) sumaComp / listEvaComp.size();
+				promedioCompetencias = StringUtils
+						.redondear(promedioCompetencias);
+			}
+			if (promedioMetas != 0F && promedioCompetencias != 0F) {
+				promedioFinal = (promedioMetas + promedioCompetencias) / 2;
+				promedioFinal = StringUtils.redondear(promedioFinal);
+			}
+
+			if (promedioFinal > 100 && promedioFinal <= 120)
+				descripcion = "Superó el objetivo";
+			else if (promedioFinal > 90 && promedioFinal <= 100)
+				descripcion = "Cumplió el objetivo";
+			else if (promedioFinal > 80 && promedioFinal <= 90)
+				descripcion = "Cumplió en parte el objetivo";
+			else if (promedioFinal > 50 && promedioFinal <= 80)
+				descripcion = "No cumplió con el objetivo";
+			else
+				descripcion = "";
+		}
+	}
+
+	public Double getPromedioMetas() {
+		return promedioMetas;
+	}
+
+	public void setPromedioMetas(Double promedioMetas) {
+		this.promedioMetas = promedioMetas;
+	}
+
+	public Double getPromedioCompetencias() {
+		return promedioCompetencias;
+	}
+
+	public void setPromedioCompetencias(Double promedioCompetencias) {
+		this.promedioCompetencias = promedioCompetencias;
+	}
+
+	public Double getPromedioFinal() {
+		return promedioFinal;
+	}
+
+	public void setPromedioFinal(Double promedioFinal) {
+		this.promedioFinal = promedioFinal;
+	}
+
+	public String getDescripcion() {
+		return descripcion;
+	}
+
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
+
+	public void getInscripcion() {
+		Inscripcion ins = inscripcionService.getInscripcionUsuario(userSesion);
+		if (ins != null)
+			inscripcionSelec = ins;
+	}
+
+	public Inscripcion getInscripcionSelec() {
+		return inscripcionSelec;
+	}
+
+	public void setInscripcionSelec(Inscripcion inscripcionSelec) {
+		this.inscripcionSelec = inscripcionSelec;
+	}
+
+	public void validarSesion() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		
+		userSesion = (Usuario) context.getExternalContext().getSessionMap()
+				.get(loginController.getUsername());
+
+		if (userSesion == null) {
+			String ctxPath = context.getExternalContext()
+					.getRequestContextPath();
+			try {
+				context.getExternalContext().redirect(ctxPath + "/login.jsf");
+			} catch (Exception e) {
+				//e.printStackTrace();
+			}
+		}
+	}
+
+	public List<EvaluacionCompetencias> getListaEvaluacioncomptencias() {
+		if (inscripcionSelec != null)
+			listaEvaluacioncomptencias = evaluacionCompetenciasService
+					.getListaEvaluacionCompetencias(inscripcionSelec.getId());
+		return listaEvaluacioncomptencias;
+	}
+
+	public void setListaEvaluacioncomptencias(
+			List<EvaluacionCompetencias> listaEvaluacioncomptencias) {
+		this.listaEvaluacioncomptencias = listaEvaluacioncomptencias;
+	}
+
+	public List<EvaluacionMetas> getListaEvaluacionMetas() {
+		if (inscripcionSelec != null)
+			listaEvaluacionMetas = evaluacionMetasService
+					.getListaEvaluacionMetas(inscripcionSelec.getId());
+		return listaEvaluacionMetas;
+	}
+
+	public void setListaEvaluacionMetas(
+			List<EvaluacionMetas> listaEvaluacionMetas) {
+		this.listaEvaluacionMetas = listaEvaluacionMetas;
+	}
+
+	public EvaluacionMetas getEvaluacionMetasSelec() {
+		return evaluacionMetasSelec;
+	}
+
+	public void setEvaluacionMetasSelec(EvaluacionMetas evaluacionMetasSelec) {
+		this.evaluacionMetasSelec = evaluacionMetasSelec;
+	}
+
+	public EvaluacionCompetencias getEvaluacionCompetenciasSelec() {
+		return evaluacionCompetenciasSelec;
+	}
+
+	public void setEvaluacionCompetenciasSelec(
+			EvaluacionCompetencias evaluacionCompetenciasSelec) {
+		this.evaluacionCompetenciasSelec = evaluacionCompetenciasSelec;
+	}
+	
+
+	private StreamedContent docFin;
+	
+	public StreamedContent getDocFin() {
+		EvaluacionFinalReport finalReport = new EvaluacionFinalReport();
+		return finalReport.generarReporteGP(inscripcionSelec, listaEvaluacionMetas, listaEvaluacioncomptencias,
+				promedioMetas, promedioCompetencias, promedioFinal, descripcion);
+	}
+
+	public void setDocFin(StreamedContent docFin) {
+		this.docFin = docFin;
+	}
+
+	
+}

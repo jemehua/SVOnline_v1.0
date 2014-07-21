@@ -1,0 +1,165 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.MensajeDao;
+import gob.servir.desempenio.model.Actividad;
+import gob.servir.desempenio.model.Mensaje;
+import gob.servir.desempenio.model.MensajePK;
+import gob.servir.desempenio.service.ActividadService;
+import gob.servir.desempenio.util.Constantes;
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Repository
+public class MensajeDaoImpl implements MensajeDao {
+	@PersistenceContext
+	private EntityManager em;
+
+	@Autowired
+	private ActividadService actividadService;
+
+	public Mensaje find(MensajePK id) {
+		try {
+			return em.find(Mensaje.class, id);
+		} catch (Exception e) {
+			// e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Mensaje save(Mensaje obj) {
+		try {
+			em.persist(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Mensaje edit(Mensaje obj) {
+		try {
+			return em.merge(obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<Mensaje> getListaMensaje() {
+		TypedQuery<Mensaje> tq = em.createNamedQuery(
+				"Mensaje.getAllListaMensaje", Mensaje.class);
+
+		tq.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+			return tq.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<Mensaje> getListaMensaje(Long idAct, Long idProceso,
+			Long idCampania) {
+
+		TypedQuery<Mensaje> tq = em.createNamedQuery("Mensaje.getListaMensaje",
+				Mensaje.class);
+
+		tq.setParameter("idAct", idAct);
+		tq.setParameter("idProceso", idProceso);
+		tq.setParameter("idCampania", idCampania);
+		tq.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+			return tq.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<Mensaje> getListaMensajeTipo(Long idAct, Long idProceso,
+			Long idCampania, String tipo) {
+
+		TypedQuery<Mensaje> tq = em.createNamedQuery(
+				"Mensaje.getListaMensajeTipo", Mensaje.class);
+
+		tq.setParameter("idAct", idAct);
+		tq.setParameter("idProceso", idProceso);
+		tq.setParameter("idCampania", idCampania);
+		tq.setParameter("tipo", tipo);
+		tq.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+			return tq.getResultList();
+		} catch (Exception as) {
+			// as.printStackTrace();
+			return null;
+		}
+	}
+
+	public Mensaje getMensaje(Actividad act) {
+		TypedQuery<Mensaje> tq = em.createNamedQuery("Mensaje.getMensaje",
+				Mensaje.class);
+
+		tq.setParameter("estado", Constantes.ACTIVO);
+		tq.setParameter("act", act.getId().getIdActividad());
+		tq.setParameter("pro", act.getId().getIdProceso());
+
+		try {
+			return tq.getSingleResult();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public Long getIdMax(Long idAct, Long idProceso, Long idCampania) {
+		Query q = null;
+		q = (Query) em
+				.createQuery("SELECT max(c.id.idMensaje) FROM Mensaje c WHERE c.id.idActividad=:idAct AND c.id.idProceso=:idProceso AND c.id.idCampania=:idCampania");
+		q.setParameter("idAct", idAct);
+		q.setParameter("idProceso", idProceso);
+		q.setParameter("idCampania", idCampania);
+		try {
+			return (Long) q.getSingleResult() + 1L;
+		} catch (Exception e) {
+			return 1L;
+		}
+	}
+
+	public Mensaje getMensajePrincipal(Long idAct, Long idProceso,
+			Long idCampania) {
+		TypedQuery<Mensaje> tq = em.createNamedQuery("Mensaje.getMensajePrincipal",
+				Mensaje.class);
+
+		tq.setParameter("estado", "A");
+		tq.setParameter("idAct", idAct);
+		tq.setParameter("idProceso", idProceso);
+		tq.setParameter("idCampania", idCampania);
+		tq.setParameter("tipo", "P");
+
+		try {
+			return tq.getSingleResult();
+		} catch (Exception as) {
+			// as.printStackTrace();
+			return null;
+		}
+	}
+
+}

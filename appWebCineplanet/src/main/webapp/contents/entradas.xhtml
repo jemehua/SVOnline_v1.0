@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+
+</h:head>
+<h:body>
+	<h:outputStylesheet name="css/cssContent.css" />
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="pnlEntrada" header="Carga de Entradas">
+		<p:focus context="pnlEntrada" />
+
+		<table cellpadding="2px;" cellspacing="2px;" style="width: 100%;">
+			<tr>
+				<td valign="top" style="width: 50%;"><p:panel id="pnlDatos">
+						<table cellpadding="2px;" cellspacing="2px;">
+							<tr>
+								<td>Tipo de Entrada<h:outputText value="*"
+										styleClass="obligatorio" /></td>
+								<td><p:selectOneMenu id="comboTipoEntrada"
+										value="#{entradaBean.tipoEntradaSelec}" style="width:210px;"
+										tabindex="2">
+										<f:selectItems value="#{entradaBean.comboTipoEntrada}" />
+									</p:selectOneMenu></td>
+							</tr>
+							<tr>
+								<td><h:outputText value="Fecha de validez"
+										style="color:blue;" /></td>
+								<td></td>
+							</tr>
+							<tr>
+								<td>Desde<h:outputText value="*" styleClass="obligatorio" /></td>
+								<td><p:calendar id="desde" locale="es"
+										value="#{entradaBean.entrada.fecInicio}" showOn="button"
+										navigator="true" tabindex="3" pattern="dd/MM/yyyy" /></td>
+							</tr>
+							<tr>
+								<td>Hasta<h:outputText value="*" styleClass="obligatorio" /></td>
+								<td><p:calendar id="hasta" locale="es"
+										value="#{entradaBean.entrada.fecFin}" showOn="button"
+										navigator="true" tabindex="4" pattern="dd/MM/yyyy" /></td>
+							</tr> 
+						</table>
+					</p:panel></td>
+				<td align="left" style="width: 50%;"><p:panel id="pnlDoc"
+						header="Adjuntar Archivo (.xlsx)">
+						<p:fileUpload fileUploadListener="#{entradaBean.handleFileUpload}"
+							mode="advanced" update="msgDoc" label="Cargar archivo"
+							dragDropSupport="true" auto="true" sizeLimit="100000"
+							allowTypes="/(\.|\/)(xlsx)$/" />
+						<f:facet name="footer">
+							<h:outputText id="msgDoc" value="#{entradaBean.msgDoc}"
+								style="color:red;" />
+						</f:facet>
+					</p:panel></td>
+			</tr>
+		</table>
+		<p:separator id="s1" />
+		<table>
+			<tr>
+				<td><p:commandButton value="Guardar"
+						action="#{entradaBean.guardar}" update="pnlEntrada, messages"
+						icon="ui-icon-disk" tabindex="7" /></td>
+				<td><p:commandButton value="Limpiar"
+						update="pnlEntrada, messages" action="#{entradaBean.limpiar}"
+						icon="ui-icon-close" tabindex="8" /></td>
+			</tr>
+		</table>
+		<p:separator id="s2" />
+		<p:dataTable var="e" value="#{entradaBean.listaEntrada}"
+			id="dtListaEntrada" scrollable="true" scrollHeight="180"
+			paginator="true" rows="8"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			emptyMessage="No hay datos">
+
+			<f:facet name="header">  
+            Lista de Clientes
+        </f:facet>
+			<p:column headerText="Id" style="width:8%">
+				<h:outputText value="#{e.idEntrada}" />
+			</p:column> 
+			<p:column headerText="Tipo de Entrada" style="width:36%">
+				<h:outputText value="#{e.tipoEntrada.nombre}" />
+			</p:column> 
+			<p:column headerText="Fecha validez" style="width:18%">
+				<h:outputText value="#{e.fecInicio}">
+					<f:convertDateTime pattern="dd/MM/yyyy" locale="es" />
+				</h:outputText> -
+				<h:outputText value="#{e.fecFin}">
+					<f:convertDateTime pattern="dd/MM/yyyy" locale="es" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Fecha de carga" style="width:10%">
+				<h:outputText value="#{e.fecRegistro}">
+					<f:convertDateTime pattern="dd/MM/yyyy" locale="es" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Total" style="width:8%">
+				<h:outputText value="#{e.cantidad}" />
+			</p:column> 
+			<p:column headerText="Estado" style="width:10%">
+				<h:outputText value="#{e.estado.equals('A')?'Activo':'Inactivo'}" />
+			</p:column>
+			<p:column headerText="#{messages.lblOpciones}" style="width:10%">
+<!-- 				<p:commandButton value="" icon="ui-icon-pencil" -->
+<!-- 					update=":frm:pnlEntrada" title="Editar"> -->
+<!-- 					<f:setPropertyActionListener value="#{e}" -->
+<!-- 						target="#{entradaBean.entrada}" /> -->
+<!-- 				</p:commandButton> -->
+			</p:column>
+		</p:dataTable>
+	</p:panel>
+</h:body>
+
+<p:ajaxStatus
+	style="width:64px;height:64px;position:fixed;right:5px;bottom:5px"
+	id="ajaxStatusPanel">
+	<f:facet name="start">
+		<p:graphicImage value="./images/loading.gif" />
+	</f:facet>
+
+	<f:facet name="complete">
+		<h:outputText value="" />
+	</f:facet>
+</p:ajaxStatus>
+
+</html>

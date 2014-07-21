@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<h:outputStylesheet name="css/cssContent.css" />
+</h:head>
+<h:body>
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datos" header="Flujo">
+		<p:focus context="datos" />
+		<p:panelGrid styleClass="panelGrid">
+			<p:row>
+				<p:column width="30">#{messages.lblCampania}<h:outputText
+						value="*" styleClass="obligatorio" />
+				</p:column>
+				<p:column width="70">
+					<p:selectOneMenu id="comboCampania"
+						value="#{flujoController.campaniaSelec}" style="width:280px;"
+						tabindex="1">
+						<f:selectItems value="#{flujoController.comboCampania}" />
+						<p:ajax update="dtList, btnBuscar" process="comboCampania"
+							event="change" />
+					</p:selectOneMenu>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblGerentePublico}<h:outputText
+						value="*" styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<p:inputText id="gp" tabindex="2"
+						value="#{flujoController.nombreGerente}" style=" width : 270px;"
+						readonly="true" />
+					<p:spacer width="5" />
+					<p:commandButton id="btnBuscar" value="Buscar"
+					    action="#{flujoController.buscarGerenteInscrito}"
+						icon="ui-icon-search" update=":frm:dtGerente"
+						disabled="#{flujoController.swBtnBuscar}"
+						oncomplete="dlgBuscarGP.show()" tabindex="3">						
+					</p:commandButton>
+					<p:spacer width="5" />
+					<p:commandButton value="#{messages.btnCancelar}"
+						update="datos,messages" action="#{flujoController.limpiar}"
+						icon="ui-icon-close" tabindex="12" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblPuesto}<h:outputText value="*"
+						styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<h:outputText
+						value="#{flujoController.inscripcionSelec.puestoTipoV}" />
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+
+		<p:separator id="s1" />
+
+		<p:dataTable var="flujo" value="#{flujoController.listaFlujo}"
+			id="dtList" emptyMessage="#{messages.msgEmptyMessage}">
+			<p:ajax event="rowToggle" listener="#{flujoController.onRowToggle}" />
+			<f:facet name="header">
+			Detalle de Flujos 
+			</f:facet>
+			<p:column style="width:10%">
+				<p:rowToggler />
+			</p:column>
+			<p:column headerText="#{messages.lblCodigo}" style="width:10%">
+				<h:outputText value="#{flujo.proceso.idProceso}" />
+			</p:column>
+			<p:column headerText="Proceso" style="width:60%">
+				<h:outputText value="#{flujo.proceso.denominacion}" />
+			</p:column>
+			<p:column headerText="Estado" style="width:10%">
+				<h:outputText
+					value="#{flujo.estado.equals('P')?'Pendiente':flujo.estado.equals('I')?'Iniciado':flujo.estado.equals('AT')?'Terminado':'Cancelado'} " />
+			</p:column>
+			<p:column headerText="#{messages.lblOpciones}" style="width:10%">
+				<p:commandButton value="" icon="ui-icon-trash"  onclick="confirmacion.show()"
+					title="Cancelar flujo"
+					disabled="#{flujo.estado.equals('AT') or flujo.estado.equals('C')?'True':'False'}">
+				</p:commandButton>
+			</p:column>
+			<p:rowExpansion>
+				<p:dataTable var="detalle"
+					value="#{flujoController.listaDetalleFlujo}" id="dtListD"
+					emptyMessage="No hay resultados para el criterio de busqueda">
+					<p:column headerText="#{messages.lblCodigo}" style="width:8%">
+						<h:outputText value="#{detalle.actividad.id.idActividad}" />
+					</p:column>
+					<p:column headerText="Actividad" style="width:70%">
+						<h:outputText value="#{detalle.actividad.nombre}" />
+					</p:column>
+					<p:column headerText="Estado" style="width:22%">
+						<h:outputText
+							value="#{detalle.estado.equals('EE')?'Pendiente':'Terminado'} " />
+					</p:column>
+				</p:dataTable>
+			</p:rowExpansion>
+		</p:dataTable>
+	</p:panel>
+	
+	<!-- 	dialog -->
+	<p:dialog id="dlgBuscar" header="Buscar Gerente Público"
+		widgetVar="dlgBuscarGP" modal="true" resizable="false" width="772"
+		showEffect="clip" closable="true" hideEffect="fold">
+
+		<p:dataTable id="dtGerente" var="inscripcion"
+			value="#{flujoController.listaGerentePublico}"	
+			filteredValue="#{flujoController.listaGerentePublicoFiltered}"					
+			scrollable="true" scrollHeight="235" paginator="true" rows="10"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			emptyMessage="#{messages.msgEmptyMessage}">
+
+			<f:facet name="header">    
+            	Lista de Gerentes Públicos Inscritos
+            	</f:facet>
+
+			<p:column headerText="#{messages.lblCodigo}" style="width:20%"
+				filterBy="#{inscripcion.asignacionGerenteV.cod_gerente}">
+				<h:outputText value="#{inscripcion.asignacionGerenteV.cod_gerente}" />
+			</p:column>
+			<p:column headerText="Nombres" style="width:20%"
+				filterBy="#{inscripcion.asignacionGerenteV.nombres}">
+				<h:outputText value="#{inscripcion.asignacionGerenteV.nombres}" />
+			</p:column>
+			<p:column headerText="Ap.Paterno" style="width:20%"
+				filterBy="#{inscripcion.asignacionGerenteV.ap_paterno}">
+				<h:outputText value="#{inscripcion.asignacionGerenteV.ap_paterno}" />
+			</p:column>
+			<p:column headerText="Ap.Materno" style="width:12%">
+				<h:outputText value="#{inscripcion.asignacionGerenteV.ap_materno}" />
+			</p:column>
+			<p:column headerText="DNI" style="width:20%"
+				filterBy="#{inscripcion.asignacionGerenteV.dni}">
+				<h:outputText value="#{inscripcion.asignacionGerenteV.dni}" />
+			</p:column>
+			<p:column headerText="#{messages.lblOpciones}" style="width:8%">
+				<p:commandButton id="btnSelec" value="" update=":frm:datos"
+					oncomplete="dlgBuscarGP.hide()" icon="ui-icon-check"
+					title="Seleccionar Gerente Público">
+					<f:setPropertyActionListener value="#{inscripcion}"
+						target="#{flujoController.inscripcionSelec}" />
+					<f:setPropertyActionListener
+						value="#{inscripcion.asignacionGerenteV}"
+						target="#{flujoController.nombreGerente}" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+	</p:dialog>
+	
+	<p:confirmDialog message="¿Estás seguro de continuar?"
+		showEffect="fade" hideEffect="fade" header="Cancelar Proceso"
+		widgetVar="confirmacion">
+		<table style="width: 100%">
+			<tr>
+				<td align="center"><p:commandButton value="Si"
+						style="width:50px" styleClass="ui-confirmdialog-yes"
+						icon="ui-icon-check" oncomplete="confirmacion.hide()"
+						action="#{flujoController.cancelarFlujo(flujo.id)}"
+					    update="dtList,:frm:messages">
+					</p:commandButton> <p:spacer width="10" /> <p:commandButton value="No"
+						style="width:50px" styleClass="ui-confirmdialog-no"
+						icon="ui-icon-close" onclick="confirmacion.hide()" /></td>
+			</tr>
+		</table>
+	</p:confirmDialog>
+</h:body>
+<p:ajaxStatus
+	style="width:64px;height:64px;position:fixed;right:5px;bottom:5px"
+	id="ajaxStatusPanel">
+	<f:facet name="start">
+		<p:graphicImage value="./images/loading.gif" />
+	</f:facet>
+
+	<f:facet name="complete">
+		<h:outputText value="" />
+	</f:facet>
+</p:ajaxStatus>
+</html>

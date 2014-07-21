@@ -1,0 +1,213 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.CronogramaDao;
+import gob.servir.desempenio.model.Campania;
+import gob.servir.desempenio.model.Cronograma;
+import gob.servir.desempenio.model.CronogramaPK;
+import gob.servir.desempenio.model.Proceso;
+import gob.servir.desempenio.model.Temporizador;
+import gob.servir.desempenio.model.TemporizadorPK;
+import gob.servir.desempenio.service.TemporizadorService;
+import gob.servir.desempenio.util.Constantes;
+
+<<<<<<< .mine
+=======
+import java.util.ArrayList;
+import java.util.Date;
+>>>>>>> .r1646
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Repository
+public class CronogramaDaoImpl implements CronogramaDao {
+	@PersistenceContext
+	private EntityManager em;
+
+	@Autowired
+	private TemporizadorService temporizadorService;
+
+	private static final Long PROCESO3 = 3L;
+
+	public Cronograma find(CronogramaPK id) {
+		try {
+			return em.find(Cronograma.class, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Cronograma save(Cronograma obj) {
+		try {
+			em.persist(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Cronograma save(Cronograma obj, int cantidadTemp) {
+		try {
+
+			Temporizador temporizador = null;
+			TemporizadorPK id = null;
+			Long idActividad = 0L;
+
+			for (int i = 0; i < cantidadTemp; i++) {
+				idActividad += 1;
+				id = new TemporizadorPK(getMaxId(obj.getId().getIdCampania()),
+						obj.getId().getIdCampania(), idActividad, obj.getId()
+								.getIdProceso());
+				temporizador = new Temporizador();
+				temporizador.setId(id);
+				temporizador.setUsuarioRegistra(obj.getUsuarioRegistra());
+				temporizador.setEstado(Constantes.ACTIVO);
+
+				em.persist(temporizador);
+			}
+
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Cronograma save(Cronograma obj, List<Temporizador> listaTemporizador) {
+		try {
+
+			Cronograma cronogramaResp = em.find(Cronograma.class, obj.getId());
+
+			cronogramaResp.setFechaInicio(obj.getFechaInicio());
+			cronogramaResp.setFechaFin(obj.getFechaFin());
+			cronogramaResp.setUsuarioRegistra(obj.getUsuarioModifica());
+			cronogramaResp.setEstado(Constantes.ACTIVO);
+
+			Temporizador temporizador = null;
+<<<<<<< .mine
+=======
+
+>>>>>>> .r1646
+			for (Temporizador row : listaTemporizador) {
+				temporizador = em.find(Temporizador.class, row.getId());
+				temporizador.setUsuarioRegistra(obj.getUsuarioRegistra());
+				temporizador.setEstado(Constantes.ACTIVO);
+				temporizador.setCantidadDias(row.getCantidadDias());
+<<<<<<< .mine
+=======
+
+>>>>>>> .r1646
+				em.merge(temporizador);
+			}
+
+			em.merge(cronogramaResp);
+
+			if (obj.getId().getIdProceso() == PROCESO3) {
+
+				Campania campaniaResp = em.find(Campania.class, obj.getId()
+						.getIdCampania());
+
+				if (campaniaResp != null) {
+					campaniaResp.setEstadoCampania(Constantes.CAMPAÑA_ACTIVO);
+					em.merge(campaniaResp);
+				}
+			}
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Cronograma edit(Cronograma obj) {
+		try {
+			return em.merge(obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Cronograma> getListaCronograma() {
+		Query q = null;
+		q = em.createNamedQuery("Cronograma.getAllListaCronograma");
+
+		try {
+			return q.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Cronograma> getListaCronograma(Long idCampania) {
+		Query q = null;
+		q = em.createNamedQuery("Cronograma.getListaCronogramaCampania");
+		q.setParameter("idCampania", idCampania);
+		//q.setParameter("tipo", "G");// cronograma gral
+		q.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+
+			List<Object[]> listaObjetos = new ArrayList<Object[]>();
+
+			listaObjetos = q.getResultList();
+
+			List<Cronograma> listaCronograma = new ArrayList<Cronograma>();
+
+			for (Object[] row : listaObjetos) {
+
+				Proceso proceso = new Proceso();
+				proceso.setIdProceso((Long) row[0]);
+				proceso.setDenominacion((String) row[1]);
+
+				Cronograma cronograma = new Cronograma();
+				cronograma.setProceso(proceso);
+				cronograma.setId((CronogramaPK) row[2]);
+				cronograma.setFechaInicio((Date) row[3]);
+				cronograma.setFechaFin((Date) row[4]);
+				cronograma.setEstado((String) row[5]);
+
+				listaCronograma.add(cronograma);
+			}
+
+			return listaCronograma;
+
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public Long getMaxId(Long idCampania) {
+
+		Query q = null;
+		q = (Query) em
+				.createQuery("select max(c.id.idCronograma) from Cronograma c where c.id.idCampania =:idCampania");
+		q.setParameter("idCampania", idCampania);
+		try {
+			return (Long) q.getSingleResult() + 1L;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return 1L;
+		}
+	}
+}

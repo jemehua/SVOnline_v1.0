@@ -1,0 +1,60 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.model.Mensaje;
+import gob.servir.desempenio.service.JavaMailService;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua García
+ */
+@Service
+public class JavaMailServiceImpl implements JavaMailService {
+
+	@Autowired
+	private JavaMailSender mailSender;
+	@Autowired
+	private SimpleMailMessage templateMessage;
+
+	@Transactional
+	public String enviar(Mensaje mensaje, String to) {
+		String retorno = null;
+
+		MimeMessage message = mailSender.createMimeMessage();
+		
+		SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+
+		String destinos[] = to.split(",");
+		
+		simpleMailMessage.setTo(destinos);
+		simpleMailMessage.setSubject(mensaje.getTitulo());
+		simpleMailMessage.setText(mensaje.getCuerpo());
+
+		try {
+			MimeMessageHelper helper = new MimeMessageHelper(message, true);
+			
+			helper.setFrom(templateMessage.getFrom());
+			helper.setTo(simpleMailMessage.getTo());
+			helper.setSubject(simpleMailMessage.getSubject());
+			helper.setText(String.format(simpleMailMessage.getText()), true);
+
+			//FileSystemResource file = new FileSystemResource("C:\\log.txt");
+			//helper.addAttachment(file.getFilename(), file);
+			mailSender.send(message);
+		} catch (MessagingException e) {
+			retorno = e.getMessage();
+		}
+	
+		return retorno;
+	}
+
+}

@@ -1,0 +1,351 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.model.DetalleFlujo;
+import gob.servir.desempenio.model.DetalleFlujoPK;
+import gob.servir.desempenio.model.EvaluacionMetas;
+import gob.servir.desempenio.model.EvaluacionMetasPK;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.Meta;
+import gob.servir.desempenio.model.PlanMetas;
+import gob.servir.desempenio.model.PlanMetasPK;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.CampaniaService;
+import gob.servir.desempenio.service.DetalleFlujoService;
+import gob.servir.desempenio.service.FlujoService;
+import gob.servir.desempenio.service.InscripcionService;
+import gob.servir.desempenio.service.MetaService;
+import gob.servir.desempenio.service.PlanMetasService;
+import gob.servir.desempenio.util.Constantes;
+import gob.servir.desempenio.util.Message;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+
+import org.primefaces.event.SelectEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Component("planMetasController")
+@Scope("session")
+public class PlanMetasController implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private static final Logger logger = LoggerFactory
+			.getLogger(PlanMetasController.class);
+
+	@Autowired
+	private CampaniaService campaniaService;
+	@Autowired
+	private MetaService metaService;
+	@Autowired
+	private InscripcionService inscripcionService;
+	@Autowired
+	private PlanMetasService planMetasService;
+	@Autowired
+	private FlujoService flujoService;
+	@Autowired
+	private DetalleFlujoService detalleFlujoService;
+
+	private Usuario userSesion = null;
+	private Message message = new Message();
+	private Inscripcion inscripcionSelc = null;
+	private Meta metaSelec = null;
+	private List<Meta> listaMetas = new ArrayList<Meta>();
+	private PlanMetas planMetas = null;
+
+	private boolean swFlujo = true;
+
+	public PlanMetasController() {
+
+	}
+
+	@PostConstruct
+	public void cargar() {
+
+		validarSesion();
+		getInscripcion();
+		buscarPlanMetas();
+		verificarEstadoFlujo();
+
+	}
+
+	public boolean verificarEstadoFlujo() {
+		if (inscripcionSelc.getId() == null) {
+			swFlujo = true;
+		} else {
+<<<<<<< .mine
+			String estado = detalleFlujoService
+					.getEstadoDetalleFlujo(new DetalleFlujoPK(inscripcionSelc
+							.getId().getIdCampania(), inscripcionSelc.getId()
+							.getIdGerentePublico(), Constantes.PROCESO1,
+							Constantes.P1_REGISTRO_METAS_INDICADORES));
+			if (estado != null) {
+				if (estado.equalsIgnoreCase(Constantes.ATENDIDO))
+=======
+			DetalleFlujo detalle = detalleFlujoService.find(new DetalleFlujoPK(
+					inscripcionSelc.getId().getIdCampania(), inscripcionSelc
+							.getId().getIdGerentePublico(),
+					Constantes.PROCESO1, Constantes.P1_PLAN_METAS));
+			if (detalle != null) {
+				if (detalle.getEstado().equalsIgnoreCase("AT"))
+>>>>>>> .r949
+					swFlujo = true;
+				else
+					swFlujo = false;
+			} else
+				swFlujo = true;
+		}
+		return swFlujo;
+	}
+
+	public boolean isSwFlujo() {
+		return swFlujo;
+	}
+
+	public void setSwFlujo(boolean swFlujo) {
+		this.swFlujo = swFlujo;
+	}
+
+	public Meta getMetaSelec() {
+		return metaSelec;
+	}
+
+	public void setMetaSelec(Meta metaSelec) {
+		this.metaSelec = metaSelec;
+	}
+
+	public void onRowSelect(SelectEvent event) {
+		if (metaSelec != null) {
+			PlanMetasPK id = new PlanMetasPK(metaSelec.getId().getIdMeta(),
+					metaSelec.getId().getIdCampania(), metaSelec.getId()
+							.getIdGerentePublico());
+			PlanMetas planMetasTemp = planMetasService.find(id);
+
+			if (planMetasTemp != null)
+				planMetas = planMetasTemp;
+			else
+				planMetas = new PlanMetas();
+		}
+	}
+
+	public PlanMetas getPlanMetas() {
+		return planMetas;
+	}
+
+	public void setPlanMetas(PlanMetas planMetas) {
+		this.planMetas = planMetas;
+	}
+
+	public void getInscripcion() {
+		Inscripcion ins = inscripcionService.getInscripcionUsuario(userSesion);
+		if (ins != null)
+			inscripcionSelc = ins;
+		else
+			inscripcionSelc = new Inscripcion();
+
+	}
+
+	public Inscripcion getInscripcionSelc() {
+		return inscripcionSelc;
+	}
+
+	public void setInscripcionSelc(Inscripcion inscripcionSelc) {
+		this.inscripcionSelc = inscripcionSelc;
+	}
+
+	public void buscarPlanMetas() {
+		listaMetas.clear();
+		if (inscripcionSelc.getId() != null) {
+<<<<<<< .mine
+			listaMetas = metaService.getListaMeta(inscripcionSelc.getId()
+					.getIdCampania(), inscripcionSelc.getId()
+					.getIdGerentePublico());
+=======
+			listaMetas = metaService.getListaMetas(inscripcionSelc.getId());
+>>>>>>> .r949
+		}
+	}
+
+	public List<Meta> getListaMetas() {
+		return listaMetas;
+	}
+
+	public void setListaMetas(List<Meta> listaMetas) {
+		this.listaMetas = listaMetas;
+	}
+
+	public void validarSesion() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		userSesion = (Usuario) context.getExternalContext().getSessionMap()
+				.get("userSesion");
+
+		if (userSesion == null) {
+			String ctxPath = context.getExternalContext()
+					.getRequestContextPath();
+			try {
+				context.getExternalContext().redirect(ctxPath + "/login.jsf");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void guardar() {
+		validarSesion();
+
+		if (!validarGuardar())
+			return;
+
+		try {
+
+			if (planMetas.getId() != null) {
+
+				planMetas.setFechaModificacion(new Date());
+				planMetas.setUsuarioModifica(userSesion.getUsuario());
+
+				planMetasService.edit(planMetas);
+
+				FacesContext.getCurrentInstance().addMessage(
+						null,
+						new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+								message.getMessage("msgModificar")));
+
+			} else {
+
+				PlanMetasPK id = new PlanMetasPK(metaSelec.getId().getIdMeta(),
+						metaSelec.getId().getIdCampania(), metaSelec.getId()
+								.getIdGerentePublico());
+
+				// planDesarrollo = new PlanDesarrollo();
+				planMetas.setId(id);
+				planMetas.setFechaCreacion(new Date());
+				planMetas.setUsuarioRegistra(userSesion.getUsuario());
+				planMetas.setEstado("A");
+				planMetas.setAprobacion(true);
+
+				planMetasService.save(planMetas);
+
+				FacesContext.getCurrentInstance().addMessage(
+						null,
+						new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+								message.getMessage("msgRegistrar")));
+
+			}
+
+			limpiar();
+		} catch (Exception e) {
+			logger.info("ERRROR AL REGISTRAR META");
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "ERROR",
+							message.getMessage("msgRegistrarError")));
+		}
+	}
+
+	public boolean validarGuardar() {
+
+		if (inscripcionSelc.getId() == null) {
+			return false;
+		}
+
+		if (planMetas.getDescripcionPlan().trim().length() < 1) {
+
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Ingrese Plan de Acción de Metas"));
+			return false;
+
+		}
+
+		return true;
+	}
+
+	public void limpiar() {
+
+		planMetas = null;
+		metaSelec = null;
+
+	}
+
+	public void atenderFlujo() {
+		validarSesion();
+
+		if (!validarAtenderFlujo())
+			return;
+
+		try {
+			DetalleFlujoPK detalleFlujoPK = new DetalleFlujoPK(inscripcionSelc
+					.getId().getIdCampania(), inscripcionSelc.getId()
+<<<<<<< .mine
+					.getIdGerentePublico(), Constantes.PROCESO1,
+					Constantes.P1_REGISTRO_METAS_INDICADORES);
+=======
+					.getIdGerentePublico(), Constantes.PROCESO1,
+					Constantes.P1_PLAN_METAS);
+>>>>>>> .r949
+
+			flujoService.atenderFlujo(detalleFlujoPK, userSesion.getUsuario());
+
+			FacesContext
+					.getCurrentInstance()
+					.addMessage(
+							null,
+							new FacesMessage(FacesMessage.SEVERITY_INFO,
+									"EXITO",
+									"Se ha procesado el registro de Plan de Acción de Metas"));
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "ERROR",
+							"Ha ocurrido un error"));
+		}
+	}
+
+	public boolean validarAtenderFlujo() {
+
+		if (inscripcionSelc.getId() == null) {
+			return false;
+		}
+
+		if (verificarRegistroPlan()) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Registre su plan de acción para cada meta"));
+			return false;
+		}
+
+		return true;
+	}
+
+	public boolean verificarRegistroPlan() {
+
+		List<PlanMetas> listPlan = planMetasService.getListaPlanMetas(
+				inscripcionSelc.getId(), Constantes.TRUE);
+
+		// if (listPlan.size() != listaMetas.size())
+		if (listPlan.size() > 0)
+			return false;
+		else
+			return true;
+	}
+
+}

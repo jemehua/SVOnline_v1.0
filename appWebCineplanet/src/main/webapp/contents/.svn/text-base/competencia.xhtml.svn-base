@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+
+</h:head>
+<h:body>
+	<h:outputStylesheet name="css/cssContent.css" />
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datos" header="Perfil">
+		<p:focus context="datos" />
+		<table cellpadding="2" cellspacing="4">
+			<tr>
+				<td>#{messages.lblPuesto}<h:outputText value="*"
+						styleClass="obligatorio" /></td>
+				<td><p:selectOneMenu id="tipoPuesto" style=" width : 380px;"
+						value="#{competenciaController.puestoSelec}" tabindex="2">
+						<f:selectItems value="#{competenciaController.comboPuestoTipo}" />
+						<p:ajax event="change"
+							listener="#{competenciaController.selecionarPuestoTipo}"
+							update=":frm:dtListaCompetencia,:frm:btn_guardar,:frm:btbConfirmar,:frm:tipoPuesto" />
+					</p:selectOneMenu></td>
+			</tr>
+		</table>
+		<p:spacer height="2" />
+		<p:dataTable var="competencia" id="dtListaCompetencia"
+			scrollable="true"
+			value="#{competenciaController.listaCompetencia}"
+			scrollHeight="238" rows="7"
+			emptyMessage="#{messages.msgEmptyMessage}">
+
+			<f:facet name="header">  
+            Lista de Competencias
+            </f:facet>
+			<p:column headerText="Código" style="width:8%">
+				<h:outputText value="#{competencia.id.idCompetencia}"/>
+			</p:column>
+			<p:column headerText="Competencias" style="width:60%">
+				<h:outputText value="#{competencia.competencia.denominacion}" />
+			</p:column>
+			<p:column headerText="Nivel Deseado [1 - 5]" style="width:32%">
+				<p:inputText id="txt_nivel"
+					value="#{competencia.nivelDeseado}" maxlength="1"
+					style="color:blue"
+					valueChangeListener="#{competenciaController.asignarNivelDeseado}"
+					readonly="#{competencia.estadoPerfil eq 'C' ? true : false}">
+						<p:ajax listener="#{competenciaController.asignarDias(competencia)}" />
+				</p:inputText>
+				<pe:keyFilter for="txt_nivel" regEx="/[1-5]/" />
+				<pe:tooltip for="txt_nivel" value="Nivel del 1 al 5"
+					showEffect="fadeIn" hideEffect="fadeIn" myPosition="left center"
+					atPosition="right center" />
+			</p:column>
+			<f:facet name="footer">
+				<div class="mensaje">Ingrese el Nivel Deseado para cada Competencia.</div>
+			</f:facet>
+
+		</p:dataTable>
+		<p:separator id="separator1" />
+		<table style="width: 100%">
+			<tr>
+				<td align="left"><p:commandButton value="Guardar"
+						id="btn_guardar" action="#{competenciaController.guardar}"
+						icon="ui-icon-disk" update="messages,:frm:btbConfirmar"
+						disabled="#{(competenciaController.puestoSelec eq '0' or competenciaController.botonGurdarP)?true:false}">						
+					</p:commandButton> <p:spacer width="5" /> <p:commandButton value="Cancelar"
+						icon="ui-icon-close" action="#{competenciaController.limpiar}"
+						update=":frm:datos" /></td>
+				<td align="right"><p:commandButton value="Confirmar" id="btbConfirmar"
+						icon="ui-icon-circle-arrow-e"  onclick="confirmacion.show()"
+						disabled="#{competenciaController.botonConfirmar}">											
+						</p:commandButton></td>
+			</tr>
+		</table>
+		<p:separator id="separator2" />
+	</p:panel>
+
+	<p:confirmDialog message="¿Estás seguro de confirmar?"
+		showEffect="fade" hideEffect="fade"
+		header="Confirmar Perfil" icon="ui-icon-alert"
+		widgetVar="confirmacion">
+		<table style="width: 100%">
+			<tr>
+				<td align="center"><p:commandButton value="Si"
+						styleClass="ui-confirmdialog-yes" icon="ui-icon-check"
+						oncomplete="confirmacion.hide()"
+						action="#{competenciaController.finalizarPerfiles}"
+						update=":frm:dtListaCompetencia,:frm:datos,:frm:btbConfirmar,messages">
+						<f:setPropertyActionListener value="#{true}"
+							target="#{competenciaController.botonConfirmar}" />
+					</p:commandButton> <p:spacer width="10" /> <p:commandButton value="No"
+						styleClass="ui-confirmdialog-no" icon="ui-icon-close"
+						onclick="confirmacion.hide()" /></td>
+			</tr>
+		</table>
+	</p:confirmDialog>
+
+</h:body>
+<p:ajaxStatus style="width:64px;height:64px;position:fixed;right:5px;bottom:5px" id="ajaxStatusPanel">  
+    <f:facet name="start">  
+        <p:graphicImage value="./images/loading.gif" /> 
+    </f:facet>  
+      
+    <f:facet name="complete">  
+        <h:outputText value="" />  
+    </f:facet>  
+</p:ajaxStatus> 
+</html>

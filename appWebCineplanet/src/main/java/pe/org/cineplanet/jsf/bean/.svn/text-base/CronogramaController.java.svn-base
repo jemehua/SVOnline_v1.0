@@ -1,0 +1,568 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.model.Cronograma;
+import gob.servir.desempenio.model.CronogramaPK;
+import gob.servir.desempenio.model.Temporizador;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.ActividadService;
+import gob.servir.desempenio.service.CampaniaService;
+import gob.servir.desempenio.service.CronogramaService;
+import gob.servir.desempenio.service.MensajeService;
+import gob.servir.desempenio.service.ProcesoService;
+import gob.servir.desempenio.service.TemporizadorService;
+import gob.servir.desempenio.util.Message;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.event.ValueChangeEvent;
+import javax.faces.model.SelectItem;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Component("cronogramaController")
+@Scope("session")
+public class CronogramaController {
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(CronogramaController.class);
+
+	@Autowired
+	private LoginController loginController;
+	@Autowired
+	private CronogramaService cronogramaService;
+	@Autowired
+	private CampaniaService campaniaService;
+	@Autowired
+	private ProcesoService procesoService;
+	@Autowired
+	private ActividadService actividadService;
+	@Autowired
+	private TemporizadorService temporizadorService;	
+	@Autowired
+	private MensajeService mensajeService;
+
+	private Usuario userSesion = null;
+	private Message message = new Message();
+
+	private List<SelectItem> comboCampania = new ArrayList<SelectItem>();
+	private Long campaniaSelec = 0L;
+	private List<SelectItem> comboProceso = new ArrayList<SelectItem>();
+	private Long procesoSelec = 0L;
+
+	private List<Cronograma> listaCronograma = new ArrayList<Cronograma>();
+	private List<Temporizador> listaTemporizador = new ArrayList<Temporizador>();
+	private Cronograma nuevoCronograma = new Cronograma();
+	private Temporizador temporizador = new Temporizador();
+	private boolean swEditar = false;
+	private Integer cantidadDias = 0;
+
+	public CronogramaController() {
+		super();
+	}
+
+	public boolean isSwEditar() {
+		return swEditar;
+	}
+
+	public void setSwEditar(boolean swEditar) {
+		this.swEditar = swEditar;
+	}
+ 
+	public List<Temporizador> getListaTemporizador() {
+
+		listaTemporizador.clear();
+
+		if (campaniaSelec != 0L && procesoSelec != 0L) {
+			listaTemporizador = temporizadorService
+					.getListaTemporizador(campaniaSelec, procesoSelec, procesoSelec);
+		}
+
+		return listaTemporizador;
+	}
+
+	public void setListaTemporizador(List<Temporizador> listaTemporizador) {
+		this.listaTemporizador = listaTemporizador;
+	}
+
+	public List<Cronograma> getListaCronograma() {
+		listaCronograma.clear();
+
+		if (campaniaSelec != 0L)
+			listaCronograma = cronogramaService
+					.getListaCronograma(campaniaSelec);
+
+		return listaCronograma;
+	}
+
+	public void setListaCronograma(List<Cronograma> listaCronograma) {
+		this.listaCronograma = listaCronograma;
+	}
+
+	public Temporizador getTemporizador() {
+		return temporizador;
+	}
+
+	public void setTemporizador(Temporizador temporizador) {
+		this.temporizador = temporizador;
+	}
+
+	public Cronograma getNuevoCronograma() {
+		return nuevoCronograma;
+	}
+
+	public void setNuevoCronograma(Cronograma nuevoCronograma) {
+		this.nuevoCronograma = nuevoCronograma;
+	}
+
+	public Long getCampaniaSelec() {
+		return campaniaSelec;
+	}
+
+	public void setCampaniaSelec(Long campaniaSelec) {
+		this.campaniaSelec = campaniaSelec;
+	}
+
+	public Long getProcesoSelec() {
+		return procesoSelec;
+	}
+
+	public void setProcesoSelec(Long procesoSelec) {
+		this.procesoSelec = procesoSelec;
+	}
+
+	public List<SelectItem> getComboCampania() {
+		comboCampania = campaniaService.getComboCampaniaCreada();
+		return comboCampania;
+	}
+
+	public void setComboCampania(List<SelectItem> comboCampania) {
+		this.comboCampania = comboCampania;
+	}
+
+	public List<SelectItem> getComboProceso() {
+		comboProceso = procesoService.getComboProceso();
+		return comboProceso;
+	}
+
+	public void setComboProceso(List<SelectItem> comboProceso) {
+		this.comboProceso = comboProceso;
+	}	
+
+	public void validarSesion() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		
+		userSesion = (Usuario) context.getExternalContext().getSessionMap()
+				.get(loginController.getUsername());
+
+		if (userSesion == null) {
+			String ctxPath = context.getExternalContext()
+					.getRequestContextPath();
+			try {
+				context.getExternalContext().redirect(ctxPath + "/login.jsf");
+			} catch (Exception e) {
+				//e.printStackTrace();
+			}
+		}
+	}
+
+	public void guardar() {
+
+		validarSesion();
+
+		if (!validarDatos())
+			return;
+
+		try {
+
+			CronogramaPK id = new CronogramaPK(procesoSelec, procesoSelec,
+					campaniaSelec);
+			nuevoCronograma.setId(id);
+			//nuevoCronograma.setTipo("G");
+			nuevoCronograma.setUsuarioModifica(userSesion.getUsuario());
+
+			cronogramaService.save(nuevoCronograma, listaTemporizador);
+
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+							message.getMessage("msgRegistrar")));
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+							message.getMessage("msgRegistrarError")));
+		}
+		limpiar();
+	}
+
+	public boolean validarDatos() {
+
+		if (campaniaSelec == 0L) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Seleccione campaña de evaluación"));
+			return false;
+		}
+
+		if (procesoSelec == 0L) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Seleccione proceso"));
+			return false;
+		}
+
+		if (nuevoCronograma.getFechaInicio() == null) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA","Ingrese fecha de inicio"));
+			return false;
+		}
+		
+		if (nuevoCronograma.getFechaFin() == null) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA","Ingrese fecha fin"));
+			return false;
+		}
+		
+		if (nuevoCronograma.getFechaInicio().after(
+				nuevoCronograma.getFechaFin())) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							message.getMessage("msgValidarFecha")));
+			return false;
+		}
+
+		/*if (nuevoCronograma.getId() != null) {
+			if (validarCronogramaModificar()) {
+				return false;
+			}
+		} else {
+			if (validarSecuenciaCronograma()) {
+				return false;
+			}
+		}*/
+
+		if (validarIngresoCantidadDias()) {
+			FacesContext
+					.getCurrentInstance()
+					.addMessage(
+							null,
+							new FacesMessage(FacesMessage.SEVERITY_WARN,
+									"ADVERTENCIA",
+									"Debe ingresar cantidad de días en el temporizador"));
+			return false;
+		}
+
+		return true;
+	}
+
+	private boolean validarIngresoCantidadDias() {
+
+		boolean respuesta = false;
+		for (Temporizador row : listaTemporizador) {
+
+			if (row.getCantidadDias() == null ) {
+				respuesta = true;
+				break;
+			}
+		}
+
+		return respuesta;
+	}
+
+	/*private boolean validarCronogramaModificar() {
+
+		boolean respuesta = false;
+
+		Campania campania = campaniaService.find(campaniaSelec);
+
+		if (procesoSelec == PROCESO1) {
+
+			if (listaCronograma.size() > 1) {
+
+				if (nuevoCronograma.getFechaInicio().before(
+						campania.getFechaInicio())
+						|| nuevoCronograma.getFechaFin().after(
+								listaCronograma.get(1).getFechaInicio())) {
+					FacesContext
+							.getCurrentInstance()
+							.addMessage(
+									null,
+									new FacesMessage(
+											FacesMessage.SEVERITY_WARN,
+											"ADVERTENCIA",
+											"La fecha de inicio y fin debe ser mayor a la fecha inicio de la campaña y menor a la fecha incio del segundo proceso."));
+					respuesta = true;
+				}
+			} else {
+				if (nuevoCronograma.getFechaInicio().before(
+						campania.getFechaInicio())) {
+					FacesContext
+							.getCurrentInstance()
+							.addMessage(
+									null,
+									new FacesMessage(
+											FacesMessage.SEVERITY_WARN,
+											"ADVERTENCIA",
+											"La fecha inicio del proceso seleccionado debe ser mayor a la fecha fin del primer proceso y menor a la fecha incio del tercer proceso."));
+					respuesta = true;
+				}
+			}
+
+		} else if (procesoSelec == PROCESO2) {
+
+			if (listaCronograma.size() > 2) {
+				if (nuevoCronograma.getFechaInicio().before(
+						listaCronograma.get(0).getFechaFin())
+						|| nuevoCronograma.getFechaFin().after(
+								listaCronograma.get(2).getFechaInicio())) {
+					FacesContext
+							.getCurrentInstance()
+							.addMessage(
+									null,
+									new FacesMessage(
+											FacesMessage.SEVERITY_WARN,
+											"ADVERTENCIA",
+											"La fecha inicio del proceso seleccionado debe ser mayor a la fecha fin del primer proceso y menor a la fecha incio del tercer proceso."));
+					respuesta = true;
+				}
+
+			} else {
+				if (nuevoCronograma.getFechaInicio().before(
+						listaCronograma.get(0).getFechaFin())) {
+					FacesContext
+							.getCurrentInstance()
+							.addMessage(
+									null,
+									new FacesMessage(
+											FacesMessage.SEVERITY_WARN,
+											"ADVERTENCIA",
+											"La fecha inicio del proceso seleccionado debe ser mayor a la fecha fin del primer proceso y menor a la fecha incio del tercer proceso."));
+					respuesta = true;
+				}
+
+			}
+
+		} else if (procesoSelec == PROCESO3) {
+
+			if (nuevoCronograma.getFechaInicio().before(
+					listaCronograma.get(1).getFechaFin())
+					|| nuevoCronograma.getFechaFin().after(
+							campania.getFechaFin())) {
+				FacesContext
+						.getCurrentInstance()
+						.addMessage(
+								null,
+								new FacesMessage(
+										FacesMessage.SEVERITY_WARN,
+										"ADVERTENCIA",
+										"La fecha inicio del proceso seleccionado debe ser mayor a la fecha fin del segundo proceso y en el rango de fecha de la campaña de evaluación."));
+				respuesta = true;
+			}
+
+		}
+
+		return respuesta;
+	}*/
+
+	/*private boolean validarSecuenciaCronograma() {
+
+		boolean respuesta = false;
+
+		try {
+
+			Campania campania = campaniaService.find(campaniaSelec);
+
+			if (listaCronograma.size() > 0) {
+
+				if (procesoSelec == PROCESO1) {
+
+					FacesContext
+							.getCurrentInstance()
+							.addMessage(
+									null,
+									new FacesMessage(
+											FacesMessage.SEVERITY_WARN,
+											"ADVERTENCIA",
+											"El cronograma para este proceso ya esta configurado, Ud. puede editarlo."));
+					respuesta = true;
+
+				} else if (procesoSelec == PROCESO2) {
+
+					if (listaCronograma.size() == 1) {
+
+						if (nuevoCronograma.getFechaInicio().before(
+								listaCronograma.get(0).getFechaFin())
+								|| nuevoCronograma.getFechaFin().after(
+										campania.getFechaFin())) {
+							FacesContext
+									.getCurrentInstance()
+									.addMessage(
+											null,
+											new FacesMessage(
+													FacesMessage.SEVERITY_WARN,
+													"ADVERTENCIA",
+													"La fecha inicio debe ser mayor a la fecha fin del primer proceso"));
+							respuesta = true;
+						}
+
+					}
+
+					if (listaCronograma.size() > 1) {
+
+						FacesContext
+								.getCurrentInstance()
+								.addMessage(
+										null,
+										new FacesMessage(
+												FacesMessage.SEVERITY_WARN,
+												"ADVERTENCIA",
+												"El cronograma para este proceso ya esta configurado, Ud. puede editarlo."));
+						respuesta = true;
+					}
+
+				} else if (procesoSelec == PROCESO3) {
+
+					if (listaCronograma.size() == 1) {
+
+						FacesContext
+								.getCurrentInstance()
+								.addMessage(
+										null,
+										new FacesMessage(
+												FacesMessage.SEVERITY_WARN,
+												"ADVERTENCIA",
+												"Primero debe configurar el segundo proceso"));
+						respuesta = true;
+					}
+
+					if (listaCronograma.size() == 2) {
+
+						if (nuevoCronograma.getFechaInicio().before(
+								listaCronograma.get(1).getFechaFin())
+								|| nuevoCronograma.getFechaFin().after(
+										campania.getFechaFin())) {
+							FacesContext
+									.getCurrentInstance()
+									.addMessage(
+											null,
+											new FacesMessage(
+													FacesMessage.SEVERITY_WARN,
+													"ADVERTENCIA",
+													"La fecha inicio debe ser mayor a la fecha fin del segundo proceso"));
+							respuesta = true;
+						}
+
+					}
+
+					if (listaCronograma.size() == 3) {
+
+						FacesContext
+								.getCurrentInstance()
+								.addMessage(
+										null,
+										new FacesMessage(
+												FacesMessage.SEVERITY_WARN,
+												"ADVERTENCIA",
+												"El cronograma para este proceso ya esta configurado, Ud. puede editarlo."));
+						respuesta = true;
+					}
+
+				}
+
+			} else {
+
+				if (procesoSelec == PROCESO1) {
+
+					if (nuevoCronograma.getFechaInicio().before(
+							campania.getFechaInicio())
+							|| nuevoCronograma.getFechaFin().after(
+									campania.getFechaFin())) {
+						FacesContext
+								.getCurrentInstance()
+								.addMessage(
+										null,
+										new FacesMessage(
+												FacesMessage.SEVERITY_WARN,
+												"ADVERTENCIA",
+												"La fecha inicio y fin debe estar dentro del rango de fecha de la campaña de evaluación"));
+						respuesta = true;
+					}
+
+				}
+
+				if (procesoSelec == PROCESO2 || procesoSelec == PROCESO3) {
+					FacesContext
+							.getCurrentInstance()
+							.addMessage(
+									null,
+									new FacesMessage(
+											FacesMessage.SEVERITY_WARN,
+											"ADVERTENCIA",
+											"Primero debe configurar el primer proceso"));
+					respuesta = true;
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return respuesta;
+	}*/
+
+	public void limpiar() {
+		nuevoCronograma = new Cronograma();
+		procesoSelec = 0L;
+		temporizador = new Temporizador();
+		//actividadSelec = 0L;
+		listaTemporizador.clear();
+		swEditar = false;
+	}
+
+	public int getCantidadDias() {
+		return cantidadDias;
+	}
+
+	public void setCantidadDias(int cantidadDias) {
+		this.cantidadDias = cantidadDias;
+	}
+
+	public void asignarCantidadDias(ValueChangeEvent evet) {
+		try {
+
+			cantidadDias = (Integer) evet.getNewValue();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void asignarDias(Temporizador paramTemporizador) {
+		try {
+			if (paramTemporizador != null) {
+				paramTemporizador.setCantidadDias(cantidadDias);
+				temporizadorService.edit(paramTemporizador);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+}

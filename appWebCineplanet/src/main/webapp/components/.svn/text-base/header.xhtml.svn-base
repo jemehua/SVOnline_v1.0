@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:body>
+	<ui:composition>
+		<h:outputStylesheet name="css/cssHeader.css" />
+		<div class="head">
+			<div class="logo">
+				<p:commandLink id="ajax" update="content">
+					<p:graphicImage value="./images/logo_servir_blanco.png" />
+					<f:setPropertyActionListener
+						target="#{contenidoController.includedPage}"
+						value="contents/bienvenido.xhtml" />
+				</p:commandLink>
+			</div>
+			<div class="der">
+				<div class="titulo">
+					<h:outputText value="#{messages.nombreSistema}" />
+				</div>
+				<div class="cerrarSesion">
+					#{messages.bienvenido}
+					#{contenidoController.userSesion} (#{contenidoController.userSesion.rol.nombre})
+					|
+					<h:outputLink value="#{request.contextPath}/j_spring_security_logout">Cerrar Sesión</h:outputLink>
+<!-- 					<p:commandLink id="cerrarSesion" -->
+<!-- 						action="#{sesionController.cerrarSesion}" immediate="true"> -->
+<!-- 						<h:outputText value="#{messages.cerrarSesion}" /> -->
+<!-- 					</p:commandLink> -->
+				</div>
+			</div>
+		</div>
+	</ui:composition>
+</h:body>
+</html>

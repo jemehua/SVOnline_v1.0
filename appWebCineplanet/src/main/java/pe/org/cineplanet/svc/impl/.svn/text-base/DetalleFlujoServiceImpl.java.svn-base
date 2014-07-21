@@ -1,0 +1,65 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.DetalleFlujoDao;
+import gob.servir.desempenio.model.DetalleFlujo;
+import gob.servir.desempenio.model.DetalleFlujoPK;
+import gob.servir.desempenio.model.DetalleFlujoV;
+import gob.servir.desempenio.model.FlujoPK;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.service.DetalleFlujoService;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Service
+public class DetalleFlujoServiceImpl implements DetalleFlujoService {
+
+	@Autowired
+	private DetalleFlujoDao detalleFlujoDao;
+
+	public DetalleFlujo find(DetalleFlujoPK id) {
+		return detalleFlujoDao.find(id);
+	}
+
+	@Transactional
+	public DetalleFlujo save(DetalleFlujo obj) {
+		return detalleFlujoDao.save(obj);
+	}
+
+	@Transactional
+	public DetalleFlujo edit(DetalleFlujo obj) {
+		return detalleFlujoDao.edit(obj);
+	}
+
+	public List<DetalleFlujo> getListaDetalleFlujo() {
+		return detalleFlujoDao.getListaDetalleFlujo();
+	}
+	
+	public List<DetalleFlujo> getListaDetalleFlujoTemp(InscripcionPK id) {
+		return detalleFlujoDao.getListaDetalleFlujoTemp(id);
+	}
+	
+	public List<DetalleFlujo> getListaDetalleFlujo(FlujoPK id) {
+		return detalleFlujoDao.getListaDetalleFlujo(id);
+	}
+	
+	public String getEstadoDetalleFlujo(DetalleFlujoPK id) {
+		return detalleFlujoDao.getEstadoDetalleFlujo(id);
+	}
+	
+	public List<DetalleFlujoV> getListaDetalleFlujoV() {
+		return detalleFlujoDao.getListaDetalleFlujoV();
+	}
+	
+	public List<DetalleFlujo> getListaMonitoreoFlujo(InscripcionPK id) {
+		return detalleFlujoDao.getListaMonitoreoFlujo(id);
+	}
+
+}

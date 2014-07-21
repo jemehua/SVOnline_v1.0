@@ -1,0 +1,20 @@
+package gob.servir.desempenio.dao;
+
+
+import gob.servir.desempenio.model.GerentePublicoV;
+
+import java.util.List;
+
+/**
+ * 
+ * @author Hever Pumallihua García
+ */
+public interface GerentePublicoVDao {
+
+	public abstract GerentePublicoV find(String codGerente);
+	
+	public abstract GerentePublicoV save(GerentePublicoV obj);
+	
+	public abstract List<GerentePublicoV> getListaGerentePublico();
+
+}

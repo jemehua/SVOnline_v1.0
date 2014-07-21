@@ -1,0 +1,183 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.CompetenciaDao;
+import gob.servir.desempenio.model.TipoCompetencia;
+import gob.servir.desempenio.model.Competencia;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.faces.model.SelectItem;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Cristhian Munguia Martinez
+ */
+@Repository
+public class CompetenciaDaoImpl implements CompetenciaDao {
+
+	@PersistenceContext
+	private EntityManager em;
+
+	@Transactional
+	public Competencia save(Competencia obj) {
+
+		try {
+			if (obj.getId() == null) {
+				em.persist(obj);
+				return obj;
+			} else {
+				return em.merge(obj);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} 
+	}
+
+	@Transactional
+	public Competencia edit(Competencia obj) {
+		try {
+			em.merge(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} 
+	}
+
+	public Competencia find(Long id) {
+		try {
+			return em.find(Competencia.class, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Competencia> getListaPerfil() {
+		Query q = null;
+		try {
+			q = (Query) em
+					.createQuery("select p from Competencia p where p.estado =:estado");
+			q.setParameter("estado", "A");
+			return q.getResultList();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} 
+	}
+
+	public List<SelectItem> getComboPerfil() {
+
+		List<SelectItem> listaCombo = new ArrayList<SelectItem>();
+		List<Competencia> lista = new ArrayList<Competencia>();
+		try {
+			lista = getListaPerfil();
+		} catch (Exception e) {
+			e.printStackTrace();
+			SelectItem fila = new SelectItem(0L, "Seleccione Perfil");
+			listaCombo.add(fila);
+			return listaCombo;
+		}
+		SelectItem fila = new SelectItem(0L, "Seleccione Perfil");
+		listaCombo.add(fila);
+
+		for (Competencia tipo : lista) {
+			fila = new SelectItem(tipo.getId(), "" + tipo.getNivelDeseado());
+			listaCombo.add(fila);
+		}
+		return listaCombo;
+	}
+
+	public Long getIdMax() {
+		try {
+			return (Long) em.createQuery(
+					"select max(r.idPerfil) from Competencia r")
+					.getSingleResult() + 1L;
+		} catch (Exception e) {
+
+		}
+		return 1L;
+	}
+
+	public List<Competencia> buscarCampaniaPuesto(Long puestoSelec,
+			List<TipoCompetencia> listaCompetencia) {
+
+		try {
+			List<Competencia> listaEvaluacionInicial = new ArrayList<Competencia>();
+			if (puestoSelec > 0) {
+
+				for (TipoCompetencia competencia : listaCompetencia) {
+					Query q = null;
+					q = (Query) em
+							.createQuery("select p from Competencia p where p.id.idPuesto =:pues"
+									+ " and p.id.idCompetencia =:comp ");
+					q.setParameter("pues", puestoSelec);
+					q.setParameter("comp", competencia.getIdCompetencia());
+
+					listaEvaluacionInicial.add((Competencia) q
+							.getSingleResult());
+
+				}
+
+				return listaEvaluacionInicial;
+			} else
+				return null;
+
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	public List<Competencia> getListaCompetencia() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Competencia> getListaCompetencia(Long idPuestoTipo) {
+		Query q = null;
+		try {
+			q = (Query) em
+					.createQuery("select p from Competencia p where p.id.idPuesto =:idPuestoTipo and p.estado =:estado and p.estadoPerfil =:estadoPerfil order by p.id.idCompetencia");
+
+			q.setParameter("idPuestoTipo", idPuestoTipo);
+			q.setParameter("estado", "A");
+			q.setParameter("estadoPerfil", "C");
+			return q.getResultList();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} 
+	}
+
+	public List<SelectItem> getComboCompetencia() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Long countPerfil() {
+		System.out.println("CONTADOR PERFIL    ---");
+		Query q = null;
+		try {
+			q = (Query) em
+					.createQuery("select COUNT(DISTINCT c.id.idPuesto) from Competencia c");
+
+			
+			return (Long) q.getSingleResult();
+
+		} catch (Exception e) {
+			return 0L;
+		}
+	}
+
+}

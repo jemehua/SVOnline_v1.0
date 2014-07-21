@@ -1,0 +1,17 @@
+package gob.servir.desempenio.service;
+
+import gob.servir.desempenio.model.ParametroSistema;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+public interface ParametroSistemaService {
+	
+	public abstract ParametroSistema find(Long id);
+	
+	public abstract ParametroSistema save(ParametroSistema obj);
+	
+	public abstract ParametroSistema edit(ParametroSistema obj);
+
+}

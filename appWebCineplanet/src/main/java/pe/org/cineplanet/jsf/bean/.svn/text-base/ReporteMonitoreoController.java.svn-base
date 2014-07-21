@@ -1,0 +1,220 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.dto.Monitoreo;
+import gob.servir.desempenio.model.Campania;
+import gob.servir.desempenio.service.CampaniaService;
+import gob.servir.desempenio.service.InscripcionService;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.faces.model.SelectItem;
+
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+
+@Component("reporteMonitoreoController")
+@Scope("session")
+public class ReporteMonitoreoController implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private static final Logger logger = LoggerFactory
+			.getLogger(ReporteMonitoreoController.class);
+
+	@Autowired
+	private LoginController loginController;
+	@Autowired
+	private CampaniaService campaniaService;
+	@Autowired
+	private InscripcionService inscripcionService;
+
+	private List<SelectItem> comboCampania = new ArrayList<SelectItem>();
+	private Long campaniaSelec = 0L;
+
+	private List<Monitoreo> listMonitoreo = new ArrayList<Monitoreo>();
+	private Campania campania = new Campania();
+	private Integer cantidad = 0;
+
+	public ReporteMonitoreoController() {
+
+	}
+
+	public void cargarData() {
+		cargarCampania();
+		buscarListaMonitoreo();
+	}
+
+	public void buscarListaMonitoreo() {
+		listMonitoreo.clear();
+		if (campaniaSelec != 0L){
+			listMonitoreo = inscripcionService.getListaMonitoreo(campaniaSelec);
+			cantidad = listMonitoreo.size();
+		}
+	}
+
+	public void cargarCampania() {
+		campania = new Campania();
+		if (campaniaSelec != 0L)
+			campania = campaniaService.find(campaniaSelec);
+	}
+
+	public Campania getCampania() {
+		return campania;
+	}
+
+	public void setCampania(Campania campania) {
+		this.campania = campania;
+	}
+
+	public List<Monitoreo> getListMonitoreo() {
+		return listMonitoreo;
+	}
+
+	public void setListMonitoreo(List<Monitoreo> listMonitoreo) {
+		this.listMonitoreo = listMonitoreo;
+	}
+
+	public List<SelectItem> getComboCampania() {
+		comboCampania = campaniaService.getComboCampania();
+		return comboCampania;
+	}
+
+	public void setComboCampania(List<SelectItem> comboCampania) {
+		this.comboCampania = comboCampania;
+	}
+
+	public Long getCampaniaSelec() {
+		return campaniaSelec;
+	}
+
+	public void setCampaniaSelec(Long campaniaSelec) {
+		this.campaniaSelec = campaniaSelec;
+	}
+
+	public Integer getCantidad() {
+		return cantidad;
+	}
+
+	public void setCantidad(Integer cantidad) {
+		this.cantidad = cantidad;
+	}
+	
+	public void postProcessXLS(Object document) {
+		HSSFWorkbook wb = (HSSFWorkbook) document;
+		HSSFSheet sheet = wb.getSheetAt(0);
+		HSSFRow header = sheet.getRow(0);
+		HSSFCellStyle cellStyle = wb.createCellStyle();
+		cellStyle.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);
+
+		HSSFFont font = wb.createFont();
+		font.setFontName(HSSFFont.FONT_ARIAL);
+		font.setFontHeightInPoints((short) 8);
+		font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+		font.setColor(HSSFColor.WHITE.index);
+		
+		HSSFFont fontCont = wb.createFont();
+		fontCont.setFontName(HSSFFont.FONT_ARIAL);
+		fontCont.setFontHeightInPoints((short) 10);
+		
+		cellStyle.setFillForegroundColor(IndexedColors.DARK_RED.getIndex());
+		cellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+		cellStyle.setFont(font);
+
+		if(!listMonitoreo.isEmpty()){
+			String tituloHeader[] = { "CODIGO", "GERENTE PUBLICO",
+			"Recibir Notificación", "Revisar y Proponer modificación de Indicadores y Metas",
+			"Notificar Monitoreo y Evaluación de las modificaciones propuestas", "V°B°",
+			"Recibir Notificación", "Registrar Plan de Desarrollo de Competencias",
+			"Registrar Plan de Acción de Metas", "Notificar Monitoreo y Evaluación de los planes registrados",
+			"Recibir y Analizar las observaciones correspondientes a los planes registrados", "Recibir Notificación",
+			"Registra Evaluación Cualitativa de Competencias", "Registra Evaluación Cualitativa de Metas",
+			"Recibir Notificación", "Evaluar Cuantitativamente Competencias Nro.1",
+			"Evaluar Cuantitativamente las Metas Nro.1","Recibir Notificación (2)",
+			"Evaluar Cuantitativamente Competencias Nro.2","Evaluar Cuantitativamente Metas Nro.2",
+			"Recibir Notificación (3)", "Evalua Cuantitativamente Competencias Nro.3", "Promedio Metas",
+			"Promedio Competencias","Promedio Final"};
+	
+			for (int i = 0; i < tituloHeader.length; i++) {
+				header.createCell(i);
+				header.getCell(i).setCellStyle(cellStyle);
+				header.getCell(i).setCellValue(
+						new HSSFRichTextString(tituloHeader[i]));
+				sheet.autoSizeColumn(i);
+			}
+
+			HSSFCellStyle cellStyleTerm = wb.createCellStyle();
+			cellStyleTerm.setFillForegroundColor(IndexedColors.BRIGHT_GREEN.getIndex());
+			cellStyleTerm.setFillPattern(CellStyle.SOLID_FOREGROUND);
+			cellStyleTerm.setFont(fontCont);
+			
+			HSSFCellStyle cellStyleProg = wb.createCellStyle();
+			cellStyleProg.setFont(fontCont);
+
+			for (int i = 0; i < listMonitoreo.size(); i++) {
+				Monitoreo monitoreo = listMonitoreo.get(i);
+				HSSFRow celdaMonitoreo = sheet.getRow(i+1);	
+				
+				if(monitoreo.getPromedioFinal() > 0.0){
+					for (int j = 0; j < 25; j++) {
+						celdaMonitoreo.createCell(j);
+						celdaMonitoreo.getCell(j).setCellStyle(cellStyleTerm);
+					}
+				}else{
+					for (int j = 0; j < 25; j++) {
+						celdaMonitoreo.createCell(j);
+						celdaMonitoreo.getCell(j).setCellStyle(cellStyleProg);
+					}
+				}
+				
+				celdaMonitoreo.getCell(0).setCellValue(new HSSFRichTextString(monitoreo.getCodGerente()));
+				celdaMonitoreo.getCell(1).setCellValue(new HSSFRichTextString(monitoreo.toString()));
+				celdaMonitoreo.getCell(2).setCellValue(new HSSFRichTextString(monitoreo.getAct1()));
+				celdaMonitoreo.getCell(3).setCellValue(new HSSFRichTextString(monitoreo.getAct2()));
+				celdaMonitoreo.getCell(4).setCellValue(new HSSFRichTextString(monitoreo.getAct3()));
+				celdaMonitoreo.getCell(5).setCellValue(new HSSFRichTextString(monitoreo.getAct4()));
+				celdaMonitoreo.getCell(6).setCellValue(new HSSFRichTextString(monitoreo.getAct5()));
+				celdaMonitoreo.getCell(7).setCellValue(new HSSFRichTextString(monitoreo.getAct6()));
+				celdaMonitoreo.getCell(8).setCellValue(new HSSFRichTextString(monitoreo.getAct7()));
+				celdaMonitoreo.getCell(9).setCellValue(new HSSFRichTextString(monitoreo.getAct8()));
+				celdaMonitoreo.getCell(10).setCellValue(new HSSFRichTextString(monitoreo.getAct9()));
+				celdaMonitoreo.getCell(11).setCellValue(new HSSFRichTextString(monitoreo.getAct10()));
+				celdaMonitoreo.getCell(12).setCellValue(new HSSFRichTextString(monitoreo.getAct11()));
+				celdaMonitoreo.getCell(13).setCellValue(new HSSFRichTextString(monitoreo.getAct12()));
+				celdaMonitoreo.getCell(14).setCellValue(new HSSFRichTextString(monitoreo.getAct13()));
+				celdaMonitoreo.getCell(15).setCellValue(new HSSFRichTextString(monitoreo.getAct14()));
+				celdaMonitoreo.getCell(16).setCellValue(new HSSFRichTextString(monitoreo.getAct15()));
+				celdaMonitoreo.getCell(17).setCellValue(new HSSFRichTextString(monitoreo.getAct16()));
+				celdaMonitoreo.getCell(18).setCellValue(new HSSFRichTextString(monitoreo.getAct17()));
+				celdaMonitoreo.getCell(19).setCellValue(new HSSFRichTextString(monitoreo.getAct18()));
+				celdaMonitoreo.getCell(20).setCellValue(new HSSFRichTextString(monitoreo.getAct19()));
+				celdaMonitoreo.getCell(21).setCellValue(new HSSFRichTextString(monitoreo.getAct20()));
+				celdaMonitoreo.getCell(22).setCellValue(monitoreo.getPromedioMetas());
+				celdaMonitoreo.getCell(23).setCellValue(monitoreo.getPromedioCompetencias());
+				celdaMonitoreo.getCell(24).setCellValue(monitoreo.getPromedioFinal());
+				
+			}
+		
+		}
+		
+	}
+
+
+}

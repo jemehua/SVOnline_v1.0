@@ -1,0 +1,61 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.ActividadDao;
+import gob.servir.desempenio.model.Actividad;
+import gob.servir.desempenio.service.ActividadService;
+
+import java.util.List;
+
+import javax.faces.model.SelectItem;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Service
+public class ActividadServiceImpl implements ActividadService {
+
+	@Autowired
+	private ActividadDao actividadDao;
+
+	@Transactional
+	public Actividad find(Long id) {
+		return actividadDao.find(id);
+	}
+
+	@Transactional
+	public Actividad save(Actividad obj) {
+		return actividadDao.save(obj);
+	}
+	
+	@Transactional
+	public Actividad edit(Actividad obj) {
+		return actividadDao.edit(obj);
+		
+	}
+
+	public List<Actividad> getListaActividad() {
+		return actividadDao.getListaActividad();
+	}
+	
+	public List<Actividad> getListaActividad(Long idProceso) {
+		return actividadDao.getListaActividad(idProceso);
+	}
+	
+	public List<Actividad> getListaActTemporizado(Long idProceso) {
+		return actividadDao.getListaActTemporizado(idProceso);
+	}
+	
+	public List<SelectItem> getComboActividad(Long idProceso){
+		return actividadDao.getComboActividad(idProceso);
+	}
+	
+	public List<SelectItem> getComboActTemp(Long idProceso){
+		return actividadDao.getComboActTemp(idProceso);
+	}
+
+}

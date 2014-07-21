@@ -1,0 +1,341 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.model.DetalleFlujoPK;
+import gob.servir.desempenio.model.EvaluacionMetas;
+import gob.servir.desempenio.model.EvaluacionMetasPK;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.PlanMetas;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.DetalleFlujoService;
+import gob.servir.desempenio.service.EvaluacionMetasService;
+import gob.servir.desempenio.service.FlujoService;
+import gob.servir.desempenio.service.InscripcionService;
+import gob.servir.desempenio.service.PlanMetasService;
+import gob.servir.desempenio.util.Constantes;
+import gob.servir.desempenio.util.Message;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+
+import org.primefaces.event.SelectEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+
+@Controller("cualitativaMetasController")
+@Scope("session")
+public class CualitativaMetasController implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private static final Logger logger = LoggerFactory
+			.getLogger(CualitativaMetasController.class);
+
+	@Autowired
+	private LoginController loginController;
+	@Autowired
+	private InscripcionService inscripcionService;
+	@Autowired
+	private EvaluacionMetasService evaluacionMetasService;
+	@Autowired
+	private PlanMetasService planMetasService;
+	@Autowired
+	private FlujoService flujoService;
+	@Autowired
+	private DetalleFlujoService detalleFlujoService;
+
+	private Usuario userSesion = null;
+	private Message message = new Message();
+
+	private Inscripcion inscripcionSelec = null;
+	private EvaluacionMetas evaluacionMetas = null;
+	private PlanMetas planMetaSelec = null;
+	private List<PlanMetas> listaPlanMetas = new ArrayList<PlanMetas>();
+
+	private boolean swFlujo = true;
+
+	public CualitativaMetasController() {
+
+	}
+
+	@PostConstruct
+	public void init() {
+		validarSesion();
+		getInscripcion();
+		buscarPlanMetasAprobados();
+		verificarEstadoFlujo();
+	}
+
+	public boolean verificarEstadoFlujo() {
+
+		if (inscripcionSelec == null) {
+			swFlujo = true;
+		} else {
+			String estado = detalleFlujoService
+					.getEstadoDetalleFlujo(new DetalleFlujoPK(inscripcionSelec
+							.getId().getIdCampania(), inscripcionSelec.getId()
+							.getIdGerentePublico(), Constantes.PROCESO2,
+							Constantes.P2_CUALITATIVA_METAS));
+			if (estado != null) {
+				if (estado.equalsIgnoreCase(Constantes.ATENDIDO))
+					swFlujo = true;
+				else
+					swFlujo = false;
+			} else
+				swFlujo = true;
+		}
+		return swFlujo;
+	}
+
+	public boolean isSwFlujo() {
+		return swFlujo;
+	}
+
+	public void setSwFlujo(boolean swFlujo) {
+		this.swFlujo = swFlujo;
+	}
+
+	public void onRowSelect(SelectEvent event) {
+		if (planMetaSelec != null) {
+			EvaluacionMetasPK id = new EvaluacionMetasPK(planMetaSelec.getId()
+					.getIdMeta(), planMetaSelec.getId().getIdCampania(),
+					planMetaSelec.getId().getIdGerentePublico());
+			EvaluacionMetas evaluacionMetasTemp = evaluacionMetasService
+					.find(id);
+
+			if (evaluacionMetasTemp != null) {
+				evaluacionMetas = evaluacionMetasTemp;
+			} else {
+				evaluacionMetas = new EvaluacionMetas();
+			}
+		}
+	}
+
+	public PlanMetas getPlanMetaSelec() {
+		return planMetaSelec;
+	}
+
+	public void setPlanMetaSelec(PlanMetas planMetaSelec) {
+		this.planMetaSelec = planMetaSelec;
+	}
+
+	public EvaluacionMetas getEvaluacionMetas() {
+		return evaluacionMetas;
+	}
+
+	public void setEvaluacionMetas(EvaluacionMetas evaluacionMetas) {
+		this.evaluacionMetas = evaluacionMetas;
+	}
+
+	public void getInscripcion() {
+		Inscripcion ins = inscripcionService.getInscripcionUsuario(userSesion);
+		if (ins != null)
+			inscripcionSelec = ins;
+	}
+
+	public Inscripcion getInscripcionSelec() {
+		return inscripcionSelec;
+	}
+
+	public void setInscripcionSelec(Inscripcion inscripcionSelec) {
+		this.inscripcionSelec = inscripcionSelec;
+	}
+
+	public void buscarPlanMetasAprobados() {
+		listaPlanMetas.clear();
+		if (inscripcionSelec != null) {
+			listaPlanMetas = planMetasService.getListaPlanMetas(
+					inscripcionSelec.getId(), Constantes.TRUE);
+		}
+	}
+
+	public List<PlanMetas> getListaPlanMetas() {
+		return listaPlanMetas;
+	}
+
+	public void setListaPlanMetas(List<PlanMetas> listaPlanMetas) {
+		this.listaPlanMetas = listaPlanMetas;
+	}
+
+	public void validarSesion() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		
+		userSesion = (Usuario) context.getExternalContext().getSessionMap()
+				.get(loginController.getUsername());
+
+		if (userSesion == null) {
+			String ctxPath = context.getExternalContext()
+					.getRequestContextPath();
+			try {
+				context.getExternalContext().redirect(ctxPath + "/login.jsf");
+			} catch (Exception e) {
+				//e.printStackTrace();
+			}
+		}
+	}
+
+	public void guardar() {
+		validarSesion();
+
+		if (!validarGuardar())
+			return;
+
+		try {
+
+			if (evaluacionMetas.getId() != null) {
+
+				evaluacionMetas.setUsuarioModifica(userSesion.getUsuario());
+				evaluacionMetasService.edit(evaluacionMetas);
+				FacesContext.getCurrentInstance().addMessage(
+						null,
+						new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+								message.getMessage("msgModificar")));
+
+			} else {
+
+				EvaluacionMetasPK evaluacionMetasPK = new EvaluacionMetasPK(
+						planMetaSelec.getId().getIdMeta(), planMetaSelec
+								.getId().getIdCampania(), planMetaSelec.getId()
+								.getIdGerentePublico());
+
+				evaluacionMetas.setId(evaluacionMetasPK);
+				evaluacionMetas.setPlanMetas(planMetaSelec);
+				evaluacionMetas.setUsuarioGP(userSesion.getUsuario());
+				evaluacionMetas.setEstado(Constantes.ACTIVO);
+
+				evaluacionMetasService.save(evaluacionMetas);
+
+				FacesContext.getCurrentInstance().addMessage(
+						null,
+						new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+								message.getMessage("msgRegistrar")));
+
+			}
+			limpiar();
+		} catch (Exception e) {
+			logger.info("ERRROR AL REGISTRAR META");
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+							message.getMessage("msgRegistrarError")));
+		}
+	}
+
+	public boolean validarGuardar() {
+		String txtObligatorio = message.getMessage("msgTxtObligatorio");
+
+		if (planMetaSelec == null) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Seleccione un registro de la lista de Metas"));
+			return false;
+		}
+
+		if (evaluacionMetas.getPorcentajeAvance() < 0
+				|| evaluacionMetas.getPorcentajeAvance() > 100) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Ingrese Porcentaje de Avance max. 100%"));
+			return false;
+		}
+
+		if (evaluacionMetas.getDescripcion().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+
+		return true;
+	}
+
+	public void limpiar() {
+		evaluacionMetas = null;
+		planMetaSelec = null;
+		init();
+	}
+
+	public void atenderFlujo() {
+
+		validarSesion();
+
+		if (!validarAtenderFlujo())
+			return;
+
+		try {
+			DetalleFlujoPK idDetalle = new DetalleFlujoPK(inscripcionSelec
+					.getId().getIdCampania(), inscripcionSelec.getId()
+					.getIdGerentePublico(), Constantes.PROCESO2,
+					Constantes.P2_CUALITATIVA_METAS);
+
+			flujoService.atenderFlujo(idDetalle, userSesion.getUsuario());
+			FacesContext
+					.getCurrentInstance()
+					.addMessage(
+							null,
+							new FacesMessage(FacesMessage.SEVERITY_INFO,
+									"EXITO",
+									"Se ha procesado la Evaluación Cualitativa de Metas para el Gerente Público"));
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+							"Ha ocurrido un error"));
+		}
+		//verificarEstadoFlujo();
+		limpiar();
+	}
+
+	public boolean validarAtenderFlujo() {
+
+		if (inscripcionSelec == null) {
+			return false;
+		}
+
+		if (verificarEvaMetas()) {
+			FacesContext
+					.getCurrentInstance()
+					.addMessage(
+							null,
+							new FacesMessage(FacesMessage.SEVERITY_WARN,
+									"ADVERTENCIA",
+									"Registre su evaluación cualitativa para cada meta"));
+			return false;
+		}
+
+		return true;
+	}
+
+	public boolean verificarEvaMetas() {
+
+		/*Integer total = evaluacionMetasService
+				.getCantidadCuantitativa(inscripcionSelec.getId());*/
+
+		Integer conEvaluacion = evaluacionMetasService
+				.getCantidadCualitativa(inscripcionSelec.getId());
+
+		if (listaPlanMetas.size() == conEvaluacion)
+			return false;
+		else
+			return true;
+	}
+
+}

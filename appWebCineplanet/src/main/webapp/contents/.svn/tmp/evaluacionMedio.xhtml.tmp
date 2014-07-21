@@ -1,0 +1,377 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+	<h:outputStylesheet name="css/cssContent.css" />
+	<script type="text/javascript">
+		function showEvaluacionMedio() {
+			statusDialog.show();
+		}
+		function hideEvaluacionMedio() {
+			statusDialog.hide();
+		}
+	</script>
+</h:head>
+<h:body>
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datos" header="Resultados de Evaluación Medio Año">
+		<p:spacer height="10" />
+		<p:focus context="datos" />
+
+		<p:panelGrid styleClass="panelGrid" id="panelVerificador">
+			<p:row>
+				<p:column width="30">#{messages.lblCampania}<h:outputText
+						value="*" styleClass="obligatorio" />
+				</p:column>
+				<p:column width="70">
+					<p:selectOneMenu id="comboCampania"
+						value="#{evaluacionMedioController.campaniaSelec}"
+						style="width:280px;" tabindex="1">
+						<f:selectItems value="#{evaluacionMedioController.comboCampania}" />
+						<p:ajax update="dtMetas, dtCompetencias, gp, btnBuscar,link"
+							event="change" listener="#{evaluacionMedioController.limpiar}" />
+					</p:selectOneMenu>
+				</p:column>
+				<p:column></p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblGerentePublico}<h:outputText
+						value="*" styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<p:inputText id="gp" tabindex="2"
+						value="#{evaluacionMedioController.inscripcion.asignacionGerenteV}"
+						style=" width : 270px;" readonly="true" />
+					<p:spacer width="5" />
+					<p:commandButton id="btnBuscar" value="Buscar"
+						action="#{evaluacionMedioController.buscarGerenteInscrito}"
+						icon="ui-icon-search" update=":frm:dtGerente"
+						disabled="#{evaluacionMedioController.swBtnBuscar}"
+						oncomplete="dlgBuscarGP.show()" tabindex="3">
+					</p:commandButton>
+				</p:column>
+				<p:column>
+					<p:commandLink ajax="false"
+						disabled="#{evaluacionMedioController.inscripcion eq null ? true : false}"
+						onclick="PrimeFaces.monitorDownload(showEvaluacionMedio,hideEvaluacionMedio)"
+						id="link">
+						<p:graphicImage value="./images/pdf.png" />
+						<p:fileDownload value="#{evaluacionMedioController.docMedioAnio}" />
+					</p:commandLink>
+				</p:column>
+			</p:row>
+
+		</p:panelGrid>
+
+		<p:dialog modal="true" widgetVar="statusDialog" header="Status"
+			draggable="false" closable="true">
+			<p:graphicImage value="./images/ajax-loader.gif" />
+		</p:dialog>
+
+		<p:spacer height="10" />
+
+		<!-- 	METAS -->
+		<p:dataTable var="evmeta"
+			value="#{evaluacionMedioController.listaEvaluacionMetas}"
+			id="dtMetas" rows="7" emptyMessage="#{messages.msgEmptyMessage}"
+			rowKey="#{evmeta.id.idMeta}">
+
+			<f:facet name="header">  
+            Lista de Metas
+            </f:facet>
+
+			<p:column headerText="#{messages.lblCodigo}"
+				style="width:5%;white-space: normal;text-align: justify;">
+				<h:outputText value="#{evmeta.id.idMeta}" />
+			</p:column>
+			<p:column headerText="Tipo Meta"
+				style="width:10%;white-space: normal;text-align: justify;">
+				<h:outputText value="#{evmeta.planMetas.meta.tipo}" />
+			</p:column>
+			<p:column headerText="Meta"
+				style="width:30%;white-space: normal;text-align: justify;">
+				<h:outputText value="#{evmeta.planMetas.meta.denominacion}" />
+			</p:column>
+			<p:column headerText="Avance(%)"
+				style="width:5%;white-space: normal;text-align: justify;">
+				<h:outputText value="#{evmeta.porcentajeAvance}" />
+			</p:column> 
+			<p:column headerText="Descripción de Avance"
+				style="width:40%;white-space: normal;text-align: justify;">
+				<h:outputText value="#{evmeta.descripcion}" />
+			</p:column>
+			<p:column headerText="Opciones"
+				style="width:10%; white-space: normal" exportable="false">
+				<p:commandButton value="" id="editAcJI" icon="ui-icon-newwin"
+					update=":frm:dlgEditPlanMeda" oncomplete="editDialogMeta.show()">
+					<f:setPropertyActionListener value="#{evmeta}"
+						target="#{evaluacionMedioController.evaluacionMetasSelec}" />
+				</p:commandButton>
+				<pe:tooltip for="editAcJI" value="Ver mas detalles"
+					showEffect="fadeIn" hideEffect="fadeIn" atPosition="top center"
+					myPosition="bottom center" />
+			</p:column>
+			<f:facet name="footer">
+				<div class="mensaje">Seleccione un registro e verifique su
+					evaluación</div>
+			</f:facet>
+		</p:dataTable>
+
+		<p:spacer height="20" />
+
+		<!-- 	PLAN DE DESARROLLO -->
+		<p:dataTable var="evaComp"
+			value="#{evaluacionMedioController.listaEvaluacionCompetencias}"
+			id="dtCompetencias" rows="7" rowKey="#{evaComp.id.idCompetencia}"
+			emptyMessage="#{messages.msgEmptyMessage}">
+
+			<f:facet name="header">  
+            Lista de Competencias [Brecha > 0]
+            </f:facet>
+
+
+			<p:column headerText="#{messages.lblCodigo}" style="width:8%">
+				<h:outputText value="#{evaComp.id.idCompetencia}" />
+			</p:column>
+			<p:column headerText="Competencia"
+				style="width:20%;white-space: normal">
+				<h:outputText
+					value="#{evaComp.planDesarrollo.evaluacionInicial.competencia.competencia.denominacion}" />
+			</p:column>
+			<p:column headerText="Nivel Deseado"
+				style="width:8%;white-space: normal;text-align: justify;">
+				<h:outputText
+					value="#{evaComp.planDesarrollo.evaluacionInicial.competencia.nivelDeseado}" />
+			</p:column>
+			<p:column headerText="Eval.Inicial"
+				style="width:8%;white-space: normal;text-align: justify;">
+				<h:outputText
+					value="#{evaComp.planDesarrollo.evaluacionInicial.nota}" />
+			</p:column>
+			<p:column headerText="Brecha"
+				style="width:8%;white-space: normal;text-align: justify;">
+				<h:outputText
+					value="#{evaComp.planDesarrollo.evaluacionInicial.brecha}" />
+			</p:column>
+
+			<p:column headerText="Evaluación Cualitativa"
+				style="width:38%;white-space: normal;text-align: justify;">
+				<h:outputText value="#{evaComp.descripcion}" />
+			</p:column>
+
+			<p:column headerText="Opciones"
+				style="width:10%; white-space: normal" exportable="false">
+				<p:commandButton value="" id="editAcJI2" icon="ui-icon-newwin"
+					update=":frm:dlgEditPlanDesarrollo"
+					oncomplete="editDialogCompetencia.show()">
+					<f:setPropertyActionListener value="#{evaComp}"
+						target="#{evaluacionMedioController.evaluacionCompetenciasSelec}" />
+				</p:commandButton>
+				<pe:tooltip for="editAcJI2" value="Ver mas detalles"
+					showEffect="fadeIn" hideEffect="fadeIn" atPosition="top center"
+					myPosition="bottom center" />
+			</p:column>
+
+			<f:facet name="footer">
+				<div class="mensaje">Seleccione un registro e verifique su
+					evaluación</div>
+			</f:facet>
+
+		</p:dataTable>
+
+	</p:panel>
+
+	<!-- 	dialog -->
+	<p:dialog id="dlgBuscar" header="Buscar Gerente Público"
+		widgetVar="dlgBuscarGP" modal="true" resizable="false" width="772"
+		showEffect="clip" closable="true" hideEffect="fold">
+
+		<p:dataTable id="dtGerente" var="ins"
+			value="#{evaluacionMedioController.listaGerentePublico}"
+			filteredValue="#{evaluacionMedioController.listaGerentePublicoFiltered}"
+			scrollable="true" scrollHeight="235" paginator="true" rows="10"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			emptyMessage="#{messages.msgEmptyMessage}">
+
+			<f:facet name="header">    
+            	Lista de Gerentes Públicos Inscritos
+            	</f:facet>
+
+			<p:column headerText="#{messages.lblCodigo}" style="width:20%"
+				filterBy="#{ins.asignacionGerenteV.cod_gerente}">
+				<h:outputText value="#{ins.asignacionGerenteV.cod_gerente}" />
+			</p:column>
+			<p:column headerText="Nombres" style="width:20%"
+				filterBy="#{ins.asignacionGerenteV.nombres}">
+				<h:outputText value="#{ins.asignacionGerenteV.nombres}" />
+			</p:column>
+			<p:column headerText="Ap.Paterno" style="width:20%"
+				filterBy="#{ins.asignacionGerenteV.ap_paterno}">
+				<h:outputText value="#{ins.asignacionGerenteV.ap_paterno}" />
+			</p:column>
+			<p:column headerText="Ap.Materno" style="width:12%">
+				<h:outputText value="#{ins.asignacionGerenteV.ap_materno}" />
+			</p:column>
+			<p:column headerText="DNI" style="width:20%"
+				filterBy="#{ins.asignacionGerenteV.dni}">
+				<h:outputText value="#{ins.asignacionGerenteV.dni}" />
+			</p:column>
+			<p:column headerText="#{messages.lblOpciones}" style="width:8%">
+				<p:commandButton value=""
+					action="#{evaluacionMedioController.seleccionarGerente}"
+					update=":frm:gp, :frm:dtMetas, :frm:dtCompetencias, :frm:link"
+					oncomplete="dlgBuscarGP.hide()" icon="ui-icon-check"
+					title="Seleccionar Gerente Público">
+					<f:setPropertyActionListener value="#{ins}"
+						target="#{evaluacionMedioController.inscripcion}" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+	</p:dialog>
+
+	<!-- 	Dialog PLan Metas -->
+	<p:dialog id="dlgEditPlanMeda" header="Evaluación Cualitativa"
+		widgetVar="editDialogMeta" modal="true" resizable="false" width="680"
+		showEffect="clip" closable="true" hideEffect="fold">
+		<p:panel id="pnlEditPlanMeta">
+			<h4>Metas Alineadas al POI</h4>
+			<p:separator id="separator1" />
+			<p:panelGrid styleClass="panelGrid">
+				<p:row>
+					<p:column>Tipo Meta:
+				    </p:column>
+					<p:column>
+						<h:outputText
+							value="#{evaluacionMedioController.evaluacionMetasSelec.planMetas.meta.tipo}" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>Meta:
+				    </p:column>
+					<p:column>
+						<h:outputText
+							value="#{evaluacionMedioController.evaluacionMetasSelec.planMetas.meta.denominacion}" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>Relación POI:
+				</p:column>
+					<p:column>
+						<h:outputLabel
+							value="#{evaluacionMedioController.evaluacionMetasSelec.planMetas.meta.relacionPOI}" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>Peso (%):
+				    </p:column>
+					<p:column>
+						<h:outputText
+							value="#{evaluacionMedioController.evaluacionMetasSelec.planMetas.meta.peso}" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>Fecha Culminación:
+				    </p:column>
+					<p:column>
+						<h:outputText
+							value="#{evaluacionMedioController.evaluacionMetasSelec.planMetas.meta.fechaFinMeta}" />
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+			<h4>Plan de Acción de Metas</h4>
+			<p:separator id="separator2" />
+			<p:panelGrid styleClass="panelGrid">
+				<p:row>
+					<p:column>Plan de acción:
+				</p:column>
+					<p:column>
+						<h:outputLabel
+							value="#{evaluacionMedioController.evaluacionMetasSelec.planMetas.descripcionPlan}" />
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+
+		</p:panel>
+	</p:dialog>
+
+	<!-- 	Dialog Plan de Desarrollo -->
+	<p:dialog id="dlgEditPlanDesarrollo" header="Evaluación Cualitativa"
+		widgetVar="editDialogCompetencia" modal="true" resizable="false"
+		width="680" showEffect="clip" closable="true" hideEffect="fold">
+		<p:panel id="pnlEditPlanDesarrollo">
+			<h4>Plan de Desarrollo de Competencias</h4>
+			<p:separator id="separator3" />
+			<p:focus context="pnlEditPlanDesarrollo" />
+			<p:panelGrid id="pgComp" styleClass="panelGrid">
+				<p:row>
+					<p:column width="30">Competencia
+				</p:column>
+					<p:column width="70">
+						<h:outputLabel
+							value="#{evaluacionMedioController.evaluacionCompetenciasSelec.planDesarrollo.evaluacionInicial.competencia.competencia.denominacion}" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column width="30">Actividad de Capacitación
+				</p:column>
+					<p:column width="70">
+						<h:outputLabel
+							value="#{evaluacionMedioController.evaluacionCompetenciasSelec.planDesarrollo.actCapacitacion}"
+							styleClass="txt" style="width:580px;" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column width="30">Fecha de culminación de Capacitación
+				</p:column>
+					<p:column width="70">
+						<h:outputLabel
+							value="#{evaluacionMedioController.evaluacionCompetenciasSelec.planDesarrollo.fechaFinCapacitacion}"
+							styleClass="txt" style="width:580px;">
+							<f:convertDateTime type="date" dateStyle="short"
+								pattern="dd/MM/yyyy" />
+						</h:outputLabel>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>Actividad de Entrenamiento
+				</p:column>
+					<p:column>
+						<h:outputLabel
+							value="#{evaluacionMedioController.evaluacionCompetenciasSelec.planDesarrollo.actEntrenamiento}"
+							styleClass="txt" style="width:580px;" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column width="30">Fecha de culminación de Entrenamiento
+				</p:column>
+					<p:column width="70">
+						<h:outputLabel
+							value="#{evaluacionMedioController.evaluacionCompetenciasSelec.planDesarrollo.fechaFinEntrenamiento}"
+							styleClass="txt" style="width:580px;">
+							<f:convertDateTime type="date" dateStyle="short"
+								pattern="dd/MM/yyyy" />
+						</h:outputLabel>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+
+		</p:panel>
+	</p:dialog>
+</h:body>
+<p:ajaxStatus
+	style="width:64px;height:64px;position:fixed;right:5px;bottom:5px"
+	id="ajaxStatusPanel">
+	<f:facet name="start">
+		<p:graphicImage value="./images/loading.gif" />
+	</f:facet>
+
+	<f:facet name="complete">
+		<h:outputText value="" />
+	</f:facet>
+</p:ajaxStatus>
+</html>

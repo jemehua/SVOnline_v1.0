@@ -1,0 +1,269 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.model.DetalleFlujoPK;
+import gob.servir.desempenio.model.DetalleTipoCompetencia;
+import gob.servir.desempenio.model.EvaluacionCompetencias;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.CampaniaService;
+import gob.servir.desempenio.service.DetalleFlujoService;
+import gob.servir.desempenio.service.DetalleTipoCompetenciaService;
+import gob.servir.desempenio.service.EvaluacionCompetenciasService;
+import gob.servir.desempenio.service.FlujoService;
+import gob.servir.desempenio.service.InscripcionService;
+import gob.servir.desempenio.util.Constantes;
+import gob.servir.desempenio.util.Message;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Component("cuantitativaCompetenciasJIController")
+@Scope("session")
+public class CuantitativaCompetenciasJIController {
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(CuantitativaCompetenciasController.class);
+
+	@Autowired
+	private LoginController loginController;
+	@Autowired
+	private CampaniaService campaniaService;
+	@Autowired
+	private InscripcionService inscripcionService;
+	@Autowired
+	private EvaluacionCompetenciasService evaluacionCompetenciasService;
+	@Autowired
+	private FlujoService flujoService;
+	@Autowired
+	private DetalleFlujoService detalleFlujoService;
+	@Autowired
+	private DetalleTipoCompetenciaService detalleTipoCompetenciaService;
+
+	private FacesMessage msg = null;
+	private Usuario userSesion = null;
+	private Message message = new Message();
+
+	private Inscripcion inscripcionSelec = null;
+	private EvaluacionCompetencias evaluacionCompetenciasSelec = null;
+	private List<EvaluacionCompetencias> listaEvaluacionCompetencias = new ArrayList<EvaluacionCompetencias>();
+	private boolean swFlujo = true;
+	private List<DetalleTipoCompetencia> detalleTipoCompetencias = null;
+
+	public CuantitativaCompetenciasJIController() {
+		super();
+	}
+
+	private void verificarEstadoFlujo() {
+		if (inscripcionSelec == null) {
+			swFlujo = false;
+		} else {
+			String estado = detalleFlujoService
+					.getEstadoDetalleFlujo(new DetalleFlujoPK(inscripcionSelec
+							.getId().getIdCampania(), inscripcionSelec.getId()
+							.getIdGerentePublico(), Constantes.PROCESO3,
+							Constantes.P3_CUANTITATIVA_COMPETENCIAS_JI));
+			if (estado != null)
+				if (estado.equalsIgnoreCase(Constantes.ATENDIDO))
+					swFlujo = true;
+				else
+					swFlujo = false;
+			else
+				swFlujo = true;
+		}
+	}
+
+	public boolean isSwFlujo() {
+		verificarEstadoFlujo();
+		return swFlujo;
+	}
+
+	public void setSwFlujo(boolean swFlujo) {
+		this.swFlujo = swFlujo;
+	}
+
+	public EvaluacionCompetencias getEvaluacionCompetenciasSelec() {
+		return evaluacionCompetenciasSelec;
+	}
+
+	public void setEvaluacionCompetenciasSelec(
+			EvaluacionCompetencias evaluacionCompetenciasSelec) {
+		this.evaluacionCompetenciasSelec = evaluacionCompetenciasSelec;
+	}
+
+	public void buscarEvaCompetencias() {
+		listaEvaluacionCompetencias.clear();
+		if (inscripcionSelec != null)
+			listaEvaluacionCompetencias = evaluacionCompetenciasService
+					.getListaEvaluacionCompetencias(inscripcionSelec.getId());
+	}
+
+	public List<EvaluacionCompetencias> getListaEvaluacionCompetencias() {
+		buscarEvaCompetencias();
+		return listaEvaluacionCompetencias;
+	}
+
+	public void setListaEvaluacionCompetencias(
+			List<EvaluacionCompetencias> listaEvaluacionCompetencias) {
+		this.listaEvaluacionCompetencias = listaEvaluacionCompetencias;
+	}
+
+	public Inscripcion getInscripcionSelec() {
+		return inscripcionSelec;
+	}
+
+	public void setInscripcionSelec(Inscripcion inscripcionSelec) {
+		this.inscripcionSelec = inscripcionSelec;
+	}
+
+	public void validarSesion() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		
+		userSesion = (Usuario) context.getExternalContext().getSessionMap()
+				.get(loginController.getUsername());
+
+		if (userSesion == null) {
+			String ctxPath = context.getExternalContext()
+					.getRequestContextPath();
+			try {
+				context.getExternalContext().redirect(ctxPath + "/login.jsf");
+			} catch (Exception e) {
+				//e.printStackTrace();
+			}
+		}
+	}
+
+	public void guardar() {
+
+		validarSesion();
+
+		try {
+			if (validarDatos()) {
+				
+				EvaluacionCompetencias evaComp = evaluacionCompetenciasService
+						.find(evaluacionCompetenciasSelec.getId());
+				evaComp.setUsuarioJI(userSesion.getUsuario());
+				evaComp.setUsuarioModifica(userSesion.getUsuario());
+				evaComp.setNotaJI(evaluacionCompetenciasSelec.getNotaJI());
+				
+				Inscripcion inscripcionJi = inscripcionService.find(inscripcionSelec.getId());
+				if(inscripcionJi.isTeAndJi()){
+					evaComp.setNotaTE(evaluacionCompetenciasSelec.getNotaJI());
+					evaComp.setUsuarioTE(userSesion.getUsuario());
+				}
+				
+				evaluacionCompetenciasService.edit(evaComp);
+
+				msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+						message.getMessage("msgRegistrar"));
+			}
+		} catch (Exception e) {
+			logger.info(this.getClass().getName() + ": ERROR AL GUARDAR");
+			msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+					"Ha ocurrido un error.");
+		}
+		FacesContext.getCurrentInstance().addMessage(null, msg);
+		limpiar();
+	}
+
+	public boolean validarDatos() {
+
+		if (evaluacionCompetenciasSelec == null) {
+			msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+					"Seleccione un registro de la lista de Competencias.");
+			return false;
+		}
+
+		if (evaluacionCompetenciasSelec.getNotaJI() < 1
+				|| evaluacionCompetenciasSelec.getNotaJI() > 5) {
+			msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+					"Ingrese evaluación anual [1 - 5].");
+			return false;
+		}
+
+		return true;
+	}
+
+	public void limpiar() {
+		evaluacionCompetenciasSelec = null;
+	}
+
+	public void atenderFlujo() {
+
+		validarSesion();
+
+		try {
+			if (validarAtenderFlujo()) {
+				DetalleFlujoPK idDetalle = new DetalleFlujoPK(inscripcionSelec
+						.getId().getIdCampania(), inscripcionSelec.getId()
+						.getIdGerentePublico(), Constantes.PROCESO3,
+						Constantes.P3_CUANTITATIVA_COMPETENCIAS_JI);
+
+				flujoService.atenderFlujo(idDetalle, userSesion.getUsuario());
+				msg = new FacesMessage(
+						FacesMessage.SEVERITY_INFO,
+						"EXITO",
+						"Se ha procesado la Evaluación Cuantitativa de Competencias para el Gerente Público.");
+			}
+		} catch (Exception e) {
+			logger.info(this.getClass().getName() + ": ERROR AL ATENDER FLUJO");
+			msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+					"Ha ocurrido un error.");
+		}
+		FacesContext.getCurrentInstance().addMessage(null, msg);
+		limpiar();
+	}
+
+	public boolean validarAtenderFlujo() throws Exception {
+
+		if (inscripcionSelec == null) {
+			msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+					"Por favor, salga del sistema e inicie sesión nuevamente.");
+			return false;
+		}
+
+		if (verificarRegistroEvaluacion()) {
+			msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+					"Para continuar debe ingresar la evaluación de anual para todos los registros.");
+			return false;
+		}
+
+		return true;
+	}
+
+	public boolean verificarRegistroEvaluacion() throws Exception {
+
+		Integer total = evaluacionCompetenciasService
+				.getCantidadCuantitativa(inscripcionSelec.getId());
+
+		Integer conEvaluacion = evaluacionCompetenciasService
+				.getCantidadCuantitativaJI(inscripcionSelec.getId());
+
+		if (total == conEvaluacion)
+			return false;
+		else
+			return true;
+	}
+
+	public List<DetalleTipoCompetencia> getDetalleTipoCompetencias() {
+		if(evaluacionCompetenciasSelec != null){
+			detalleTipoCompetencias = (List<DetalleTipoCompetencia>) detalleTipoCompetenciaService.find(evaluacionCompetenciasSelec.getId().getIdCompetencia());
+		}
+		return detalleTipoCompetencias;
+	}
+	
+}

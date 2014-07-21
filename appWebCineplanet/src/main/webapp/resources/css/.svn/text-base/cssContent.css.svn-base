@@ -1,0 +1,45 @@
+
+.obligatorio{
+	color:red;
+}
+
+.txt{
+	width:200px;
+}
+
+.total{
+	color:blue; 
+	font-weight: bold;
+	text-transform: uppercase;
+}
+
+.combo{
+	width:210px;
+}
+
+.panelGrid td {
+     border-style: hidden !important;
+}
+
+.mensaje {
+    font-size: 7pt;
+    color:blue;
+	text-align: left;
+}
+
+.rowStyle {
+	background: #f3f3f3;
+}
+
+.old {
+	background: #99FF66;
+}
+
+.atendido {
+	background: #99FF66;
+}
+
+.enespera {
+	background: #FFFF66;
+}
+

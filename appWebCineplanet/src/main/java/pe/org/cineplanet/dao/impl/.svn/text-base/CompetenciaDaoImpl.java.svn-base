@@ -1,0 +1,178 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.CompetenciaDao;
+import gob.servir.desempenio.model.Competencia;
+import gob.servir.desempenio.model.CompetenciaPK;
+import gob.servir.desempenio.util.Constantes;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.faces.model.SelectItem;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Cristhian Munguia Martinez
+ */
+@Repository
+public class CompetenciaDaoImpl implements CompetenciaDao {
+
+	@PersistenceContext
+	private EntityManager em;
+
+	@Transactional
+	public Competencia save(Competencia obj) {
+
+		try {
+			if (obj.getId() == null) {
+				em.persist(obj);
+				return obj;
+			} else {
+				return em.merge(obj);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Competencia edit(Competencia obj) {
+		try {
+			em.merge(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public Competencia find(CompetenciaPK id) {
+		try {
+			return em.find(Competencia.class, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<Competencia> getListaPerfil() {
+		TypedQuery<Competencia> tq = em.createNamedQuery(
+				"Competencia.getAllListaPerfil", Competencia.class);
+
+		try {
+			tq.setParameter("estado", Constantes.ACTIVO);
+			return tq.getResultList();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<Competencia> getListaSinPerfil(Long puestoSelec) {
+		TypedQuery<Competencia> tq = em.createNamedQuery(
+				"Competencia.getListaSinPerfil", Competencia.class);
+		try {
+
+			tq.setParameter("estadoPerfil", Constantes.PENDIENTE);
+			tq.setParameter("idPuestoTipo", puestoSelec);
+			tq.setParameter("estado", Constantes.ACTIVO);
+			return tq.getResultList();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<SelectItem> getComboPerfil() {
+
+		List<SelectItem> listaCombo = new ArrayList<SelectItem>();
+		List<Competencia> lista = new ArrayList<Competencia>();
+		try {
+			lista = getListaPerfil();
+		} catch (Exception e) {
+			e.printStackTrace();
+			SelectItem fila = new SelectItem(0L, "Seleccione Perfil");
+			listaCombo.add(fila);
+			return listaCombo;
+		}
+		SelectItem fila = new SelectItem(0L, "Seleccione Perfil");
+		listaCombo.add(fila);
+
+		for (Competencia tipo : lista) {
+			fila = new SelectItem(tipo.getId(), "" + tipo.getNivelDeseado());
+			listaCombo.add(fila);
+		}
+		return listaCombo;
+	}
+
+	public List<Competencia> getListaCompetencia(Long idPuestoTipo) {
+		TypedQuery<Competencia> tq = em.createNamedQuery(
+				"Competencia.getListaCompetencia", Competencia.class);
+		try {
+
+			tq.setParameter("idPuestoTipo", idPuestoTipo);
+			tq.setParameter("estado", Constantes.ACTIVO);
+			tq.setParameter("estadoPerfil", Constantes.CONFIRMADO);
+			return tq.getResultList();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<Competencia> getListaPerfil(Long idPuestoTipo) {
+		TypedQuery<Competencia> tq = em.createNamedQuery(
+				"Competencia.getListaPerfil", Competencia.class);
+		try {
+
+			tq.setParameter("idPuestoTipo", idPuestoTipo);
+			tq.setParameter("estado", Constantes.ACTIVO);
+			return tq.getResultList();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public Integer getCountNivelDeseado(Long puestoSelec) {
+
+		Query q = null;
+		try {
+			q = (Query) em
+					.createQuery("SELECT COUNT(c.id.idCompetencia) FROM Competencia c where c.id.idPuesto =:idPuesto AND c.nivelDeseado IS NULL");
+			q.setParameter("idPuesto", puestoSelec);
+			return ((Long) q.getSingleResult()).intValue();
+
+		} catch (Exception e) {
+			return 0;
+		}
+
+	}
+
+	public Integer getCountNivelDeseadoConfirmado(Long puestoSelec) {
+
+		Query q = null;
+		try {
+			q = (Query) em
+					.createQuery("SELECT COUNT(c.id.idCompetencia) FROM Competencia c where c.id.idPuesto =:idPuesto AND c.nivelDeseado IS NOT NULL "
+							+ "AND c.estadoPerfil =:estadoPerfil");
+			q.setParameter("idPuesto", puestoSelec);
+			q.setParameter("estadoPerfil", "C");
+			return ((Long) q.getSingleResult()).intValue();
+
+		} catch (Exception e) {
+			return 0;
+		}
+
+	}
+
+}

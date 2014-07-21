@@ -1,0 +1,31 @@
+package gob.servir.desempenio.service;
+
+import gob.servir.desempenio.model.Actividad;
+
+import java.util.List;
+
+import javax.faces.model.SelectItem;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+public interface ActividadService {
+	
+	public abstract Actividad find(Long id);
+	
+	public abstract Actividad save(Actividad obj);
+	
+	public abstract Actividad edit(Actividad obj);
+	
+	public abstract List<Actividad> getListaActividad();
+	
+	public abstract List<Actividad> getListaActividad(Long idProceso);
+	
+	public abstract List<Actividad> getListaActTemporizado(Long idProceso);
+	
+	public abstract List<SelectItem> getComboActividad(Long idProceso);
+	
+	public abstract List<SelectItem> getComboActTemp(Long idProceso);
+
+}

@@ -1,0 +1,33 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.JefeInmediatoVDao;
+import gob.servir.desempenio.model.JefeInmediatoV;
+import gob.servir.desempenio.service.JefeInmediatoVService;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+/**
+ * 
+ * @author Hever Pumallihua García
+ */
+@Service
+public class JefeInmediatoVServiceImpl implements JefeInmediatoVService {
+
+	@Autowired
+	private JefeInmediatoVDao jefeInmediatoVDao;
+
+	public JefeInmediatoV find(Long id) {
+		return jefeInmediatoVDao.find(id);
+	}
+	public JefeInmediatoV getNombreCompletoAndDni(Long id) {
+		return jefeInmediatoVDao.getNombreCompletoAndDni(id);
+	}
+	
+	public List<JefeInmediatoV> getListaJefeInmediato() {
+		return jefeInmediatoVDao.getListaJefeInmediato();
+	}
+
+}

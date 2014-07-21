@@ -1,0 +1,51 @@
+package gob.servir.desempenio.util;
+
+public interface Constantes {
+
+	public static final Long PROCESO1 = 1L;
+	public static final Long PROCESO2 = 2L;
+	public static final Long PROCESO3 = 3L;
+	
+	public static final Long P1_REGISTRA_PERFIL = 2L;
+	public static final Long P1_EVALUACION_INICIAL = 3L;
+	public static final Long P1_REGISTRO_METAS_INDICADORES = 4L;
+	public static final Long P1_RECIBIR_NOTIFICACION = 6L;
+	public static final Long P1_APROBACION_METAS = 7L;
+	public static final Long P1_VERIFICAR_REVISAR_OBS = 9L;
+	public static final Long P1_VB = 10L;
+	public static final Long P1_NOTIFICA_GP_METAS_FINALES = 11L;
+	public static final Long P1_RECIBIR_NOTIFICACION2 = 12L;
+	public static final Long P1_PLAN_COMPETENCIAS = 13L;
+	public static final Long P1_PLAN_METAS = 14L;	
+	public static final Long P1_VERIFICAR_PLANES = 16L;
+	public static final Long P1_MODIFICAR_PLANES = 18L;
+	public static final Long P1_NOTIFICA_GP_PLANES_OBS = 17L;
+	public static final Long P1_NOTIFICA_GP_PLANES_FINALES = 19L;
+	public static final Long P1_DESCARGAR_ADJUNTAR = 20L;
+	public static final Long P1_VISUALIZAR_PLANES = 21L;
+
+	public static final Long P2_NOTIFICAR_GP = 1L;
+	public static final Long P2_CUALITATIVA_COMPETENCIAS = 3L;
+	public static final Long P2_CUALITATIVA_METAS = 4L;
+	
+	public static final String ACTIVO = "A";
+	public static final String INACTIVO = "E";
+	public static final String PENDIENTE = "P";
+	public static final String INICIADO = "I";
+	public static final String EN_ESPERA = "EE";
+	public static final String ATENDIDO = "AT";
+	
+	public static final String REGISTRADO = "R";
+	public static final String APROBADO = "A";
+	public static final String DESAPROBADO = "D";
+	
+	//Estado campaña
+	public static final String CAMPAÑA_CREADO = "Creado";
+	public static final String CAMPAÑA_ACTIVO = "Activo";
+	public static final String CAMPAÑA_TERMINADO = "Terminado";
+	
+	// tipo meta
+	public static final String FUNCIONAL = "FUNCIONAL";
+	public static final String INNOVACION = "INNOVACIÓN";
+	
+}

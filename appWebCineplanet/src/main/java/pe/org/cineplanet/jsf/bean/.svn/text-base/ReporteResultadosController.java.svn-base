@@ -1,0 +1,184 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.dto.Resultado;
+import gob.servir.desempenio.model.EvaluacionCompetencias;
+import gob.servir.desempenio.model.EvaluacionMetas;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.service.CampaniaService;
+import gob.servir.desempenio.service.EntidadDestinoVService;
+import gob.servir.desempenio.service.EvaluacionCompetenciasService;
+import gob.servir.desempenio.service.EvaluacionMetasService;
+import gob.servir.desempenio.service.InscripcionService;
+import gob.servir.desempenio.service.PuestoTipoVService;
+import gob.servir.desempenio.util.Constantes;
+import gob.servir.desempenio.util.Evaluacion;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.faces.model.SelectItem;
+
+import org.primefaces.model.chart.PieChartModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+
+@Component("reporteResultadosController")
+@Scope("session")
+public class ReporteResultadosController implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private static final Logger logger = LoggerFactory
+			.getLogger(ReporteResultadosController.class);
+
+	@Autowired
+	private LoginController loginController;
+	@Autowired
+	private CampaniaService campaniaService;
+	@Autowired
+	private PuestoTipoVService puestoTipoVService;
+	@Autowired
+	private EntidadDestinoVService entidadDestinoVService;
+	@Autowired
+	private InscripcionService inscripcionService;
+	@Autowired
+	private EvaluacionMetasService evaMetasService;
+	@Autowired
+	private EvaluacionCompetenciasService evaCompetenciasService;
+
+	private List<SelectItem> comboCampania = new ArrayList<SelectItem>();
+	private Long campaniaSelec = 0L;
+	private List<SelectItem> comboPuestoTipo = new ArrayList<SelectItem>();
+	private Long puestoTipoSelec = 0L;
+	private List<SelectItem> comboEntidad = new ArrayList<SelectItem>();
+	private Long entidadSelec = 0L;
+
+	private List<Inscripcion> listInscripcion = new ArrayList<Inscripcion>();
+
+	private PieChartModel pieModel;
+
+	public ReporteResultadosController() {
+
+	}
+
+	public List<SelectItem> getComboEntidad() {
+		comboEntidad = entidadDestinoVService.getComboEntidadDestino();
+		return comboEntidad;
+	}
+
+	public void setComboEntidad(List<SelectItem> comboEntidad) {
+		this.comboEntidad = comboEntidad;
+	}
+
+	public Long getEntidadSelec() {
+		return entidadSelec;
+	}
+
+	public void setEntidadSelec(Long entidadSelec) {
+		this.entidadSelec = entidadSelec;
+	}
+
+	public List<SelectItem> getComboPuestoTipo() {
+		comboPuestoTipo = puestoTipoVService.getComboPuestoTipo();
+		return comboPuestoTipo;
+	}
+
+	public void setComboPuestoTipo(List<SelectItem> comboPuestoTipo) {
+		this.comboPuestoTipo = comboPuestoTipo;
+	}
+
+	public Long getPuestoTipoSelec() {
+		return puestoTipoSelec;
+	}
+
+	public void setPuestoTipoSelec(Long puestoTipoSelec) {
+		this.puestoTipoSelec = puestoTipoSelec;
+	}
+
+	public List<SelectItem> getComboCampania() {
+		comboCampania = campaniaService.getComboCampania();
+		return comboCampania;
+	}
+
+	public void setComboCampania(List<SelectItem> comboCampania) {
+		this.comboCampania = comboCampania;
+	}
+
+	public Long getCampaniaSelec() {
+		return campaniaSelec;
+	}
+
+	public void setCampaniaSelec(Long campaniaSelec) {
+		this.campaniaSelec = campaniaSelec;
+	}
+
+	public List<Inscripcion> getListInscripcion() {
+		listInscripcion.clear();
+		//if (campaniaSelec != 0L)
+		listInscripcion = inscripcionService.getListGpEvaCulminado(
+					campaniaSelec, puestoTipoSelec, entidadSelec);
+		return listInscripcion;
+	}
+
+	public void setListInscripcion(List<Inscripcion> listInscripcion) {
+		this.listInscripcion = listInscripcion;
+	}
+
+	public PieChartModel getPieModel() {
+		createPieModel();
+		return pieModel;
+	}
+
+	private void createPieModel() {
+
+		Integer countSupero = 0;
+		Integer countCumplio = 0;
+		Integer countCumplioParte = 0;
+		Integer countNoCumplio = 0;
+		Integer countOtro = 0;
+
+		for (Inscripcion row : listInscripcion) {
+
+			/*List<EvaluacionMetas> listEvaMetas = evaMetasService
+					.getListaNotasEvaMetas(row.getId());
+
+			List<EvaluacionCompetencias> listEvaComp = evaCompetenciasService
+					.getListaSoloEvaCompetencias(row.getId());
+
+			Resultado resultado = Evaluacion.procesarEvaluacion(listEvaMetas,
+					listEvaComp);*/
+
+			if (row.getPromedioFinal() > 100
+					&& row.getPromedioFinal() <= 120) {
+				countSupero++;
+			} else if (row.getPromedioFinal() > 90
+					&& row.getPromedioFinal() <= 100) {
+				countCumplio++;
+			} else if (row.getPromedioFinal() > 80
+					&& row.getPromedioFinal() <= 90) {
+				countCumplioParte++;
+			} else if (row.getPromedioFinal() > 50
+					&& row.getPromedioFinal() <= 80) {
+				countNoCumplio++;
+			} else
+				countOtro++;
+		}
+
+		pieModel = new PieChartModel();
+
+		pieModel.set(Constantes.SUPERO_OBJETIVO, countSupero);
+		pieModel.set(Constantes.CUMPLIO_OBJETIVO, countCumplio);
+		pieModel.set(Constantes.CUMPLIO_EN_PARTE, countCumplioParte);
+		pieModel.set(Constantes.NO_CUMPLIO, countNoCumplio);
+		pieModel.set(Constantes.OTRO, countOtro);
+	}
+
+}

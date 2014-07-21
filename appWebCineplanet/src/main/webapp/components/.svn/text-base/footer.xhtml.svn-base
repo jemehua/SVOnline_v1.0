@@ -1,0 +1,21 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:body>
+
+	<ui:composition>
+		<h:outputStylesheet name="css/cssFooter.css" />
+		<div id="foo1">
+			Pasaje Zela 150 (Edificio MINTRA piso 10) - Jesus María, Lima - Perú.<br />
+			Teléfono: 511 206 3370 - Anexo: 3355<br /> Correo:
+			infogp@servir.gob.pe<br />
+		</div>
+		<div id="foo2">
+		Copyright © 2013 - Autoridad Nacional del Servicio Civil</div>
+	</ui:composition>
+</h:body>
+</html>

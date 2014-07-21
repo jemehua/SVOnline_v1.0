@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+
+</h:head>
+<h:body>
+	<h:outputStylesheet name="css/cssContent.css" />
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel header="Bienvenido">
+		<table>
+			<tr>
+				<td>Visión del Producto</td>
+			</tr>
+			<tr>
+				<td>Para el usuario del área de GDGP</td>
+			</tr>
+			<tr>
+				<td>Quienes necesitan ubicar y atender de una manera fácil y
+					rápida los flujos o atenciones en los procesos de asignación
+					inmediata, asignación abreviada, modificación de asignación,
+					conclusión y exclusión.</td>
+			</tr>
+			<tr>
+				<td>El producto es un sistema workflow de requerimientos y
+					asignación de gerentes públicos.</td>
+			</tr>
+			<tr>
+				<td>Es una aplicación web para terminales desktop.</td>
+			</tr>
+			<tr>
+				<td>A diferencia de otros productos, nuestro producto será
+					desarrollado a medida del área usuaria.</td>
+			</tr>
+			<tr>
+				<td>Nuestro producto será interactivo y amigable a los
+					usuarios.</td>
+			</tr>
+		</table>
+	</p:panel>
+</h:body>
+</html>

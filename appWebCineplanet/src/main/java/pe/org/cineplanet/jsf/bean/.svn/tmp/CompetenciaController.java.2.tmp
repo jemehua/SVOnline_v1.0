@@ -1,0 +1,453 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.model.Competencia;
+import gob.servir.desempenio.model.CompetenciaPK;
+import gob.servir.desempenio.model.DetalleFlujoPK;
+import gob.servir.desempenio.model.DetalleInscripcion;
+import gob.servir.desempenio.model.PuestoTipoV;
+import gob.servir.desempenio.model.TipoCompetencia;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.CompetenciaService;
+import gob.servir.desempenio.service.DetalleInscripcionService;
+import gob.servir.desempenio.service.FlujoService;
+import gob.servir.desempenio.service.PuestoTipoVService;
+import gob.servir.desempenio.service.TipoCompetenciaService;
+import gob.servir.desempenio.service.UsuarioService;
+import gob.servir.desempenio.util.Message;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.component.UIOutput;
+import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
+import javax.faces.event.ValueChangeEvent;
+import javax.faces.model.SelectItem;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+/**
+ * 
+ * @author Cristhian Alberto Munguia Martinez
+ */
+@Component("competenciaController")
+@Scope("session")
+public class CompetenciaController {
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(CompetenciaController.class);
+
+	private Message message = new Message();
+
+	@Autowired
+	private PuestoTipoVService puestoTipoVService;
+	@Autowired
+	private UsuarioService usuarioService;
+	@Autowired
+	private TipoCompetenciaService tipoCompetenciaService;
+	@Autowired
+	private DetalleInscripcionService detalleInsService;
+	@Autowired
+	private CompetenciaService competenciaService;
+	@Autowired
+	private FlujoService flujoService;
+
+	private Usuario userSesion = null;
+
+	private List<SelectItem> comboPuestoTipo = new ArrayList<SelectItem>();
+	private Long puestoSelec = 0L;
+
+	private List<TipoCompetencia> listaTipoCompetencia = new ArrayList<TipoCompetencia>();
+	private TipoCompetencia nuevoTipoCompetencia = new TipoCompetencia();
+	private Long lonContaCompetencia = 0L;
+
+	private Boolean booNivelDeaseado = true;
+	private Boolean booGuardar = true;
+	private Boolean boofinalizar = true;
+
+	HashMap<Long, Competencia> map = new HashMap<Long, Competencia>();
+
+	private List<DetalleInscripcion> listaInscripcionDetalle = new ArrayList<DetalleInscripcion>();
+
+	private Integer nivelDeseado = null;
+	private List<Competencia> listaCompetencia = new ArrayList<Competencia>();
+
+	public CompetenciaController() {
+
+	}
+
+	public Boolean getBoofinalizar() {
+		return boofinalizar;
+	}
+
+	public void setBoofinalizar(Boolean boofinalizar) {
+		this.boofinalizar = boofinalizar;
+	}
+
+	public Boolean getBooGuardar() {
+
+		return booGuardar;
+	}
+
+	public void setBooGuardar(Boolean booGuardar) {
+		this.booGuardar = booGuardar;
+	}
+
+	public HashMap<Long, Competencia> getMap() {
+		return map;
+	}
+
+	public void setMap(HashMap<Long, Competencia> map) {
+		this.map = map;
+	}
+
+	public Long getLonContaCompetencia() {
+		return lonContaCompetencia;
+	}
+
+	public Boolean getBooNivelDeaseado() {
+		return booNivelDeaseado;
+	}
+
+	public void setBooNivelDeaseado(Boolean booNivelDeaseado) {
+		this.booNivelDeaseado = booNivelDeaseado;
+	}
+
+	public void setLonContaCompetencia(Long lonContaCompetencia) {
+		this.lonContaCompetencia = lonContaCompetencia;
+	}
+
+	public List<Competencia> getListaCompetencia() {
+		return listaCompetencia;
+	}
+
+	public void setListaCompetencia(List<Competencia> listaCompetencia) {
+		this.listaCompetencia = listaCompetencia;
+	}
+
+	public Long getPuestoSelec() {
+		return puestoSelec;
+	}
+
+	public void setPuestoSelec(Long puestoSelec) {
+		this.puestoSelec = puestoSelec;
+	}
+
+	public Integer getNivelDeseado() {
+		return nivelDeseado;
+	}
+
+	public void setNivelDeseado(Integer nivelDeseado) {
+		this.nivelDeseado = nivelDeseado;
+	}
+
+	public TipoCompetencia getNuevoTipoCompetencia() {
+		return nuevoTipoCompetencia;
+	}
+
+	public void setNuevoTipoCompetencia(TipoCompetencia nuevoTipoCompetencia) {
+		this.nuevoTipoCompetencia = nuevoTipoCompetencia;
+	}
+
+	public List<TipoCompetencia> getListaTipoCompetencia() {
+		return tipoCompetenciaService.getListaCompetencia();
+	}
+
+	public void setListaTipoCompetencia(
+			List<TipoCompetencia> listaTipoCompetencia) {
+		this.listaTipoCompetencia = listaTipoCompetencia;
+	}
+
+	public List<SelectItem> getComboPuestoTipo() {
+		return puestoTipoVService.getComboPuestoTipo();
+	}
+
+	public void setComboPuestoTipo(List<SelectItem> comboPuestoTipo) {
+		this.comboPuestoTipo = comboPuestoTipo;
+	}
+
+	public void guardarCompetencia() {
+
+		validarSesion();
+		listaCompetencia = new ArrayList<Competencia>();
+
+		Iterator itr = map.entrySet().iterator();
+		while (itr.hasNext()) {
+			Map.Entry e = (Map.Entry) itr.next();
+			listaCompetencia.add((Competencia) e.getValue());
+
+		}
+
+		if (!validarDatos())
+			return;
+
+		PuestoTipoV nuevoPuesto = new PuestoTipoV();
+		nuevoPuesto = puestoTipoVService.find(puestoSelec);
+
+		try {
+			for (Competencia competencia : listaCompetencia) {
+
+				Competencia nuevoCompetencia = new Competencia();
+				CompetenciaPK nuevoCompetenciaPK = new CompetenciaPK(
+						competencia.getCompetencia().getIdCompetencia(),
+						puestoSelec);
+
+				nuevoCompetencia.setId(nuevoCompetenciaPK);
+
+				nuevoCompetencia.setNivelDeseado(competencia.getNivelDeseado());
+				nuevoCompetencia.setFechaCreacion(new Date());
+				nuevoCompetencia.setEstado("A");
+				nuevoCompetencia.setUsuarioRegistra(userSesion.getUsuario());
+				competenciaService.save(nuevoCompetencia);
+
+			}
+
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+							message.getMessage("msgRegistrar")));
+
+			limpiarG();
+		} catch (Exception e) {
+			logger.info("ERRROR AL REGISTRAR USUARIO");
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "ERROR",
+							message.getMessage("msgRegistrarError")));
+		}
+		//verificarPerfil();
+
+	}
+
+	public void limpiar() {
+
+		puestoSelec = 0L;
+		nivelDeseado = null;
+		listaCompetencia = new ArrayList<Competencia>();
+		booNivelDeaseado = true;
+		lonContaCompetencia = 0L;
+
+	}
+
+	public void limpiarG() {
+
+		// campaniaSelec = 0L;
+		puestoSelec = 0L;
+		if (listaCompetencia != null)
+			listaCompetencia.clear();
+		listaCompetencia = new ArrayList<Competencia>();
+		booNivelDeaseado = true;
+		lonContaCompetencia = 0L;
+
+		map = new HashMap<Long, Competencia>();
+		// nivelDeseado = null;
+
+	}
+
+	public void validarSesion() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		userSesion = (Usuario) context.getExternalContext().getSessionMap()
+				.get("userSesion");
+
+		if (userSesion == null) {
+			String ctxPath = context.getExternalContext()
+					.getRequestContextPath();
+			try {
+				context.getExternalContext().redirect(ctxPath + "/login.jsf");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public boolean validarDatos() {
+
+		if (puestoSelec.equals(0L)) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Ingrese Tipo de Puesto "));
+			listaCompetencia = new ArrayList<Competencia>();
+			return false;
+		}
+
+		if (map.size() != 7) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Ingrese Todas de Competencias"));
+
+			return false;
+		}
+
+		return true;
+	}
+
+	public boolean validarUsuario(String username) {
+		Usuario user = null;
+		user = usuarioService.findUsuarioByUsername(username);
+
+		if (user != null) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public void selecionarPuestoTipo() {
+		listaCompetencia.clear();
+		map = new HashMap<Long, Competencia>();
+		if (puestoSelec != 0)
+			buscarCampaniaPuesto();
+
+	}
+
+	public void buscarCampaniaPuesto() {
+
+		listaCompetencia = competenciaService.buscarCampaniaPuesto(puestoSelec,
+				tipoCompetenciaService.getListaCompetencia());
+		if (listaCompetencia == null) {
+			booNivelDeaseado = false;
+			listaCompetencia = new ArrayList<Competencia>();
+		} else {
+			for (Competencia competencia : listaCompetencia) {
+				map.put(competencia.getCompetencia().getIdCompetencia(),
+						competencia);
+			}
+
+		}
+
+		//verificarPerfil();
+
+	}
+
+	public void firstNameChanged(AjaxBehaviorEvent vce) {
+
+		nivelDeseado = (Integer) ((UIOutput) vce.getSource()).getValue();
+		Long numero = null;
+
+		String employee = ((UIOutput) vce.getSource()).getClientId();
+		numero = Long.parseLong(employee.substring((employee.indexOf(":") + 1),
+				employee.lastIndexOf(":"))) + 1;
+
+		TipoCompetencia nuevoCompetencia = new TipoCompetencia();
+
+		if (nivelDeseado != 0) {
+
+			nuevoCompetencia = tipoCompetenciaService.find(numero);
+			Competencia competencia = new Competencia();
+			competencia.setNivelDeseado(nivelDeseado);
+			competencia.setEstado("A");
+			competencia.setCompetencia(nuevoCompetencia);
+
+			map.put(numero, competencia);
+
+		} else {
+
+			map.remove(numero);
+		}
+
+		if (map.size() != 7) {
+			booGuardar = true;
+
+		} else {
+
+			booGuardar = false;
+
+		}
+
+	}
+
+	public void verNiveles(String id2) {
+
+		Long id = Long.parseLong(id2);
+		nivelDeseado = null;
+		if (listaCompetencia != null) {
+			for (int i = 0; listaCompetencia.size() > i; i++) {
+				if (id == (i + 1)) {
+					nivelDeseado = listaCompetencia.get(i).getNivelDeseado();
+
+				}
+				booNivelDeaseado = true;
+			}
+		}
+
+	}
+
+//	public void verificarPerfil() {
+//
+//		long cantidadPuesto = puestoTipoVService.getComboPuestoTipo().size() - 1;
+//		long cantidadPerfil=competenciaService.countPerfil();
+//
+//		 if(cantidadPerfil==cantidadPuesto)
+//		 boofinalizar=false;
+//		 else
+//		 boofinalizar=true;
+//
+//	}
+
+<<<<<<< .mine
+				/*DetalleFlujoPK detalleFlujoPK = new DetalleFlujoPK(
+						campaniaSelec, detalleInscripcion.getInscripcion()
+								.getGerentePublicoV().getCod_gerente(), 1L, 1L );
+=======
+//	public void finalizarPerfil() {
+//		// FLUJO
+//		validarSesion();
+//
+//		listaInscripcionDetalle.clear();
+//		 if (campaniaSelec != 0L) {
+//		 listaInscripcionDetalle = detalleInsService
+//		 .getListaInscripcionDetalle(campaniaSelec);
+//		
+//		 for (DetalleInscripcion detalleInscripcion : listaInscripcionDetalle)
+//		 {
+//		
+//		 DetalleFlujoPK detalleFlujoPK = new DetalleFlujoPK(
+//		 campaniaSelec, detalleInscripcion.getInscripcion()
+//		 .getGerentePublicoV().getCod_gerente(), 1L, 1L );
+//		
+//		 flujoService.atenderFlujo(detalleFlujoPK,
+//		 userSesion.getUsuario());
+//		
+//		 }
+//		
+//		 }
+//
+//		FacesContext.getCurrentInstance().addMessage(
+//				null,
+//				new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO", message
+//						.getMessage("msgRegistrar")));
+//
+//	}
+>>>>>>> .r648
+
+<<<<<<< .mine
+				flujoService.atenderFlujo(detalleFlujoPK,
+						userSesion.getUsuario());*/
+
+			}
+
+		}
+		
+		FacesContext.getCurrentInstance().addMessage(
+				null,
+				new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+						message.getMessage("msgRegistrar")));
+
+	}
+
+=======
+>>>>>>> .r648
+}

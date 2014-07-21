@@ -1,0 +1,42 @@
+package gob.servir.desempenio.service;
+
+import gob.servir.desempenio.dto.InscripcionGerente;
+import gob.servir.desempenio.model.DetalleInscripcion;
+import gob.servir.desempenio.model.DetalleInscripcionPK;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.Usuario;
+
+import java.util.List;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+public interface DetalleInscripcionService {
+
+	public abstract DetalleInscripcion find(DetalleInscripcionPK id);
+
+	public abstract DetalleInscripcion save(DetalleInscripcion obj);
+	
+	public abstract DetalleInscripcion saveTotal(DetalleInscripcion obj);
+	
+	public abstract DetalleInscripcion saveTotalUpdate(DetalleInscripcion antes,
+			DetalleInscripcion obj);
+
+	public abstract DetalleInscripcion edit(DetalleInscripcion obj);
+
+	public abstract List<DetalleInscripcion> getListaInscripcionDetalle();
+	
+	public abstract Long getMaxId();
+
+	public abstract List<DetalleInscripcion> getListaInscripcionDetalle(
+			Long campaniaSelec);
+<<<<<<< .mine
+	
+	public abstract List<InscripcionGerente> getListaInscripcion(Long idCampania);
+=======
+	
+	public abstract List<DetalleInscripcion> getListaInscripcionDetalleCampaña(Long idCampania, Usuario usuario);
+>>>>>>> .r609
+
+}

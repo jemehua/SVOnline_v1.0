@@ -1,0 +1,54 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.AsignacionGerenteVDao;
+import gob.servir.desempenio.model.AsignacionGerenteV;
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+
+import org.springframework.stereotype.Repository;
+
+/**
+ * 
+ * @author Hever Pumallihua García
+ */
+@Repository
+public class AsignacionGerenteVDaoImpl implements AsignacionGerenteVDao {
+
+	@PersistenceContext
+	private EntityManager em;
+
+	public AsignacionGerenteV find(String codGerente) {
+		return em.find(AsignacionGerenteV.class, codGerente);
+	}
+
+	public List<AsignacionGerenteV> getListaAsignacionGerente() {
+		TypedQuery<AsignacionGerenteV> tq = em.createNamedQuery(
+				"AsignacionGerenteV.getListaAsignacionGerenteAll",
+				AsignacionGerenteV.class);
+		try {
+			return tq.getResultList();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<AsignacionGerenteV> getListaAsignacionGerente(String codGerente) {
+
+		TypedQuery<AsignacionGerenteV> tq = em.createNamedQuery(
+				"AsignacionGerenteV.getListaAsignacionGerente",
+				AsignacionGerenteV.class);
+		try {
+			tq.setParameter("codGerente", codGerente);
+			return tq.getResultList();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+}

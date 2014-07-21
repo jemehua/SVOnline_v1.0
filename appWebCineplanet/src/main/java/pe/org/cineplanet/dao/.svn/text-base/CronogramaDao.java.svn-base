@@ -1,0 +1,31 @@
+package gob.servir.desempenio.dao;
+
+import gob.servir.desempenio.model.Cronograma;
+import gob.servir.desempenio.model.CronogramaPK;
+import gob.servir.desempenio.model.Temporizador;
+
+import java.util.List;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+public interface CronogramaDao {
+
+	public abstract Cronograma find(CronogramaPK id);
+
+	public abstract Cronograma save(Cronograma obj);
+
+	public abstract Cronograma save(Cronograma obj, int cantidadTemp);
+
+	public abstract Cronograma save(Cronograma obj,	List<Temporizador> listaTemporizador);
+
+	public abstract Cronograma edit(Cronograma obj);
+
+	public abstract List<Cronograma> getListaCronograma();
+
+	public abstract List<Cronograma> getListaCronograma(Long idCampania);
+
+	public abstract Long getMaxId(Long idCampania);
+
+}

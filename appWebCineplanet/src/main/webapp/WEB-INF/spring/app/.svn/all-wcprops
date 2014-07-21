@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/repservir/!svn/ver/994/desempenio/branches/desempenio/src/main/webapp/WEB-INF/spring/app
+END
+controllers.xml
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/repservir/!svn/ver/994/desempenio/branches/desempenio/src/main/webapp/WEB-INF/spring/app/controllers.xml
+END
+servlet-context.xml
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/repservir/!svn/ver/248/desempenio/branches/desempenio/src/main/webapp/WEB-INF/spring/app/servlet-context.xml
+END
+jboss-deployment-structure.xml
+K 25
+svn:wc:ra_dav:version-url
+V 121
+/repservir/!svn/ver/1601/desempenio/branches/desempenio/src/main/webapp/WEB-INF/spring/app/jboss-deployment-structure.xml
+END

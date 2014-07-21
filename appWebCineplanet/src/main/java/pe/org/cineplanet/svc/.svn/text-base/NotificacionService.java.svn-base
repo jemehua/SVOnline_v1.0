@@ -1,0 +1,29 @@
+package gob.servir.desempenio.service;
+
+import gob.servir.desempenio.model.DetalleFlujoPK;
+import gob.servir.desempenio.model.Notificacion;
+import gob.servir.desempenio.model.NotificacionPK;
+
+import java.util.List;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+public interface NotificacionService {
+	
+	public abstract Notificacion find(NotificacionPK id);
+
+	public abstract Notificacion save(Notificacion obj);
+
+	public abstract Notificacion edit(Notificacion obj);
+
+	public abstract List<Notificacion> getListaNotificacion();
+	
+	public abstract List<Notificacion> getListaNotificacion(DetalleFlujoPK id);
+	
+	public abstract Long getMaxId(DetalleFlujoPK id);
+	
+	public abstract Integer getCountByReceptor(DetalleFlujoPK id, String receptor);
+	
+}

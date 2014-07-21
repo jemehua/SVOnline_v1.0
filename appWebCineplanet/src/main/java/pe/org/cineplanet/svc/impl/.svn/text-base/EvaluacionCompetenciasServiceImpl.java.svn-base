@@ -1,0 +1,76 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.EvaluacionCompetenciasDao;
+import gob.servir.desempenio.model.EvaluacionCompetencias;
+import gob.servir.desempenio.model.EvaluacionCompetenciasPK;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.service.EvaluacionCompetenciasService;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua García
+ */
+@Service
+public class EvaluacionCompetenciasServiceImpl implements
+		EvaluacionCompetenciasService {
+
+	@Autowired
+	private EvaluacionCompetenciasDao evaluacionCualitativaDao;
+
+	@Transactional
+	public EvaluacionCompetencias find(EvaluacionCompetenciasPK id) {
+		return evaluacionCualitativaDao.find(id);
+	}
+
+	@Transactional
+	public EvaluacionCompetencias save(EvaluacionCompetencias obj) {
+		return evaluacionCualitativaDao.save(obj);
+	}
+
+	@Transactional
+	public EvaluacionCompetencias edit(EvaluacionCompetencias obj) {
+		return evaluacionCualitativaDao.edit(obj);
+
+	}
+
+	public List<EvaluacionCompetencias> getListaEvaluacionCompetencias() {
+		return evaluacionCualitativaDao.getListaEvaluacionCompetencias();
+	}
+
+	public List<EvaluacionCompetencias> getListaSoloEvaCompetencias(
+			InscripcionPK id) {
+		return evaluacionCualitativaDao.getListaSoloEvaCompetencias(id);
+	}
+
+	public List<EvaluacionCompetencias> getListaEvaluacionCompetencias(
+			InscripcionPK id) {
+		return evaluacionCualitativaDao.getListaEvaluacionCompetencias(id);
+	}
+
+	public Integer getCantidadCuantitativa(InscripcionPK id) {
+		return evaluacionCualitativaDao.getCantidadCuantitativa(id);
+	}
+
+	public Integer getCantidadCualitativa(InscripcionPK id) {
+		return evaluacionCualitativaDao.getCantidadCualitativa(id);
+	}
+
+	public Integer getCantidadCuantitativaGP(InscripcionPK id) {
+		return evaluacionCualitativaDao.getCantidadCuantitativaGP(id);
+	}
+
+	public Integer getCantidadCuantitativaJI(InscripcionPK id) {
+		return evaluacionCualitativaDao.getCantidadCuantitativaJI(id);
+	}
+
+	public Integer getCantidadCuantitativaTE(InscripcionPK id) {
+		return evaluacionCualitativaDao.getCantidadCuantitativaTE(id);
+	}
+
+}

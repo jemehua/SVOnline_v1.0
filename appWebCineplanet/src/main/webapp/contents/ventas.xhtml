@@ -1,0 +1,211 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+	<script type="text/javascript">
+		function start() {
+			PF('statusDialog').show();
+		}
+
+		function stop() {
+			PF('statusDialog').hide();
+		}
+	</script>
+</h:head>
+<h:body>
+	<h:outputStylesheet name="css/cssContent.css" />
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="pnlVentas" header="Ventas">
+		<p:focus context="pnlVentas" />
+		<table style="width: 100%;">
+			<tr>
+				<td>Cliente<h:outputText value="*" styleClass="obligatorio" /></td>
+				<td><p:selectOneMenu id="comboCliente"
+						value="#{ventasBean.clienteSelec}" style="width:210px;"
+						tabindex="1">
+						<f:selectItems value="#{ventasBean.comboCliente}" />
+						<p:ajax event="change"
+							listener="#{ventasBean.cargarDescAgenciaByCliente}"
+							update="agencia" />
+					</p:selectOneMenu></td>
+				<td>Agencia</td>
+				<td><h:outputText id="agencia"
+						value="#{ventasBean.descAgencia}" /></td>
+			</tr>
+			<tr>
+				<td>Otorgado a<h:outputText value="*" styleClass="obligatorio" /></td>
+				<td><p:inputText id="otorgado"
+						value="#{ventasBean.venta.otorgado}" tabindex="2" maxlength="200"
+						styleClass="txt">
+					</p:inputText></td>
+				<td>Documento venta<h:outputText value="*"
+						styleClass="obligatorio" /></td>
+				<td><p:selectOneMenu id="comboTipoDoc"
+						value="#{ventasBean.tipoDocumentoSelec}" style="width:210px;"
+						tabindex="3">
+						<f:selectItems value="#{ventasBean.comboTipoDocumento}" />
+					</p:selectOneMenu></td>
+			</tr>
+			<tr>
+				<td>Serie<h:outputText value="*" styleClass="obligatorio" /></td>
+				<td><p:inputText id="serie" value="#{ventasBean.venta.serie}"
+						tabindex="4" maxlength="3" styleClass="txt">
+					</p:inputText></td>
+				<td>Numero<h:outputText value="*" styleClass="obligatorio" /></td>
+				<td><p:inputText id="numero" value="#{ventasBean.venta.numero}"
+						tabindex="5" maxlength="20" styleClass="txt">
+					</p:inputText></td>
+			</tr>
+		</table>
+
+		<p:panel id="pnlPedidos" header="Pedidos">
+
+			<table style="width: 100%;">
+				<tr>
+					<td>Tipo de Vale<h:outputText value="*"
+							styleClass="obligatorio" /></td>
+					<td><p:selectOneMenu id="comboTipoVale"
+							value="#{ventasBean.tipoEntradaSelec}" style="width:210px;"
+							tabindex="6">
+							<f:selectItems value="#{ventasBean.comboTipoEntrada}" />
+							<p:ajax event="change" listener="#{ventasBean.handleItemSelect}"
+								update="validoPara cantidadDisponible" />
+						</p:selectOneMenu></td>
+					<td>Valido para</td>
+					<td><h:outputText id="validoPara"
+							value="#{ventasBean.descTipoEntrada}" /></td>
+					<td>Cantidad disponible</td>
+					<td><h:outputText id="cantidadDisponible"
+							value="#{ventasBean.cantidadDisponible}" /></td>
+				</tr>
+				<tr>
+					<td>Cantidad<h:outputText value="*" styleClass="obligatorio" /></td>
+					<td><p:inputText id="cantidad" value="#{ventasBean.cantidad}"
+							tabindex="7" maxlength="2" styleClass="txt">
+							<pe:keyFilter for="cantidad" regEx="/[0-9]/i" />
+						</p:inputText></td>
+					<td><p:commandButton value="Agregar"
+							action="#{ventasBean.agregar}" update="pnlPedidos, messages"
+							icon="ui-icon-disk" tabindex="8" /></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+			</table>
+			<p:separator id="s3" />
+			<p:dataTable var="d" value="#{ventasBean.listaDetalleVenta}"
+				id="dtListaDetalleVenta" rows="4" emptyMessage="No hay datos">
+
+				<f:facet name="header">  
+            Lista de Pedidos
+        </f:facet>
+				<p:column headerText="Tipo de Vale" style="width:50%">
+					<h:outputText value="#{d.tipoEntrada.nombre}" />
+				</p:column>
+				<p:column headerText="Cantidad" style="width:20%">
+					<h:outputText value="#{d.cantidad}" />
+				</p:column>
+				<p:column headerText="Estado" style="width:20%">
+					<h:outputText value="#{d.estado.equals('A')?'Activo':'Inactivo'}" />
+				</p:column>
+				<p:column headerText="#{messages.lblOpciones}" style="width:10%">
+					<p:commandButton value="" icon="ui-icon-pencil"
+						update=":frm:pnlPedidos :frm:validoPara :frm:cantidadDisponible"
+						title="Editar" action="#{ventasBean.handleItemSelect}">
+						<f:setPropertyActionListener value="#{d.cantidad}"
+							target="#{ventasBean.cantidad}" />
+						<f:setPropertyActionListener
+							value="#{d.tipoEntrada.idTipoEntrada}"
+							target="#{ventasBean.tipoEntradaSelec}" />
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+
+		<p:separator id="s1" />
+		<table>
+			<tr>
+				<td><p:commandButton value="Guardar"
+						action="#{ventasBean.guardar}" update="pnlVentas, messages"
+						icon="ui-icon-disk" tabindex="7" /></td>
+				<td><p:commandButton value="Limpiar"
+						update="pnlVentas, messages" action="#{ventasBean.limpiar}"
+						icon="ui-icon-close" tabindex="8" /></td>
+				<td></td>
+			</tr>
+		</table>
+		<p:separator id="s2" />
+		<p:dataTable var="v" value="#{ventasBean.listaVenta}"
+			id="dtListaVenta" scrollable="true" scrollHeight="180"
+			paginator="true" rows="8"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			emptyMessage="No hay datos">
+
+			<f:facet name="header">  
+            Lista de ventas
+        </f:facet>
+        <p:column headerText="Id" style="width:8%">
+				<h:outputText value="#{v.idVenta}" />
+			</p:column>
+			<p:column headerText="Agencia" style="width:12%">
+				<h:outputText value="#{v.cliente.agencia.nombre}" />
+			</p:column>
+			<p:column headerText="Cliente" style="width:22%">
+				<h:outputText value="#{v.cliente.razonSocial}" />
+			</p:column>
+			<p:column headerText="Otorgado a" style="width:22%">
+				<h:outputText value="#{v.otorgado}" />
+			</p:column>
+			<p:column headerText="Fecha de venta" style="width:10%">
+				<h:outputText value="#{v.fecRegistro}">
+					<f:convertDateTime pattern="dd/MM/yyyy" locale="es" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Total" style="width:8%">
+				<h:outputText value="#{v.total}" />
+			</p:column>
+			<p:column headerText="Estado" style="width:8%">
+				<h:outputText value="#{v.estado.equals('A')?'Activo':'Inactivo'}" />
+			</p:column>
+			<p:column headerText="#{messages.lblOpciones}" style="width:10%">
+				<!-- <p:commandButton value="" icon="ui-icon-pencil"
+					update=":frm:pnlVentas" title="Editar">
+					<f:setPropertyActionListener value="#{v}"
+						target="#{ventasBean.venta}" />
+					<f:setPropertyActionListener value="#{v.cliente.nroDocumento}"
+						target="#{ventasBean.clienteSelec}" />
+				</p:commandButton>-->
+				<p:commandButton value="Generar" ajax="false"
+					onclick="PrimeFaces.monitorDownload(start, stop);"
+					icon="ui-icon-arrowthick-1-s" actionListener="#{ventasBean.downloadAction(v.idVenta)}">
+					<p:fileDownload value="#{ventasBean.file}" />
+<!-- 					<f:setPropertyActionListener value="#{v.idVenta}" -->
+<!-- 						target="#{ventasBean.idVentaSelec}" /> -->
+				</p:commandButton>
+
+			</p:column>
+		</p:dataTable>
+	</p:panel>
+</h:body>
+<p:dialog modal="true" widgetVar="statusDialog" header="Status"
+	draggable="false" closable="true">
+	<p:graphicImage value="./images/ajax-loader.gif" />
+</p:dialog>
+<p:ajaxStatus
+	style="width:64px;height:64px;position:fixed;right:5px;bottom:5px"
+	id="ajaxStatusPanel">
+	<f:facet name="start">
+		<p:graphicImage value="./images/loading.gif" />
+	</f:facet>
+
+	<f:facet name="complete">
+		<h:outputText value="" />
+	</f:facet>
+</p:ajaxStatus>
+
+</html>

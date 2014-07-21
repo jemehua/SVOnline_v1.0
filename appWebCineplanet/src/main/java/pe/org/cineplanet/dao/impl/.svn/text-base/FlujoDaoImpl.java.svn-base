@@ -1,0 +1,1403 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.FlujoDao;
+import gob.servir.desempenio.model.AsignacionGerenteV;
+import gob.servir.desempenio.model.Campania;
+import gob.servir.desempenio.model.Competencia;
+import gob.servir.desempenio.model.DetalleFlujo;
+import gob.servir.desempenio.model.DetalleFlujoPK;
+import gob.servir.desempenio.model.DetalleInscripcion;
+import gob.servir.desempenio.model.EvaluacionCompetencias;
+import gob.servir.desempenio.model.EvaluacionInicial;
+import gob.servir.desempenio.model.EvaluacionInicialPK;
+import gob.servir.desempenio.model.EvaluacionMetas;
+import gob.servir.desempenio.model.Flujo;
+import gob.servir.desempenio.model.FlujoPK;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.Mensaje;
+import gob.servir.desempenio.model.MensajePK;
+import gob.servir.desempenio.model.Meta;
+import gob.servir.desempenio.model.MetaPK;
+import gob.servir.desempenio.model.Notificacion;
+import gob.servir.desempenio.model.NotificacionPK;
+import gob.servir.desempenio.model.ParametroSistema;
+import gob.servir.desempenio.model.Proceso;
+import gob.servir.desempenio.model.Temporizador;
+import gob.servir.desempenio.model.TemporizadorPK;
+import gob.servir.desempenio.model.UltimaCampaniaGp;
+import gob.servir.desempenio.model.UltimaCampaniaGpPK;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.CampaniaService;
+import gob.servir.desempenio.service.CompetenciaService;
+import gob.servir.desempenio.service.DetalleInscripcionService;
+import gob.servir.desempenio.service.EvaluacionCompetenciasService;
+import gob.servir.desempenio.service.EvaluacionInicialService;
+import gob.servir.desempenio.service.EvaluacionMetasService;
+import gob.servir.desempenio.service.InscripcionService;
+import gob.servir.desempenio.service.JavaMailService;
+import gob.servir.desempenio.service.MensajeService;
+import gob.servir.desempenio.service.MetaService;
+import gob.servir.desempenio.service.NotificacionService;
+import gob.servir.desempenio.service.ParametroSistemaService;
+import gob.servir.desempenio.service.TemporizadorService;
+import gob.servir.desempenio.service.UltimaCampaniaGpService;
+import gob.servir.desempenio.service.UsuarioService;
+import gob.servir.desempenio.util.Constantes;
+import gob.servir.desempenio.util.Fecha;
+import gob.servir.desempenio.util.FormatTemplateMessage;
+import gob.servir.desempenio.util.Message;
+import gob.servir.desempenio.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Repository
+public class FlujoDaoImpl implements FlujoDao {
+
+	@PersistenceContext
+	private EntityManager em;
+
+	@Autowired
+	private JavaMailService javaMailService;
+	@Autowired
+	private MensajeService mensajeService;
+	@Autowired
+	private NotificacionService notificacionService;
+	@Autowired
+	private InscripcionService inscripcionService;
+	@Autowired
+	private CompetenciaService competenciaService;
+	@Autowired
+	private DetalleInscripcionService detalleInscripcionService;
+	@Autowired
+	private EvaluacionCompetenciasService evaluacionCompetenciasService;
+	@Autowired
+	private EvaluacionMetasService evaluacionMetasService;
+	@Autowired
+	private MetaService metaService;
+	@Autowired
+	private UltimaCampaniaGpService ultimaCampaniaGpService;
+	@Autowired
+	private TemporizadorService temporizadorService;
+	@Autowired
+	private ParametroSistemaService parametroSistemaService;
+	@Autowired
+	private EvaluacionInicialService evaluacionInicialService;
+	@Autowired
+	private CampaniaService campaniaService;
+	@Autowired
+	private UsuarioService usuarioService;
+
+	private Message message = new Message();
+
+	public Flujo find(FlujoPK id) {
+		try {
+			return em.find(Flujo.class, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Flujo save(Flujo obj) {
+		try {
+			em.persist(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Flujo edit(Flujo obj) {
+		try {
+			return em.merge(obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<Flujo> getListaFlujo() {
+		TypedQuery<Flujo> tq = em.createNamedQuery("Flujo.getListAll",
+				Flujo.class);
+		try {
+			return tq.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<Flujo> getListaFlujo(InscripcionPK id) {
+		Query q = em.createNamedQuery("Flujo.getListByCampaniaAndGerente");
+		q.setParameter("idCampania", id.getIdCampania());
+		q.setParameter("codGerente", id.getIdGerentePublico());
+		try {
+
+			List<Object[]> listaObjetos = new ArrayList<Object[]>();
+
+			listaObjetos = q.getResultList();
+
+			List<Flujo> listaFlujo = new ArrayList<Flujo>();
+
+			for (Object[] row : listaObjetos) {
+				Flujo flujo = new Flujo();
+				flujo.setId((FlujoPK) row[0]);
+				flujo.setEstado((String) row[1]);
+				flujo.setProceso((Proceso) row[2]);
+				listaFlujo.add(flujo);
+			}
+
+			return listaFlujo;
+
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Flujo> getListaFlujo(Long idCampania, Long idProceso,
+			String estado) {
+		Query q = em
+				.createNamedQuery("Flujo.getListByCampaniaAndProcesoAndEstado");
+
+		q.setParameter("idCampania", idCampania);
+		q.setParameter("idProceso", idProceso);
+		q.setParameter("estado", estado);
+		try {
+
+			List<Object[]> listaObjetos = new ArrayList<Object[]>();
+
+			listaObjetos = q.getResultList();
+
+			List<Flujo> listaFlujo = new ArrayList<Flujo>();
+
+			for (Object[] row : listaObjetos) {
+				Flujo flujo = new Flujo();
+				flujo.setId((FlujoPK) row[0]);
+				Inscripcion inscripcion = new Inscripcion();
+				inscripcion.setId((InscripcionPK) row[1]);
+
+				AsignacionGerenteV gerente = new AsignacionGerenteV();
+				gerente.setCod_gerente((String) row[2]);
+				gerente.setNombres((String) row[3]);
+				gerente.setAp_paterno((String) row[4]);
+				gerente.setAp_materno((String) row[5]);
+				gerente.setDni((String) row[6]);
+				inscripcion.setAsignacionGerenteV(gerente);
+
+				flujo.setInscripcion(inscripcion);
+				flujo.setEstado((String) row[7]);
+
+				listaFlujo.add(flujo);
+			}
+
+			return listaFlujo;
+
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<Flujo> getListaFlujo(InscripcionPK id, String estado) {
+		Query q = em.createNamedQuery("Flujo.getListByCampaniaAndGerenteAndEstado");
+		q.setParameter("idCampania", id.getIdCampania());
+		q.setParameter("codGerente", id.getIdGerentePublico());
+		q.setParameter("estado", estado);
+		try {
+
+			List<Object[]> listaObjetos = new ArrayList<Object[]>();
+
+			listaObjetos = q.getResultList();
+
+			List<Flujo> listaFlujo = new ArrayList<Flujo>();
+
+			for (Object[] row : listaObjetos) {
+				Flujo flujo = new Flujo();
+				flujo.setId((FlujoPK) row[0]);
+				flujo.setEstado((String) row[1]);
+				listaFlujo.add(flujo);
+			}
+
+			return listaFlujo;
+
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public void atenderFlujo(DetalleFlujoPK id, String usuarioSesion)
+			throws Exception {
+
+		DetalleFlujo detalleFlujo = null;
+		DetalleFlujoPK id00 = null;
+		Long sgteActividad = 0L;
+
+		InscripcionPK insPk = null;
+		Inscripcion inscripcion = null;
+
+		int opcion = id.getIdActividad().intValue();
+
+		if (id.getIdProceso() == Constantes.PROCESO1) {
+
+			switch (opcion) {
+
+			case 1:
+
+				atenderActividad(id, usuarioSesion, 2);
+
+				Inscripcion ins = inscripcionService.find(new InscripcionPK(id
+						.getIdCampania(), id.getIdGerentePublico()));
+
+				UltimaCampaniaGp ultimaCamp = verificarUltimaCampania(
+						id.getIdGerentePublico(), ins.getPuestoTipoV()
+								.getId_puesto_tipo());
+
+				if (ultimaCamp != null) {
+
+					actualizarCompetencias(id, ultimaCamp.getId()
+							.getIdCampania(), ins.getPuestoTipoV()
+							.getId_puesto_tipo(), usuarioSesion);
+
+					sgteActividad = id.getIdActividad() + 1L;
+					id00 = new DetalleFlujoPK(id.getIdCampania(),
+							id.getIdGerentePublico(), id.getIdProceso(),
+							sgteActividad);
+
+					atenderActividad(id00, usuarioSesion, 2);
+
+					ins.setEstadoEvaInicial(Constantes.REGISTRADO);
+					em.merge(ins);
+
+					sgteActividad = id00.getIdActividad() + 1L;
+					id00 = new DetalleFlujoPK(id.getIdCampania(),
+							id.getIdGerentePublico(), id.getIdProceso(),
+							sgteActividad);
+					atenderActividad(id00, usuarioSesion, 2);
+				} else {
+					sgteActividad = id.getIdActividad() + 1L;
+					id00 = new DetalleFlujoPK(id.getIdCampania(),
+							id.getIdGerentePublico(), id.getIdProceso(),
+							sgteActividad);
+
+					List<Competencia> listCompetencia = competenciaService
+							.getListaCompetencia(ins.getPuestoTipoV()
+									.getId_puesto_tipo());
+					if (listCompetencia.size() > 0)
+						atenderActividad(id00, usuarioSesion, 2);
+					else
+						atenderActividad(id00, usuarioSesion, 1);
+
+					sgteActividad = id00.getIdActividad() + 1L;
+					id00 = new DetalleFlujoPK(id.getIdCampania(),
+							id.getIdGerentePublico(), id.getIdProceso(),
+							sgteActividad);
+					atenderActividad(id00, usuarioSesion, 1);
+				}
+
+				sgteActividad = id00.getIdActividad() + 1L;
+				id00 = new DetalleFlujoPK(id.getIdCampania(),
+						id.getIdGerentePublico(), id.getIdProceso(),
+						sgteActividad);
+				atenderActividad(id00, usuarioSesion, 1);
+
+				iniciarProceso(id, usuarioSesion);
+				break;
+			case 2:
+				flujoSecuencial(id, usuarioSesion);
+				break;
+			case 3:
+
+				id00 = new DetalleFlujoPK(id.getIdCampania(),
+						id.getIdGerentePublico(), id.getIdProceso(),
+						Constantes.P1_REGISTRA_PERFIL);
+				atenderActividad(id00, usuarioSesion, 3);
+
+				id00 = new DetalleFlujoPK(id.getIdCampania(),
+						id.getIdGerentePublico(), id.getIdProceso(),
+						Constantes.P1_VERIFICAR_METAS);
+				detalleFlujo = em.find(DetalleFlujo.class, id00);
+
+				if (detalleFlujo != null) {
+					if (detalleFlujo.getEstado().equalsIgnoreCase(
+							Constantes.ATENDIDO))
+						notificarGerentePublico(id, usuarioSesion);
+					else if (detalleFlujo.getEstado().equalsIgnoreCase(
+							Constantes.PENDIENTE))
+						atenderActividad(id, usuarioSesion, 3);
+				} else
+					atenderActividad(id, usuarioSesion, 3);
+				break;
+			case 4:
+				notificarGerentePublico(id, usuarioSesion);
+				break;
+			case 5:
+				// no entra
+				break;
+			case 6:
+				// no entra
+				break;
+			case 7:
+				inscripcion = em.find(
+						Inscripcion.class,
+						new InscripcionPK(id.getIdCampania(), id
+								.getIdGerentePublico()));
+
+				if (inscripcion != null) {
+					id00 = new DetalleFlujoPK(id.getIdCampania(),
+							id.getIdGerentePublico(), id.getIdProceso(),
+							Constantes.P1_RECIBIR_NOTIFICACION);
+					atenderActividad(id00, usuarioSesion, 3);
+
+					if (inscripcion.getEstadoMetas().equalsIgnoreCase(
+							Constantes.APROBADO)) {
+
+						atenderActividad(id, usuarioSesion, 3);
+
+						id00 = new DetalleFlujoPK(id.getIdCampania(),
+								id.getIdGerentePublico(), id.getIdProceso(),
+								Constantes.P1_VB);
+						atenderActividad(id00, usuarioSesion, 1);
+					} else if (inscripcion.getEstadoMetas().equalsIgnoreCase(
+							Constantes.DESAPROBADO))
+						notificarMe(id, usuarioSesion);
+				}
+				break;
+			case 8:
+				// no entra
+				break;
+			case 9:
+				notificarGerentePublico(id, usuarioSesion);
+				break;
+			case 10:
+				// no entra
+				break;
+			case 11:
+				flujoSecuencial(id, usuarioSesion);
+				break;
+			case 12:
+				id00 = new DetalleFlujoPK(id.getIdCampania(),
+						id.getIdGerentePublico(), id.getIdProceso(),
+						Constantes.P1_EVALUACION_INICIAL);
+				detalleFlujo = em.find(DetalleFlujo.class, id00);
+
+				if (detalleFlujo.getEstado().equalsIgnoreCase(
+						Constantes.ATENDIDO))
+					notificarGerentePublico(id, usuarioSesion);
+				else
+					atenderActividad(id, usuarioSesion, 3);
+				break;
+			case 13:
+				// no entra
+				break;
+			case 14:
+				// no entra
+				break;
+			case 15:
+				sgteActividad = id.getIdActividad() + 1L;
+				id00 = new DetalleFlujoPK(id.getIdCampania(),
+						id.getIdGerentePublico(), id.getIdProceso(),
+						sgteActividad);
+
+				detalleFlujo = em.find(DetalleFlujo.class, id00);
+
+				if (detalleFlujo != null) {
+					if (detalleFlujo.getEstado().equalsIgnoreCase(
+							Constantes.ATENDIDO)) {
+						notificarMe(id, usuarioSesion);
+					} else {
+						id00 = new DetalleFlujoPK(id.getIdCampania(),
+								id.getIdGerentePublico(), id.getIdProceso(),
+								Constantes.P1_RECIBIR_NOTIFICACION2);
+						atenderActividad(id00, usuarioSesion, 3);
+						atenderActividad(id, usuarioSesion, 3);
+					}
+				}
+				break;
+			case 16:
+				sgteActividad = id.getIdActividad() - 1L;
+				id00 = new DetalleFlujoPK(id.getIdCampania(),
+						id.getIdGerentePublico(), id.getIdProceso(),
+						sgteActividad);
+
+				detalleFlujo = em.find(DetalleFlujo.class, id00);
+
+				if (detalleFlujo.getEstado().equalsIgnoreCase(
+						Constantes.ATENDIDO)) {
+					notificarMe(id, usuarioSesion);
+				} else {
+					id00 = new DetalleFlujoPK(id.getIdCampania(),
+							id.getIdGerentePublico(), id.getIdProceso(),
+							Constantes.P1_RECIBIR_NOTIFICACION2);
+					atenderActividad(id00, usuarioSesion, 3);
+					atenderActividad(id, usuarioSesion, 3);
+				}
+				break;
+			case 17:
+				// no entra
+				break;
+			case 18:
+
+				insPk = new InscripcionPK(id.getIdCampania(),
+						id.getIdGerentePublico());
+				inscripcion = em.find(Inscripcion.class, insPk);
+
+				if (inscripcion != null) {
+					if (inscripcion.getEstadoPlanes().equalsIgnoreCase(
+							Constantes.APROBADO))
+						terminarFlujo(id, usuarioSesion);
+					else
+						notificarGerentePublico(id, usuarioSesion);
+				}
+				break;
+			case 19:
+				// no entra
+				break;
+			case 20:
+				atenderActividad(id, usuarioSesion, 3);
+
+				// Habilitar acceso
+				id00 = new DetalleFlujoPK(id.getIdCampania(),
+						id.getIdGerentePublico(), id.getIdProceso(),
+						Constantes.P1_VERIFICAR_PLANES);
+				atenderActividad(id00, usuarioSesion, 4);
+				break;
+			}
+		} else if (id.getIdProceso() == Constantes.PROCESO2) {
+			switch (id.getIdActividad().intValue()) {
+			case 1:
+				notificarGerentePublico(id, usuarioSesion);
+				iniciarProceso(id, usuarioSesion);
+				break;
+			case 2:
+				// no entra
+				break;
+			case 3:
+				sgteActividad = id.getIdActividad() + 1L;
+				id00 = new DetalleFlujoPK(id.getIdCampania(),
+						id.getIdGerentePublico(), id.getIdProceso(),
+						sgteActividad);
+
+				detalleFlujo = em.find(DetalleFlujo.class, id00);
+
+				if (detalleFlujo.getEstado().equalsIgnoreCase(
+						Constantes.ATENDIDO)) {
+					terminarFlujo(id, usuarioSesion);
+				} else {
+					id00 = new DetalleFlujoPK(id.getIdCampania(),
+							id.getIdGerentePublico(), id.getIdProceso(),
+							Constantes.P2_RECIBIR_NOTIFICACION);
+					atenderActividad(id00, usuarioSesion, 3);
+					atenderActividad(id, usuarioSesion, 3);
+				}
+				break;
+			case 4:
+				sgteActividad = id.getIdActividad() - 1L;
+				id00 = new DetalleFlujoPK(id.getIdCampania(),
+						id.getIdGerentePublico(), id.getIdProceso(),
+						sgteActividad);
+
+				detalleFlujo = em.find(DetalleFlujo.class, id00);
+
+				if (detalleFlujo.getEstado().equalsIgnoreCase(
+						Constantes.ATENDIDO)) {
+					terminarFlujo(id, usuarioSesion);
+				} else {
+					id00 = new DetalleFlujoPK(id.getIdCampania(),
+							id.getIdGerentePublico(), id.getIdProceso(),
+							Constantes.P2_RECIBIR_NOTIFICACION);
+					atenderActividad(id00, usuarioSesion, 3);
+					atenderActividad(id, usuarioSesion, 3);
+				}
+				break;
+			}
+		} else if (id.getIdProceso() == Constantes.PROCESO3) {
+			switch (id.getIdActividad().intValue()) {
+			case 1:
+				notificarGpP3(id, usuarioSesion);
+				iniciarProceso(id, usuarioSesion);
+				break;
+			case 2:
+				// no entra
+				break;
+			case 3:
+			case 4:
+				id00 = new DetalleFlujoPK(id.getIdCampania(),
+						id.getIdGerentePublico(), id.getIdProceso(),
+						Constantes.P3_RECIBIR_NOTIFICACION_GP);
+				atenderActividad(id00, usuarioSesion, 3);
+
+				id00 = atenderEvaluacionCuantitativa(id, usuarioSesion);
+				if (id00 != null)
+					terminarFlujo(id00, usuarioSesion);
+				break;
+			case 5:
+				// no entra
+				break;
+			case 6:
+
+				id00 = new DetalleFlujoPK(id.getIdCampania(),
+						id.getIdGerentePublico(), id.getIdProceso(),
+						Constantes.P3_RECIBIR_NOTIFICACION_JI);
+				atenderActividad(id00, usuarioSesion, 3);
+
+				insPk = new InscripcionPK(id.getIdCampania(),
+						id.getIdGerentePublico());
+				inscripcion = em.find(Inscripcion.class, insPk);
+
+				if (inscripcion != null) {
+					if (inscripcion.isTeAndJi()) {
+						id00 = new DetalleFlujoPK(id.getIdCampania(),
+								id.getIdGerentePublico(), id.getIdProceso(),
+								Constantes.P3_RECIBIR_NOTIFICACION_TE);
+						atenderActividad(id00, usuarioSesion, 3);
+
+						id00 = new DetalleFlujoPK(id.getIdCampania(),
+								id.getIdGerentePublico(), id.getIdProceso(),
+								Constantes.P3_CUANTITATIVA_COMPETENCIAS_TE);
+						atenderActividad(id00, usuarioSesion, 3);
+					}
+				}
+
+				id00 = atenderEvaluacionCuantitativa(id, usuarioSesion);
+				if (id00 != null)
+					terminarFlujo(id00, usuarioSesion);
+				break;
+			case 7:
+				id00 = new DetalleFlujoPK(id.getIdCampania(),
+						id.getIdGerentePublico(), id.getIdProceso(),
+						Constantes.P3_RECIBIR_NOTIFICACION_JI);
+				atenderActividad(id00, usuarioSesion, 3);
+
+				id00 = atenderEvaluacionCuantitativa(id, usuarioSesion);
+				if (id00 != null)
+					terminarFlujo(id00, usuarioSesion);
+				break;
+			case 8:
+				// no entra
+				break;
+			case 9:
+				id00 = new DetalleFlujoPK(id.getIdCampania(),
+						id.getIdGerentePublico(), id.getIdProceso(),
+						Constantes.P3_RECIBIR_NOTIFICACION_TE);
+				atenderActividad(id00, usuarioSesion, 3);
+
+				id00 = atenderEvaluacionCuantitativa(id, usuarioSesion);
+				if (id00 != null)
+					terminarFlujo(id00, usuarioSesion);
+				break;
+			case 10:
+				// no entra
+				break;
+			case 11:
+				// no entra
+				break;
+			case 12:
+				// no entra
+				break;
+			}
+		}
+	}
+
+	public UltimaCampaniaGp verificarUltimaCampania(String codGerente,
+			Long idPuesto) throws Exception {
+
+		List<UltimaCampaniaGp> listUltima = ultimaCampaniaGpService
+				.getListaUltimaCampaniaGp(codGerente);
+
+		if (listUltima.size() > 0) {
+
+			InscripcionPK idAnt = new InscripcionPK(listUltima.get(0).getId()
+					.getIdCampania(), codGerente);
+
+			Inscripcion inscripcionAnt = em.find(Inscripcion.class, idAnt);
+
+			if (inscripcionAnt.getPuestoTipoV().getId_puesto_tipo() == idPuesto)
+				return listUltima.get(0);
+			else
+				return null;
+		} else
+			return null;
+	}
+
+	public void actualizarCompetencias(DetalleFlujoPK id, Long idCampAnt,
+			Long idPuesto, String user) throws Exception {
+
+		InscripcionPK inscripcionPK = new InscripcionPK(idCampAnt,
+				id.getIdGerentePublico());
+
+		Set<EvaluacionInicial> listNewComp = new HashSet<EvaluacionInicial>();
+		List<EvaluacionCompetencias> listaEvaComp = evaluacionCompetenciasService
+				.getListaSoloEvaCompetencias(inscripcionPK);
+		List<EvaluacionInicial> listaEvaIni = evaluacionInicialService
+				.getListaEvaluacionInicial(inscripcionPK, 1);
+
+		for (EvaluacionInicial evaInicial : listaEvaIni) {
+			for (EvaluacionCompetencias evaFinal : listaEvaComp) {
+				if (evaInicial.getId().getIdCompetencia() == evaFinal.getId()
+						.getIdCompetencia()) {
+					Long prom = Math.round(evaFinal.getPromedio());
+					evaInicial.setNota(prom.intValue());
+					if (evaInicial.getCompetencia().getNivelDeseado() > evaInicial
+							.getNota())
+						evaInicial.setBrecha(evaInicial.getCompetencia()
+								.getNivelDeseado() - evaInicial.getNota());
+					else
+						evaInicial.setBrecha(0);
+					break;
+				}
+			}
+			listNewComp.add(evaInicial);
+		}
+
+		for (EvaluacionInicial evaInicial : listNewComp) {
+			EvaluacionInicial newEvaInicial = null;
+			EvaluacionInicialPK id01 = new EvaluacionInicialPK(evaInicial
+					.getId().getIdCompetencia(), id.getIdCampania(),
+					id.getIdGerentePublico(), idPuesto);
+
+			newEvaInicial = em.find(EvaluacionInicial.class, id01);
+
+			if (newEvaInicial == null) {
+				newEvaInicial = new EvaluacionInicial();
+				newEvaInicial.setId(id01);
+				newEvaInicial.setEstado(Constantes.ACTIVO);
+				newEvaInicial.setUsuarioRegistra(user);
+				newEvaInicial.setNota(evaInicial.getNota());
+				newEvaInicial.setBrecha(evaInicial.getBrecha());
+				em.persist(newEvaInicial);
+			} else {
+				newEvaInicial.setEstado(Constantes.ACTIVO);
+				newEvaInicial.setUsuarioModifica(user);
+				newEvaInicial.setNota(evaInicial.getNota());
+				newEvaInicial.setBrecha(evaInicial.getBrecha());
+				em.merge(newEvaInicial);
+			}
+		}
+	}
+
+	public void iniciarProceso(DetalleFlujoPK id, String userSesion)
+			throws Exception {
+		FlujoPK flujoPK = new FlujoPK(id.getIdCampania(),
+				id.getIdGerentePublico(), id.getIdProceso());
+		Flujo flujo = em.find(Flujo.class, flujoPK);
+		flujo.setEstado(Constantes.INICIADO);
+		flujo.setUsuarioModifica(userSesion);
+		em.merge(flujo);
+	}
+
+	public void atenderActividad(DetalleFlujoPK id, String userSesion,
+			int opcion) throws Exception {
+
+		if (opcion == 1 || opcion == 2) {// save
+			DetalleFlujo detalleFlujo = em.find(DetalleFlujo.class, id);
+			if (detalleFlujo == null) {
+				detalleFlujo = new DetalleFlujo();
+				detalleFlujo.setId(id);
+				if (opcion == 1)
+					detalleFlujo.setEstado(Constantes.EN_ESPERA);
+				else if (opcion == 2)
+					detalleFlujo.setEstado(Constantes.ATENDIDO);
+				detalleFlujo.setUsuarioRegistra(userSesion);
+				em.persist(detalleFlujo);
+			}
+		}
+
+		if (opcion == 3) {// edit
+			DetalleFlujo detalleFlujo = em.find(DetalleFlujo.class, id);
+			if (detalleFlujo.getEstado().equalsIgnoreCase(Constantes.EN_ESPERA)) {
+				detalleFlujo.setEstado(Constantes.ATENDIDO);
+				detalleFlujo.setUsuarioModifica(userSesion);
+				em.merge(detalleFlujo);
+			}
+		}
+
+		if (opcion == 4) {// edit
+			DetalleFlujo detalleFlujo = em.find(DetalleFlujo.class, id);
+			detalleFlujo.setEstado(Constantes.EN_ESPERA);
+			detalleFlujo.setUsuarioModifica(userSesion);
+			em.merge(detalleFlujo);
+		}
+	}
+
+	public DetalleFlujoPK atenderEvaluacionCuantitativa(DetalleFlujoPK id,
+			String usuarioSesion) throws Exception {
+
+		DetalleFlujoPK id00 = null;
+		Long sgteActividad = 0L;
+
+		atenderActividad(id, usuarioSesion, 3);
+
+		if (verificarEvaluacionFinal(id)) {
+
+			procesarEvaluacionMetas(id);
+			procesarEvaluacionCompetencias(id);
+			actualizarCompetencias(id, usuarioSesion);
+
+			sgteActividad = Constantes.P3_PROCESAR_EVALUACION;
+			id00 = new DetalleFlujoPK(id.getIdCampania(),
+					id.getIdGerentePublico(), id.getIdProceso(), sgteActividad);
+			atenderActividad(id00, usuarioSesion, 2);
+
+			sgteActividad += 1L;
+			id00 = new DetalleFlujoPK(id.getIdCampania(),
+					id.getIdGerentePublico(), id.getIdProceso(), sgteActividad);
+			atenderActividad(id00, usuarioSesion, 2);
+
+			// enviar a gp
+			sgteActividad += 1L;
+			id00 = new DetalleFlujoPK(id.getIdCampania(),
+					id.getIdGerentePublico(), id.getIdProceso(), sgteActividad);
+			atenderActividad(id00, usuarioSesion, 1);
+
+			Mensaje mensaje = mensajeService.getMensajePrincipal(
+					id00.getIdActividad(), id00.getIdProceso(),
+					id00.getIdCampania());
+
+			enviarCorreoGP(id00, mensaje, usuarioSesion);
+			return id00;
+		} else
+			return null;
+	}
+
+	private boolean verificarEvaluacionFinal(DetalleFlujoPK id)
+			throws Exception {
+
+		DetalleFlujoPK id00 = null;
+
+		id00 = new DetalleFlujoPK(id.getIdCampania(), id.getIdGerentePublico(),
+				id.getIdProceso(), Constantes.P3_CUANTITATIVA_COMPETENCIAS);
+		DetalleFlujo detalleFlujo03 = em.find(DetalleFlujo.class, id00);
+
+		id00 = new DetalleFlujoPK(id.getIdCampania(), id.getIdGerentePublico(),
+				id.getIdProceso(), Constantes.P3_CUANTITATIVA_METAS);
+		DetalleFlujo detalleFlujo04 = em.find(DetalleFlujo.class, id00);
+
+		id00 = new DetalleFlujoPK(id.getIdCampania(), id.getIdGerentePublico(),
+				id.getIdProceso(), Constantes.P3_CUANTITATIVA_COMPETENCIAS_JI);
+		DetalleFlujo detalleFlujo06 = em.find(DetalleFlujo.class, id00);
+
+		id00 = new DetalleFlujoPK(id.getIdCampania(), id.getIdGerentePublico(),
+				id.getIdProceso(), Constantes.P3_CUANTITATIVA_METAS_JI);
+		DetalleFlujo detalleFlujo07 = em.find(DetalleFlujo.class, id00);
+
+		id00 = new DetalleFlujoPK(id.getIdCampania(), id.getIdGerentePublico(),
+				id.getIdProceso(), Constantes.P3_CUANTITATIVA_COMPETENCIAS_TE);
+		DetalleFlujo detalleFlujo09 = em.find(DetalleFlujo.class, id00);
+
+		if (detalleFlujo03 != null && detalleFlujo04 != null
+				&& detalleFlujo06 != null && detalleFlujo07 != null
+				&& detalleFlujo09 != null) {
+			if (detalleFlujo03.getEstado()
+					.equalsIgnoreCase(Constantes.ATENDIDO)
+					&& detalleFlujo04.getEstado().equalsIgnoreCase(
+							Constantes.ATENDIDO)
+					&& detalleFlujo06.getEstado().equalsIgnoreCase(
+							Constantes.ATENDIDO)
+					&& detalleFlujo07.getEstado().equalsIgnoreCase(
+							Constantes.ATENDIDO)
+					&& detalleFlujo09.getEstado().equalsIgnoreCase(
+							Constantes.ATENDIDO)) {
+				return true;
+			} else
+				return false;
+		} else
+			return false;
+	}
+
+	@Transactional
+	private void flujoSecuencial(DetalleFlujoPK id, String usuarioSesion)
+			throws Exception {
+
+		atenderActividad(id, usuarioSesion, 3);
+
+		Long sgteActividad = id.getIdActividad() + 1L;
+		atenderActividad(
+				new DetalleFlujoPK(id.getIdCampania(),
+						id.getIdGerentePublico(), id.getIdProceso(),
+						sgteActividad), usuarioSesion, 1);
+	}
+
+	@Transactional
+	private void notificarMe(DetalleFlujoPK id, String usuarioSesion)
+			throws Exception {
+
+		DetalleFlujoPK id00 = null;
+		Long sgteActividad = 0L;
+
+		atenderActividad(id, usuarioSesion, 3);
+
+		// notifica ME
+		if (id.getIdActividad() == Constantes.P1_PLAN_COMPETENCIAS) {
+			sgteActividad = id.getIdActividad() + 2L;
+		} else {
+			sgteActividad = id.getIdActividad() + 1L;
+		}
+
+		id00 = new DetalleFlujoPK(id.getIdCampania(), id.getIdGerentePublico(),
+				id.getIdProceso(), sgteActividad);
+		atenderActividad(id00, usuarioSesion, 2);
+
+		Mensaje mensaje = mensajeService.getMensajePrincipal(sgteActividad,
+				id.getIdProceso(), id.getIdCampania());
+
+		String correoME = message.getMessage("correoME");
+
+		if (mensaje != null && correoME != null) {
+
+			AsignacionGerenteV gerente = em.find(AsignacionGerenteV.class,
+					id.getIdGerentePublico());
+
+			String rpta = FormatTemplateMessage.getMensajeME(
+					mensaje.getCuerpo(), id00, gerente.toString());
+
+			Mensaje mensaje2 = new Mensaje();
+			mensaje2.setTitulo(mensaje.getTitulo());
+			mensaje2.setCuerpo(rpta);
+
+			String resultado = javaMailService.enviar(mensaje2, correoME);
+
+			guardarNotificacion(id00, usuarioSesion, mensaje.getId(),
+					resultado, Constantes.MONITOREO_EVALUACION);
+		}
+
+		sgteActividad += 1L;
+		id00 = new DetalleFlujoPK(id.getIdCampania(), id.getIdGerentePublico(),
+				id.getIdProceso(), sgteActividad);
+		atenderActividad(id00, usuarioSesion, 1);
+	}
+
+	@Transactional
+	private void notificarGpP3(DetalleFlujoPK id, String usuarioSesion)
+			throws Exception {
+
+		DetalleFlujoPK id00 = null;
+		Long sgteActividad = 0L;
+
+		atenderActividad(id, usuarioSesion, 2);
+
+		Mensaje mensaje = mensajeService.getMensajePrincipal(
+				id.getIdActividad(), id.getIdProceso(), id.getIdCampania());
+
+		for (int i = 1; i < 4; i++) {
+			if (i == 1) {// GP
+				enviarCorreoGP(id, mensaje, usuarioSesion);
+				sgteActividad = Constantes.P3_RECIBIR_NOTIFICACION_GP;
+			} else if (i == 2) {// JI
+				enviarCorreoJI(id, mensaje, usuarioSesion);
+				sgteActividad = Constantes.P3_RECIBIR_NOTIFICACION_JI;
+			} else if (i == 3) {// TE
+				Inscripcion ins = em.find(Inscripcion.class, new InscripcionPK(
+						id.getIdCampania(), id.getIdGerentePublico()));
+				if (!ins.isTeAndJi())
+					enviarCorreoTE(id, mensaje, usuarioSesion);
+				sgteActividad = Constantes.P3_RECIBIR_NOTIFICACION_TE;
+			}
+
+			id00 = new DetalleFlujoPK(id.getIdCampania(),
+					id.getIdGerentePublico(), id.getIdProceso(), sgteActividad);
+			atenderActividad(id00, usuarioSesion, 1);
+
+			sgteActividad += 1L;
+			id00 = new DetalleFlujoPK(id.getIdCampania(),
+					id.getIdGerentePublico(), id.getIdProceso(), sgteActividad);
+			atenderActividad(id00, usuarioSesion, 1);
+
+			if (sgteActividad == Constantes.P3_CUANTITATIVA_COMPETENCIAS
+					|| sgteActividad == Constantes.P3_CUANTITATIVA_COMPETENCIAS_JI) {
+				sgteActividad += 1L;
+				id00 = new DetalleFlujoPK(id.getIdCampania(),
+						id.getIdGerentePublico(), id.getIdProceso(),
+						sgteActividad);
+				atenderActividad(id00, usuarioSesion, 1);
+			}
+		}
+	}
+
+	@Transactional
+	public void terminarFlujo(DetalleFlujoPK id, String usuarioSesion)
+			throws Exception {
+		FlujoPK flujoPK = null;
+		Flujo flujo = null;
+
+		atenderActividad(id, usuarioSesion, 3);
+
+		flujoPK = new FlujoPK(id.getIdCampania(), id.getIdGerentePublico(),
+				id.getIdProceso());
+
+		flujo = em.find(Flujo.class, flujoPK);
+
+		if (flujo != null) {
+			flujo.setUsuarioModifica(usuarioSesion);
+			flujo.setEstado(Constantes.ATENDIDO);
+			em.merge(flujo);
+
+			if (id.getIdProceso() == Constantes.PROCESO1
+					|| id.getIdProceso() == Constantes.PROCESO2) {
+				flujoPK = new FlujoPK(id.getIdCampania(),
+						id.getIdGerentePublico(), (id.getIdProceso() + 1L));
+				flujo = new Flujo();
+				flujo.setId(flujoPK);
+				flujo.setUsuarioRegistra(usuarioSesion);
+				flujo.setFechaCreacion(new Date());
+				flujo.setEstado(Constantes.PENDIENTE);
+				em.merge(flujo);
+			}
+		}
+	}
+
+	@Transactional
+	private void notificarGerentePublico(DetalleFlujoPK id, String usuarioSesion)
+			throws Exception {
+
+		DetalleFlujoPK id00 = null;
+		Long sgteActividad = 0L;
+
+		if (id.getIdProceso() == Constantes.PROCESO1) {
+			atenderActividad(id, usuarioSesion, 3);
+			if (id.getIdActividad() == Constantes.P1_EVALUACION_INICIAL)
+				sgteActividad = Constantes.P1_NOTIFICA_GP_METAS_FINALES;
+			else
+				sgteActividad = id.getIdActividad() + 1L;
+			id00 = new DetalleFlujoPK(id.getIdCampania(),
+					id.getIdGerentePublico(), id.getIdProceso(), sgteActividad);
+			atenderActividad(id00, usuarioSesion, 2);
+		} else if (id.getIdProceso() == Constantes.PROCESO2) {
+			atenderActividad(id, usuarioSesion, 2);
+			sgteActividad = id.getIdActividad();
+		}
+
+		id00 = new DetalleFlujoPK(id.getIdCampania(), id.getIdGerentePublico(),
+				id.getIdProceso(), sgteActividad);
+
+		Mensaje mensaje = mensajeService.getMensajePrincipal(
+				id00.getIdActividad(), id00.getIdProceso(),
+				id00.getIdCampania());
+
+		enviarCorreoGP(id00, mensaje, usuarioSesion);
+
+		sgteActividad += 1L;
+		id00 = new DetalleFlujoPK(id.getIdCampania(), id.getIdGerentePublico(),
+				id.getIdProceso(), sgteActividad);
+		atenderActividad(id00, usuarioSesion, 1);
+
+		// opcional
+		if (sgteActividad == Constantes.P2_RECIBIR_NOTIFICACION
+				|| sgteActividad == Constantes.P1_RECIBIR_NOTIFICACION
+				|| sgteActividad == Constantes.P1_RECIBIR_NOTIFICACION2) {
+			sgteActividad += 1L;
+			id00 = new DetalleFlujoPK(id.getIdCampania(),
+					id.getIdGerentePublico(), id.getIdProceso(), sgteActividad);
+			atenderActividad(id00, usuarioSesion, 1);
+
+			if (sgteActividad == Constantes.P1_PLAN_COMPETENCIAS
+					|| sgteActividad == Constantes.P2_CUALITATIVA_COMPETENCIAS) {
+
+				sgteActividad += 1L;
+				id00 = new DetalleFlujoPK(id.getIdCampania(),
+						id.getIdGerentePublico(), id.getIdProceso(),
+						sgteActividad);
+				atenderActividad(id00, usuarioSesion, 1);
+			}
+		}
+	}
+
+	public boolean isEstadoIniciado(InscripcionPK inscripcionPK) {
+		boolean estado = false;
+		List<Flujo> listaFlujos = this.getListaFlujo(inscripcionPK);
+
+		if (listaFlujos.size() == 1) {
+			if (listaFlujos.get(0).getEstado()
+					.equalsIgnoreCase(Constantes.PENDIENTE)) {
+				estado = true;
+			}
+		}
+
+		return estado;
+	}
+
+	private void procesarEvaluacionCompetencias(DetalleFlujoPK id)
+			throws Exception {
+
+		List<EvaluacionCompetencias> listEvaComp = evaluacionCompetenciasService
+				.getListaSoloEvaCompetencias(new InscripcionPK(id
+						.getIdCampania(), id.getIdGerentePublico()));
+
+		for (EvaluacionCompetencias row : listEvaComp) {
+			double promedio = ((double) row.getNotaGP() + row.getNotaJI() + row
+					.getNotaTE()) / 3;
+			// Long promedio2 = Math.round(promedio);
+			Double promedio2 = StringUtils.redondear(promedio);
+			double porcentaje = ((double) promedio2 / 5) * 100;
+			row.setPromedio(promedio2);
+			row.setPorcentaje(StringUtils.redondear(porcentaje));
+			em.merge(row);
+		}
+	}
+
+	private void procesarEvaluacionMetas(DetalleFlujoPK id) throws Exception {
+
+		List<EvaluacionMetas> listEvaMetas = evaluacionMetasService
+				.getListaNotasEvaMetas(new InscripcionPK(id.getIdCampania(), id
+						.getIdGerentePublico()));
+
+		for (EvaluacionMetas row : listEvaMetas) {
+
+			MetaPK id00 = new MetaPK(row.getId().getIdMeta(), row.getId()
+					.getIdCampania(), row.getId().getIdGerentePublico());
+
+			Meta meta = metaService.find(id00);
+
+			double promedio = ((double) row.getNotaGP() + row.getNotaJI()) / 2;
+			double proemedio2 = StringUtils.redondear(promedio);
+			double porcentaje = ((double) proemedio2 * meta.getPeso()) / 100;
+			row.setPromedio(proemedio2);
+			row.setPorcentaje(StringUtils.redondear(porcentaje));
+			em.merge(row);
+		}
+	}
+
+	private void actualizarCompetencias(DetalleFlujoPK id, String usuarioSesion)
+			throws Exception {
+
+		List<UltimaCampaniaGp> list = ultimaCampaniaGpService
+				.getListaUltimaCampaniaGp(new InscripcionPK(id.getIdCampania(),
+						id.getIdGerentePublico()));
+
+		for (UltimaCampaniaGp row : list) {
+			row.setEstado(Constantes.INACTIVO);
+			row.setUsuarioModifica(usuarioSesion);
+			ultimaCampaniaGpService.edit(row);
+		}
+
+		UltimaCampaniaGpPK id01 = new UltimaCampaniaGpPK(id.getIdCampania(),
+				id.getIdGerentePublico());
+		UltimaCampaniaGp ultimo = new UltimaCampaniaGp();
+		ultimo.setId(id01);
+		ultimo.setEstado(Constantes.ACTIVO);
+		ultimo.setUsuarioRegistra(usuarioSesion);
+		em.merge(ultimo);
+	}
+
+	@Transactional
+	public Integer enviarCorreoGP(DetalleFlujoPK id, Mensaje mensaje,
+			String usuarioSesion) throws Exception {
+
+		AsignacionGerenteV gerente = em.find(AsignacionGerenteV.class,
+				id.getIdGerentePublico());
+
+		if (gerente != null) {
+
+			StringBuilder para = new StringBuilder();
+
+			if (gerente.getMail_01() != null)
+				para.append(gerente.getMail_01());
+			if (gerente.getMail_02() != null) {
+				if (para.length() > 0)
+					para.append(", ");
+				para.append(gerente.getMail_02());
+			}
+			if (gerente.getMail_03() != null) {
+				if (para.length() > 0)
+					para.append(", ");
+				para.append(gerente.getMail_03());
+			}
+
+			if (mensaje != null && para.length() > 0) {
+
+				Usuario user = new Usuario();
+				user = usuarioService
+						.findByDniAndCampaniaAndRol(gerente.getDni(),
+								Constantes.ROL_GP, id.getIdCampania());
+
+				Long idActTemp = 0L;
+				if (id.getIdActividad() == Constantes.P2_NOTIFICAR_GP
+						|| id.getIdActividad() == Constantes.P1_NOTIFICAR_GP
+						|| id.getIdActividad() == Constantes.P1_NOTIFICA_GP_METAS_FINALES)
+					idActTemp = id.getIdActividad() + 1L;
+				else
+					idActTemp = id.getIdActividad();
+
+				ParametroSistema param = parametroSistemaService
+						.find(Constantes.ID_URL_CONFIRMACION);
+
+				DetalleFlujoPK pk = new DetalleFlujoPK(id.getIdCampania(),
+						id.getIdGerentePublico(), id.getIdProceso(), idActTemp);
+
+				Mensaje mensaje00 = new Mensaje();
+				mensaje00.setTitulo(mensaje.getTitulo());
+				mensaje00.setCuerpo(FormatTemplateMessage.textMessage(
+						mensaje.getCuerpo(), pk, user, param.getValor()));
+
+				Long tiempoTrascurrido = System.currentTimeMillis();
+				String resultado = javaMailService.enviar(mensaje00,
+						para.toString());
+				/*
+				 * Mail mail = new Mail(); String resultado =
+				 * mail.enviarEmail(mensaje00, para.toString());
+				 */
+				Long tiempoTrascurrido2 = System.currentTimeMillis();
+				Long result = tiempoTrascurrido2 - tiempoTrascurrido;
+				int tiempoTrascurridoSeg = (int) (result / 1000);// millisegundos
+																	// a
+																	// segundos
+				System.out.println("TIEMPO TRANSCURRIDO="
+						+ tiempoTrascurridoSeg);
+
+				guardarNotificacion(id, usuarioSesion, mensaje.getId(),
+						resultado, Constantes.GERENTE_PUBLICO);
+
+				return 1;
+			} else
+				return 0;
+		} else
+			return 0;
+	}
+
+	@Transactional
+	public Integer enviarCorreoJI(DetalleFlujoPK id, Mensaje mensaje,
+			String usuarioSesion) throws Exception {
+
+		List<DetalleInscripcion> listDetalle = detalleInscripcionService
+				.getListaDetalleInscripcion(id.getIdCampania(),
+						id.getIdGerentePublico());
+
+		if (listDetalle.size() > 0) {
+
+			DetalleInscripcion detalleInscripcion = listDetalle.get(0);
+			StringBuilder para = new StringBuilder();
+			Usuario user = new Usuario();
+			Campania campania = campaniaService.find(id.getIdCampania());
+
+			if (detalleInscripcion.getJefeInmediatoV() != null) {
+				if (detalleInscripcion.getJefeInmediatoV()
+						.getCorreo_electronico_personal() != null)
+					para.append(detalleInscripcion.getJefeInmediatoV()
+							.getCorreo_electronico_personal());
+				if (detalleInscripcion.getJefeInmediatoV()
+						.getCorreo_electronico_trabajo() != null) {
+					if (para.length() > 0)
+						para.append(", ");
+					para.append(detalleInscripcion.getJefeInmediatoV()
+							.getCorreo_electronico_trabajo());
+				}
+				/*user = usuarioService.findByDniAndCampaniaAndRol(
+						detalleInscripcion.getJefeInmediatoV()
+								.getNumero_documento(), Constantes.ROL_JI, id
+								.getIdCampania());*/
+				user = usuarioService.getUsuarioByDniAndAnio(detalleInscripcion.getJefeInmediatoV()
+						.getNumero_documento(), campania.getAnio());
+			} else if (detalleInscripcion.getJefeInmediato() != null) {
+				if (detalleInscripcion.getJefeInmediato().getCorreo1() != null)
+					para.append(detalleInscripcion.getJefeInmediato()
+							.getCorreo1());
+				if (detalleInscripcion.getJefeInmediato().getCorreo2() != null) {
+					if (para.length() > 0)
+						para.append(", ");
+					para.append(detalleInscripcion.getJefeInmediato()
+							.getCorreo2());
+				}
+				/*user = usuarioService.findByDniAndCampaniaAndRol(
+						detalleInscripcion.getJefeInmediato().getDni(),
+						Constantes.ROL_JI, id.getIdCampania());*/
+				
+				user = usuarioService.getUsuarioByDniAndAnio(detalleInscripcion.getJefeInmediato().getDni(), campania.getAnio());
+			}
+
+			if (mensaje != null && para.length() > 0) {
+
+				ParametroSistema param = parametroSistemaService
+						.find(Constantes.ID_URL_CONFIRMACION);
+
+				DetalleFlujoPK pk = new DetalleFlujoPK(id.getIdCampania(),
+						id.getIdGerentePublico(), id.getIdProceso(),
+						Constantes.P3_RECIBIR_NOTIFICACION_JI);
+
+				Mensaje mensaje00 = new Mensaje();
+				mensaje00.setTitulo(mensaje.getTitulo());
+				mensaje00.setCuerpo(FormatTemplateMessage.textMessage(
+						mensaje.getCuerpo(), pk, user, param.getValor()));
+
+				String resultado = javaMailService.enviar(mensaje00,
+						para.toString());
+
+				guardarNotificacion(id, usuarioSesion, mensaje.getId(),
+						resultado, Constantes.JEFE_INMEDIATO);
+
+				return 1;
+			} else
+				return 0;
+		} else
+			return 0;
+	}
+
+	@Transactional
+	public Integer enviarCorreoTE(DetalleFlujoPK id, Mensaje mensaje,
+			String usuarioSesion) throws Exception {
+
+		List<DetalleInscripcion> listDetalle = detalleInscripcionService
+				.getListaDetalleInscripcion(id.getIdCampania(),
+						id.getIdGerentePublico());
+
+		if (listDetalle.size() > 0) {
+
+			DetalleInscripcion detalleInscripcion = listDetalle.get(0);
+			StringBuilder para = new StringBuilder();
+			Usuario user = new Usuario();
+			Campania campania = campaniaService.find(id.getIdCampania());
+			
+			if (detalleInscripcion.getEntidadDestinoV() != null) {
+
+				if (detalleInscripcion.getEntidadDestinoV()
+						.getTe_numero_documento() != null) {
+
+					if (detalleInscripcion.getEntidadDestinoV()
+							.getTe_correo_electronico_personal() != null)
+						para.append(detalleInscripcion.getEntidadDestinoV()
+								.getTe_correo_electronico_personal());
+					if (detalleInscripcion.getEntidadDestinoV()
+							.getTe_correo_electronico_trabajo() != null) {
+						if (para.length() > 0)
+							para.append(", ");
+						para.append(detalleInscripcion.getEntidadDestinoV()
+								.getTe_correo_electronico_trabajo());
+					}
+
+					/*user = usuarioService.findByDniAndCampaniaAndRol(
+							detalleInscripcion.getEntidadDestinoV()
+									.getTe_numero_documento(),
+							Constantes.ROL_TE, id.getIdCampania());*/
+					
+					user = usuarioService.getUsuarioByDniAndAnio(detalleInscripcion.getEntidadDestinoV()
+							.getTe_numero_documento(), campania.getAnio());
+				} else if (detalleInscripcion.getTitularEntidad() != null) {
+					if (detalleInscripcion.getTitularEntidad()
+							.getCorreoPersonal() != null)
+						para.append(detalleInscripcion.getTitularEntidad()
+								.getCorreoPersonal());
+					if (detalleInscripcion.getTitularEntidad()
+							.getCorreoTrabajo() != null) {
+						if (para.length() > 0)
+							para.append(", ");
+						para.append(detalleInscripcion.getTitularEntidad()
+								.getCorreoTrabajo());
+					}
+
+					/*user = usuarioService.findByDniAndCampaniaAndRol(
+							detalleInscripcion.getTitularEntidad()
+									.getNroDocTE(), Constantes.ROL_TE, id
+									.getIdCampania());*/
+					user = usuarioService.getUsuarioByDniAndAnio(detalleInscripcion.getTitularEntidad()
+							.getNroDocTE(), campania.getAnio());
+				}
+
+			} else if (detalleInscripcion.getTitularEntidad() != null) {
+
+				if (detalleInscripcion.getTitularEntidad().getCorreoTrabajo() != null)
+					para.append(detalleInscripcion.getTitularEntidad()
+							.getCorreoTrabajo());
+				if (detalleInscripcion.getTitularEntidad().getCorreoPersonal() != null) {
+					if (para.length() > 0)
+						para.append(", ");
+					para.append(detalleInscripcion.getTitularEntidad()
+							.getCorreoPersonal());
+				}
+
+				/*user = usuarioService.findByDniAndCampaniaAndRol(
+						detalleInscripcion.getTitularEntidad().getNroDocTE(),
+						Constantes.ROL_TE, id.getIdCampania());*/
+				user = usuarioService.getUsuarioByDniAndAnio(detalleInscripcion.getTitularEntidad().getNroDocTE(), campania.getAnio());
+			}
+
+			if (mensaje != null && para.length() > 0) {
+
+				ParametroSistema param = parametroSistemaService
+						.find(Constantes.ID_URL_CONFIRMACION);
+
+				DetalleFlujoPK pk = new DetalleFlujoPK(id.getIdCampania(),
+						id.getIdGerentePublico(), id.getIdProceso(),
+						Constantes.P3_RECIBIR_NOTIFICACION_TE);
+
+				Mensaje mensaje00 = new Mensaje();
+				mensaje00.setTitulo(mensaje.getTitulo());
+				mensaje00.setCuerpo(FormatTemplateMessage.textMessage(
+						mensaje.getCuerpo(), pk, user, param.getValor()));
+
+				String resultado = javaMailService.enviar(mensaje00,
+						para.toString());
+
+				guardarNotificacion(id, usuarioSesion, mensaje.getId(),
+						resultado, Constantes.TITULAR_ENTIDAD);
+
+				return 1;
+			} else
+				return 0;
+		} else
+			return 0;
+	}
+
+	private void guardarNotificacion(DetalleFlujoPK id, String usuarioSesion,
+			MensajePK idMensaje, String resultado, String receptor)
+			throws Exception {
+
+		NotificacionPK notificacionPK = new NotificacionPK(
+				notificacionService.getMaxId(id), idMensaje.getIdMensaje(),
+				idMensaje.getIdActividad(), idMensaje.getIdProceso(),
+				id.getIdGerentePublico(), id.getIdCampania());
+
+		Notificacion notificacion = new Notificacion();
+		notificacion.setId(notificacionPK);
+		if (resultado == null)
+			notificacion.setObservacion("Enviado correctamente");
+		else
+			notificacion.setObservacion(resultado);
+		notificacion.setFechaCreacion(new Date(Calendar.getInstance().getTime()
+				.getTime()));
+		notificacion.setUsuarioRegistra(usuarioSesion);
+		notificacion.setEstado(Constantes.ACTIVO);
+		notificacion.setReceptor(receptor);
+		em.merge(notificacion);
+
+		TemporizadorPK temporizadorPK = new TemporizadorPK(id.getIdProceso(),
+				id.getIdCampania(), id.getIdActividad(), id.getIdProceso());
+		Temporizador temp = temporizadorService.find(temporizadorPK);
+
+		DetalleFlujo detalle = em.find(DetalleFlujo.class, id);
+		if (detalle.getNroEnvios() == null)
+			detalle.setNroEnvios(1);
+		else
+			detalle.setNroEnvios(detalle.getNroEnvios() + 1);
+
+		if (temp != null) {
+			Date fecha = Fecha.sumarDias(new Date(Calendar.getInstance()
+					.getTime().getTime()), temp.getCantidadDias());
+			detalle.setFechaSgteEnvio(fecha);
+		}
+		em.merge(detalle);
+	}
+}

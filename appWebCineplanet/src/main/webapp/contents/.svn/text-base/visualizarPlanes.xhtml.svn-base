@@ -1,0 +1,220 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+	<script type="text/javascript">
+		function start() {
+			statusDialog.show();
+		}
+		function stop() {
+			statusDialog.hide();
+		}
+	</script>
+</h:head>
+<h:body>
+	<h:outputStylesheet name="css/cssContent.css" />
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datos2" header="Verificación de Metas e Indicadores">
+		<p:focus context="datos2" />
+		<p:spacer height="10" />
+		<p:panelGrid styleClass="panelGrid">
+			<p:row>
+				<p:column width="30">#{messages.lblCampania}<h:outputText
+						value="*" styleClass="obligatorio" />
+				</p:column>
+				<p:column width="70">
+					<p:selectOneMenu id="comboCampania"
+						value="#{visualizarPlanesController.campaniaSelec}"
+						style="width:280px;" tabindex="1">
+						<f:selectItems value="#{visualizarPlanesController.comboCampania}" />
+						<p:ajax update="datos2" event="change"
+							listener="#{visualizarPlanesController.limpiar}" />
+					</p:selectOneMenu>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblGerentePublico}<h:outputText
+						value="*" styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<p:inputText id="gp" tabindex="2"
+						value="#{visualizarPlanesController.inscripcionSelec.asignacionGerenteV}"
+						style=" width : 270px;" readonly="true" />
+					<p:spacer width="5" />
+					<p:commandButton id="btnBuscar" value="Buscar"
+						actionListener="#{visualizarPlanesController.buscarGerenteInscrito}"
+						icon="ui-icon-search" update=":frm:dtGerente"
+						disabled="#{visualizarPlanesController.swBtnBuscar}"
+						oncomplete="dlgBuscarGP.show()" tabindex="3">
+					</p:commandButton>
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+
+		<p:spacer height="10" />
+		<p:dataTable var="meta"
+			value="#{visualizarPlanesController.listaMetas}" id="dtMetas"
+			rows="7" emptyMessage="#{messages.msgEmptyMessage}">
+
+			<f:facet name="header">  
+            Lista de Metas e Indicadores
+            </f:facet>
+
+			<p:column headerText="#{messages.lblCodigo}"
+				style="width:2%; white-space: normal;text-align: justify;">
+				<h:outputText value="#{meta.id.idMeta}" />
+			</p:column>
+			<p:column headerText="Tipo Meta"
+				style="width:10%; white-space: normal;text-align: justify;">
+				<h:outputText value="#{meta.tipo}" />
+			</p:column>
+			<p:column headerText="Meta"
+				style="width:30%; white-space: normal;text-align: justify;">
+				<h:outputText value="#{meta.denominacion}" />
+			</p:column>
+			<p:column headerText="Relación con el POI"
+				style="width:28%; white-space: normal;text-align: justify;">
+				<h:outputText value="#{meta.relacionPOI}" />
+			</p:column>
+			<p:column headerText="Peso (%)"
+				style="width:10%; white-space: normal;text-align: justify;">
+				<h:outputText value="#{meta.peso}" />
+			</p:column>
+			<p:column headerText="Fecha Culminación"
+				style="width:20%; white-space: normal;text-align: justify;">
+				<h:outputText value="#{meta.fechaFinMeta}" pattern="dd/MM/yyyy">
+					<f:convertDateTime pattern="dd/MM/yyyy" />
+				</h:outputText>
+			</p:column>
+
+		</p:dataTable>
+
+		<p:spacer height="1" />
+		<p:separator />
+		<table style="width: 100%">
+			<tr>
+				<td align="left"><p:outputLabel>Descargar :</p:outputLabel> <p:commandLink
+						id="descarga" ajax="false"
+						onclick="PrimeFaces.monitorDownload(start, stop)"
+						disabled="#{visualizarPlanesController.fileDesDoc eq null ? true : false}">
+						<p:graphicImage value="./images/pdf.png" width="25" height="25"
+							id="desImag" />
+						<pe:tooltip for="desImag" value="Descargar Metas e Indicadores"
+							showEffect="fadeIn" hideEffect="fadeIn" myPosition="left center"
+							atPosition="right center" />
+						<p:fileDownload value="#{visualizarPlanesController.fileDesDoc}" />
+					</p:commandLink></td>
+			</tr>
+		</table>
+
+		<p:dialog modal="true" widgetVar="statusDialog" header="Status"
+			draggable="false" closable="true" resizable="false">
+			<p:graphicImage value="./images/ajax-loader.gif" />
+		</p:dialog>
+
+		<p:separator />
+		<p:media id="viewPdf" value="#{visualizarPlanesController.fileDesDoc}"
+			width="100%"
+			disabled="#{visualizarPlanesController.fileDesDoc eq null ? true : false}"
+			height="300px" player="pdf" />
+		<p:separator />
+
+		<table style="width: 100%">
+			<tr>
+				<td align="left"><p:commandButton value="Habilitar acceso"
+						update="messages,btnFlujo" id="btnGuardar"
+						action="#{visualizarPlanesController.habilitarCarga}"
+						disabled="#{visualizarPlanesController.swFlujo}"
+						icon="ui-icon-arrowreturnthick-1-w" tabindex="4" /></td>
+				<td align="right"><p:commandButton value="Continuar"
+						id="btnFlujo" onclick="confirmacion.show()"
+						icon="ui-icon-circle-arrow-e" tabindex="5"
+						disabled="#{visualizarPlanesController.swFlujo}" /></td>
+			</tr>
+
+		</table>
+		<p:separator id="s3" />
+	</p:panel>
+
+
+	<!-- 	dialog -->
+	<p:dialog id="dlgBuscar" header="Buscar Gerente Público"
+		widgetVar="dlgBuscarGP" modal="true" resizable="false" width="772"
+		showEffect="clip" closable="true" hideEffect="fold">
+
+		<p:dataTable id="dtGerente" var="inscripcion"
+			value="#{visualizarPlanesController.listaGerentePublico}"
+			filteredValue="#{visualizarPlanesController.listaGerentePublicoFiltered}"
+			scrollable="true" scrollHeight="235" paginator="true" rows="10"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			emptyMessage="#{messages.msgEmptyMessage}">
+
+			<f:facet name="header">    
+            	Lista de Gerentes Públicos Inscritos
+            	</f:facet>
+
+			<p:column headerText="#{messages.lblCodigo}" style="width:20%"
+				filterBy="#{inscripcion.asignacionGerenteV.cod_gerente}">
+				<h:outputText value="#{inscripcion.asignacionGerenteV.cod_gerente}" />
+			</p:column>
+			<p:column headerText="Nombres" style="width:20%"
+				filterBy="#{inscripcion.asignacionGerenteV.nombres}">
+				<h:outputText value="#{inscripcion.asignacionGerenteV.nombres}" />
+			</p:column>
+			<p:column headerText="Ap.Paterno" style="width:20%"
+				filterBy="#{inscripcion.asignacionGerenteV.ap_paterno}">
+				<h:outputText value="#{inscripcion.asignacionGerenteV.ap_paterno}" />
+			</p:column>
+			<p:column headerText="Ap.Materno" style="width:12%">
+				<h:outputText value="#{inscripcion.asignacionGerenteV.ap_materno}" />
+			</p:column>
+			<p:column headerText="DNI" style="width:20%"
+				filterBy="#{inscripcion.asignacionGerenteV.dni}">
+				<h:outputText value="#{inscripcion.asignacionGerenteV.dni}" />
+			</p:column>
+			<p:column headerText="#{messages.lblOpciones}" style="width:8%">
+				<p:commandButton value=""
+					action="#{visualizarPlanesController.verificarEstadoFlujo}"
+					update=":frm:gp, :frm:dtMetas, :frm:btnFlujo, :frm:viewPdf, :frm:datos2"
+					oncomplete="dlgBuscarGP.hide()" icon="ui-icon-check"
+					title="Seleccionar Gerente Público">
+					<f:setPropertyActionListener value="#{inscripcion}"
+						target="#{visualizarPlanesController.inscripcionSelec}" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+	</p:dialog>
+	<p:confirmDialog message="¿Estás seguro de continuar?"
+		showEffect="fade" hideEffect="fade"
+		header="Verificación de Metas e Indicadores" widgetVar="confirmacion">
+		<table style="width: 100%">
+			<tr>
+				<td align="center"><p:commandButton value="Si"
+						style="width:50px" styleClass="ui-confirmdialog-yes"
+						icon="ui-icon-check" oncomplete="confirmacion.hide()"
+						update="messages,btnFlujo,btnGuardar"
+						action="#{visualizarPlanesController.atenderFlujo}">
+					</p:commandButton> <p:spacer width="10" /> <p:commandButton value="No"
+						style="width:50px" styleClass="ui-confirmdialog-no"
+						icon="ui-icon-close" onclick="confirmacion.hide()" /></td>
+			</tr>
+		</table>
+	</p:confirmDialog>
+</h:body>
+<p:ajaxStatus
+	style="width:64px;height:64px;position:fixed;right:5px;bottom:5px"
+	id="ajaxStatusPanel">
+	<f:facet name="start">
+		<p:graphicImage value="./images/loading.gif" />
+	</f:facet>
+
+	<f:facet name="complete">
+		<h:outputText value="" />
+	</f:facet>
+</p:ajaxStatus>
+</html>

@@ -1,0 +1,42 @@
+package gob.servir.desempenio.service;
+
+import gob.servir.desempenio.model.DetalleFlujoPK;
+import gob.servir.desempenio.model.Flujo;
+import gob.servir.desempenio.model.FlujoPK;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.Mensaje;
+
+import java.util.List;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+public interface FlujoService {
+	
+	public abstract Flujo find(FlujoPK id);
+
+	public abstract Flujo save(Flujo obj);
+
+	public abstract Flujo edit(Flujo obj);
+
+	public abstract List<Flujo> getListaFlujo();
+	
+	public abstract List<Flujo> getListaFlujo(InscripcionPK id);
+	
+	public abstract void atenderFlujo(DetalleFlujoPK id, String usuarioSesion) throws Exception;
+	
+	public abstract List<Flujo> getListaFlujo(Long idCampania, Long idProceso, String estado);
+	
+	public abstract List<Flujo> getListaFlujo(InscripcionPK id, String estado);
+	
+	public abstract boolean isEstadoIniciado(InscripcionPK inscripcionPK);
+
+	public abstract Integer enviarCorreoGP(DetalleFlujoPK id, Mensaje mensaje, String usuarioSesion) throws Exception; 
+	
+	public abstract Integer enviarCorreoJI(DetalleFlujoPK id, Mensaje mensaje, String usuarioSesion) throws Exception; 
+	
+	public abstract Integer enviarCorreoTE(DetalleFlujoPK id, Mensaje mensaje, String usuarioSesion) throws Exception; 
+
+
+}

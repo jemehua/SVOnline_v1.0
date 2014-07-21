@@ -1,0 +1,335 @@
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/repservir/!svn/ver/1566/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model
+END
+NotificacionPK.java
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/repservir/!svn/ver/751/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/NotificacionPK.java
+END
+DetalleFlujoV.java
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/repservir/!svn/ver/1233/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/DetalleFlujoV.java
+END
+DetalleFlujoPK.java
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/repservir/!svn/ver/400/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/DetalleFlujoPK.java
+END
+Notificacion.java
+K 25
+svn:wc:ra_dav:version-url
+V 115
+/repservir/!svn/ver/1498/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/Notificacion.java
+END
+UltimaCampaniaGpPK.java
+K 25
+svn:wc:ra_dav:version-url
+V 121
+/repservir/!svn/ver/1064/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/UltimaCampaniaGpPK.java
+END
+DetalleTipoCompetenciaPK.java
+K 25
+svn:wc:ra_dav:version-url
+V 127
+/repservir/!svn/ver/1264/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/DetalleTipoCompetenciaPK.java
+END
+Proceso.java
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/repservir/!svn/ver/1566/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/Proceso.java
+END
+EvaluacionInicialPK.java
+K 25
+svn:wc:ra_dav:version-url
+V 121
+/repservir/!svn/ver/967/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/EvaluacionInicialPK.java
+END
+FlujoPK.java
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/repservir/!svn/ver/400/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/FlujoPK.java
+END
+DetalleFlujo.java
+K 25
+svn:wc:ra_dav:version-url
+V 115
+/repservir/!svn/ver/1566/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/DetalleFlujo.java
+END
+EvaluacionCompetenciasPK.java
+K 25
+svn:wc:ra_dav:version-url
+V 126
+/repservir/!svn/ver/967/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/EvaluacionCompetenciasPK.java
+END
+PlanDesarrolloPK.java
+K 25
+svn:wc:ra_dav:version-url
+V 118
+/repservir/!svn/ver/968/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/PlanDesarrolloPK.java
+END
+UltimaCampaniaGp.java
+K 25
+svn:wc:ra_dav:version-url
+V 119
+/repservir/!svn/ver/1566/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/UltimaCampaniaGp.java
+END
+DetalleTipoCompetencia.java
+K 25
+svn:wc:ra_dav:version-url
+V 125
+/repservir/!svn/ver/1595/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/DetalleTipoCompetencia.java
+END
+EvaluacionInicial.java
+K 25
+svn:wc:ra_dav:version-url
+V 120
+/repservir/!svn/ver/1566/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/EvaluacionInicial.java
+END
+Flujo.java
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/repservir/!svn/ver/1519/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/Flujo.java
+END
+MetaPK.java
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/repservir/!svn/ver/347/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/MetaPK.java
+END
+EvaluacionCompetencias.java
+K 25
+svn:wc:ra_dav:version-url
+V 125
+/repservir/!svn/ver/1256/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/EvaluacionCompetencias.java
+END
+PlanDesarrollo.java
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/repservir/!svn/ver/1566/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/PlanDesarrollo.java
+END
+ItemMenu.java
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/repservir/!svn/ver/1566/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/ItemMenu.java
+END
+TipoCompetencia.java
+K 25
+svn:wc:ra_dav:version-url
+V 118
+/repservir/!svn/ver/1566/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/TipoCompetencia.java
+END
+Meta.java
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/repservir/!svn/ver/1483/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/Meta.java
+END
+Usuario.java
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/repservir/!svn/ver/1663/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/Usuario.java
+END
+PuestoTipoV.java
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/repservir/!svn/ver/1566/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/PuestoTipoV.java
+END
+Task.java
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/repservir/!svn/ver/248/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/Task.java
+END
+JefeInmediato.java
+K 25
+svn:wc:ra_dav:version-url
+V 115
+/repservir/!svn/ver/962/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/JefeInmediato.java
+END
+Menu.java
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/repservir/!svn/ver/248/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/Menu.java
+END
+DetalleInscripcionPK.java
+K 25
+svn:wc:ra_dav:version-url
+V 122
+/repservir/!svn/ver/440/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/DetalleInscripcionPK.java
+END
+Campania.java
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/repservir/!svn/ver/1648/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/Campania.java
+END
+TemporizadorPK.java
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/repservir/!svn/ver/403/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/TemporizadorPK.java
+END
+DetalleInscripcion.java
+K 25
+svn:wc:ra_dav:version-url
+V 121
+/repservir/!svn/ver/1660/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/DetalleInscripcion.java
+END
+AsignacionGerenteV.java
+K 25
+svn:wc:ra_dav:version-url
+V 121
+/repservir/!svn/ver/1566/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/AsignacionGerenteV.java
+END
+EvaluacionMetasPK.java
+K 25
+svn:wc:ra_dav:version-url
+V 119
+/repservir/!svn/ver/919/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/EvaluacionMetasPK.java
+END
+InscripcionPK.java
+K 25
+svn:wc:ra_dav:version-url
+V 115
+/repservir/!svn/ver/335/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/InscripcionPK.java
+END
+TitularEntidad.java
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/repservir/!svn/ver/962/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/TitularEntidad.java
+END
+MensajePK.java
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/repservir/!svn/ver/572/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/MensajePK.java
+END
+Permiso.java
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/repservir/!svn/ver/1566/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/Permiso.java
+END
+PlanMetasPK.java
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/repservir/!svn/ver/919/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/PlanMetasPK.java
+END
+Temporizador.java
+K 25
+svn:wc:ra_dav:version-url
+V 115
+/repservir/!svn/ver/1566/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/Temporizador.java
+END
+Inscripcion.java
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/repservir/!svn/ver/1566/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/Inscripcion.java
+END
+EvaluacionMetas.java
+K 25
+svn:wc:ra_dav:version-url
+V 118
+/repservir/!svn/ver/1130/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/EvaluacionMetas.java
+END
+ParametroSistema.java
+K 25
+svn:wc:ra_dav:version-url
+V 119
+/repservir/!svn/ver/1301/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/ParametroSistema.java
+END
+Mensaje.java
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/repservir/!svn/ver/1566/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/Mensaje.java
+END
+CompetenciaPK.java
+K 25
+svn:wc:ra_dav:version-url
+V 115
+/repservir/!svn/ver/741/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/CompetenciaPK.java
+END
+ActividadPK.java
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/repservir/!svn/ver/324/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/ActividadPK.java
+END
+CronogramaPK.java
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/repservir/!svn/ver/403/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/CronogramaPK.java
+END
+PlanMetas.java
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/repservir/!svn/ver/1392/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/PlanMetas.java
+END
+EntidadDestinoV.java
+K 25
+svn:wc:ra_dav:version-url
+V 118
+/repservir/!svn/ver/1566/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/EntidadDestinoV.java
+END
+Competencia.java
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/repservir/!svn/ver/1566/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/Competencia.java
+END
+Cronograma.java
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/repservir/!svn/ver/1663/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/Cronograma.java
+END
+Actividad.java
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/repservir/!svn/ver/1566/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/Actividad.java
+END
+JefeInmediatoV.java
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/repservir/!svn/ver/1566/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/JefeInmediatoV.java
+END
+DetalleFlujoVPK.java
+K 25
+svn:wc:ra_dav:version-url
+V 118
+/repservir/!svn/ver/1130/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/DetalleFlujoVPK.java
+END
+Rol.java
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/repservir/!svn/ver/1566/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/Rol.java
+END
+GerentePublicoV.java
+K 25
+svn:wc:ra_dav:version-url
+V 118
+/repservir/!svn/ver/1566/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/model/GerentePublicoV.java
+END

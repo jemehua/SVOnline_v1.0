@@ -1,0 +1,217 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.EvaluacionMetasDao;
+import gob.servir.desempenio.model.EvaluacionMetas;
+import gob.servir.desempenio.model.EvaluacionMetasPK;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.Meta;
+import gob.servir.desempenio.model.PlanMetas;
+import gob.servir.desempenio.util.Constantes;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Repository
+public class EvaluacionMetasDaoImpl implements EvaluacionMetasDao {
+	@PersistenceContext
+	private EntityManager em;
+
+	public EvaluacionMetas find(EvaluacionMetasPK id) {
+		try {
+			return em.find(EvaluacionMetas.class, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public EvaluacionMetas save(EvaluacionMetas obj) {
+		try {
+			em.persist(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public EvaluacionMetas edit(EvaluacionMetas obj) {
+		try {
+			return em.merge(obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<EvaluacionMetas> getListaEvaluacionMetas() {
+		TypedQuery<EvaluacionMetas> tq = em
+				.createNamedQuery("EvaluacionMetas.getListEvaluacionMetas",
+						EvaluacionMetas.class);
+		try {
+			return tq.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<EvaluacionMetas> getListaNotasEvaMetas(InscripcionPK id) {
+		Query q = em
+				.createNamedQuery("EvaluacionMetas.getListNotasEvaluacionMetas");
+		q.setParameter("idCampania", id.getIdCampania());
+		q.setParameter("idGerente", id.getIdGerentePublico());
+		q.setParameter("estado", Constantes.ACTIVO);
+		
+		//List<Object[]> listObjects = new ArrayList<Object[]>();
+		//List<EvaluacionMetas> listaEvaMetas = new ArrayList<EvaluacionMetas>();
+		try {
+			
+			return q.getResultList();
+
+			/*for (Object[] row : listObjects) {
+
+				EvaluacionMetas evaMetas = new EvaluacionMetas();
+				evaMetas.setId((EvaluacionMetasPK) row[0]);
+				evaMetas.setDescripcion((String) row[1]);
+				evaMetas.setPorcentajeAvance((Integer) row[2]);
+				evaMetas.setNotaGP((Integer) row[3]);
+				evaMetas.setNotaJI((Integer) row[4]);
+				evaMetas.setPromedio((Float) row[5]);
+				evaMetas.setPorcentaje((Float) row[6]);
+
+				listaEvaMetas.add(evaMetas);
+			}*/
+
+			//return listaEvaMetas;
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+	
+	
+
+	@SuppressWarnings("unchecked")
+	public List<EvaluacionMetas> getListaEvaluacionMetas(InscripcionPK id) {
+		Query q = null;
+		q = (Query) em
+				.createQuery("SELECT m.planMetas.meta.denominacion, m.planMetas.meta.relacionPOI, m.planMetas.meta.peso, m.planMetas.meta.fechaFinMeta, m.planMetas.meta.tipo, m.planMetas.descripcionPlan, " +
+						"m.id, m.descripcion, m.porcentajeAvance, m.notaGP, m.notaJI, m.promedio, m.porcentaje "
+						+ "FROM EvaluacionMetas m where m.id.idCampania =:idCampania AND m.id.idGerentePublico =:idGerente AND m.estado =:estado");
+		q.setParameter("idCampania", id.getIdCampania());
+		q.setParameter("idGerente", id.getIdGerentePublico());
+		q.setParameter("estado", Constantes.ACTIVO);
+
+		List<Object[]> listObjects = new ArrayList<Object[]>();
+		List<EvaluacionMetas> listaEvaMetas = new ArrayList<EvaluacionMetas>();
+		try {
+			listObjects = q.getResultList();
+
+			for (Object[] row : listObjects) {
+
+				Meta meta = new Meta();
+				meta.setDenominacion((String) row[0]);
+				meta.setRelacionPOI((String) row[1]);
+				meta.setPeso((Integer) row[2]);
+				meta.setFechaFinMeta((Date) row[3]);
+				meta.setTipo((String) row[4]);
+
+				PlanMetas planMetas = new PlanMetas();
+				planMetas.setMeta(meta);
+				planMetas.setDescripcionPlan((String) row[5]);
+
+				EvaluacionMetas evaMetas = new EvaluacionMetas();
+				evaMetas.setId((EvaluacionMetasPK) row[6]);
+				evaMetas.setDescripcion((String) row[7]);
+				evaMetas.setPorcentajeAvance((Integer) row[8]);
+				evaMetas.setNotaGP((Integer) row[9]);
+				evaMetas.setNotaJI((Integer) row[10]);
+				evaMetas.setPromedio((Double) row[11]);
+				evaMetas.setPorcentaje((Double) row[12]);
+				evaMetas.setPlanMetas(planMetas);
+
+				listaEvaMetas.add(evaMetas);
+			}
+
+			return listaEvaMetas;
+
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public Integer getCantidadCualitativa(InscripcionPK id) {
+		TypedQuery<Long> tq = em.createNamedQuery(
+				"EvaluacionMetas.getCantidadCualitativa", Long.class);
+		tq.setParameter("idCampania", id.getIdCampania());
+		tq.setParameter("idGerente", id.getIdGerentePublico());
+		tq.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+			return tq.getSingleResult().intValue();
+		} catch (Exception as) {
+			return 0;
+		}
+	}
+	
+	public Integer getCantidadCuantitativa(InscripcionPK id) {
+		TypedQuery<Long> tq = em.createNamedQuery(
+				"EvaluacionMetas.getCantidadCuantitativa", Long.class);
+		tq.setParameter("idCampania", id.getIdCampania());
+		tq.setParameter("idGerente", id.getIdGerentePublico());
+		tq.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+			return tq.getSingleResult().intValue();
+		} catch (Exception as) {
+			return 0;
+		}
+	}
+
+	public Integer getCantidadCuantitativaGP(InscripcionPK id) {
+		TypedQuery<Long> tq = em.createNamedQuery(
+				"EvaluacionMetas.getCantidadCuantitativaGP", Long.class);
+		tq.setParameter("idCampania", id.getIdCampania());
+		tq.setParameter("idGerente", id.getIdGerentePublico());
+		tq.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+			return tq.getSingleResult().intValue();
+		} catch (Exception as) {
+			return 0;
+		}
+	}
+
+	public Integer getCantidadCuantitativaJI(InscripcionPK id) {
+		TypedQuery<Long> tq = em.createNamedQuery(
+				"EvaluacionMetas.getCantidadCuantitativaJI", Long.class);
+		tq.setParameter("idCampania", id.getIdCampania());
+		tq.setParameter("idGerente", id.getIdGerentePublico());
+		tq.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+			return tq.getSingleResult().intValue();
+		} catch (Exception as) {
+			return 0;
+		}
+	}
+
+}

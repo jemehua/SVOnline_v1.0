@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+	<h:outputStylesheet name="css/cssContent.css" />
+</h:head>
+<h:body>
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datos" header="Modificación de Indicadores y Metas">
+		<p:focus context="datos" />
+		<p:panelGrid styleClass="panelGrid">
+			<p:row>
+				<p:column width="30">#{messages.lblCampania} </p:column>
+				<p:column width="70">
+					<p:selectOneMenu id="comboCampania"
+						value="#{verificacionMetasController.campaniaSelec}"
+						style="width:280px;" tabindex="1">
+						<f:selectItems
+							value="#{verificacionMetasController.comboCampania}" />
+						<p:ajax update="dtIncripcion" event="change"
+							listener="#{verificacionMetasController.buscarListaGerentes}" />
+					</p:selectOneMenu>
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+		<p:spacer height="10" />
+		<p:dataTable var="inscripcion"
+			value="#{verificacionMetasController.listaInscripcion}"
+			id="dtIncripcion" scrollable="true" scrollHeight="300"
+			paginator="true" rows="10"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			emptyMessage="#{messages.msgEmptyMessage}">
+
+			<f:facet name="header">    
+            	Lista de conformidad de Gerentes Publicos
+            </f:facet>
+
+			<p:column headerText="#{messages.lblCodigo}" style="width:20%"
+				filterBy="#{inscripcion.id.idGerentePublico}">
+				<h:outputText value="#{inscripcion.id.idGerentePublico}" />
+			</p:column>
+			<p:column headerText="#{messages.lblNombre}" style="width:20%"
+				filterBy="#{inscripcion.asignacionGerenteV.nombres}">
+				<h:outputText value="#{inscripcion.asignacionGerenteV.nombres}" />
+			</p:column>
+			<p:column headerText="#{messages.lblApPaterno}" style="width:20%"
+				filterBy="#{inscripcion.asignacionGerenteV.ap_paterno}">
+				<h:outputText value="#{inscripcion.asignacionGerenteV.ap_paterno}" />
+			</p:column>
+			<p:column headerText="#{messages.lblApMaterno}" style="width:20%">
+				<h:outputText value="#{inscripcion.asignacionGerenteV.ap_materno}" />
+			</p:column>
+			<p:column headerText="Estado" style="width:10%">
+				<h:outputText
+					value="#{inscripcion.estadoMetas.equals('A')?'Aprobo':'Desaprobo'}" />
+			</p:column>
+			<p:column headerText="#{messages.lblOpciones}" style="width:10%">
+				<p:commandButton value=""
+					update=":frm:datos,:frm:dlgBuscarObservaciones"
+					oncomplete="dlgBuscarObs.show()" icon="ui-icon-newwin"
+					title="Seleccionar Gerente Público"
+					disabled="#{inscripcion.estadoMetas eq 'A' ? true : false}"
+					actionListener="#{verificacionMetasController.cargarObservaciones(inscripcion)}">
+					<f:setPropertyActionListener value="#{inscripcion}"
+						target="#{verificacionMetasController.inscripcionSelec2}" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+	</p:panel>
+
+	<p:dialog id="dlgBuscarObservaciones"
+		header="Lista de Indicadores y Metas  que han sido observados"
+		widgetVar="dlgBuscarObs" modal="true" resizable="false" width="680"
+		showEffect="clip" closable="true" hideEffect="fold">
+
+		<p:dataTable var="meta"
+			value="#{verificacionMetasController.listaMetas}" id="dtMetas"
+			rows="6" rowKey="#{meta.id.idMeta}" selectionMode="single"
+			emptyMessage="#{messages.msgEmptyMessage}">
+			<p:ajax event="rowSelect"
+				listener="#{verificacionMetasController.onRowSelect}"
+				update=":frm:pnlObservacion2" />
+			<p:column headerText="#{messages.lblCodigo}" style="width:10%">
+				<h:outputText value="#{meta.id.idMeta}" />
+			</p:column>
+			<p:column headerText="Tipo Meta" style="width:15%">
+				<h:outputText value="#{meta.tipo}" />
+			</p:column>
+			<p:column headerText="Meta" style="width:30%; white-space: normal">
+				<h:outputText value="#{meta.denominacion}" />
+			</p:column>
+			<p:column headerText="Relación POI"
+				style="width:25%; white-space: normal">
+				<h:outputText value="#{meta.relacionPOI}" />
+			</p:column>
+
+			<f:facet name="footer">
+				<div class="mensaje">Seleccione un registro y modifique su
+					plan de metas de acuerdo a la observación</div>
+			</f:facet>
+
+		</p:dataTable>
+		<p:spacer width="20" height="5" />
+		<p:panelGrid id="pnlObservacion2" styleClass="panelGrid">
+			<p:row>
+				<p:column>Observación
+					</p:column>
+				<p:column>
+					<p:inputTextarea id="txtObservacionComp"
+						value="#{verificacionMetasController.nuevoMeta.observacion}"
+						rows="5" cols="100" autoResize="false" maxlength="3000"
+						style="width:510px;color:blue" readonly="true" />
+
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>Meta <h:outputText value="*"
+						styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<p:inputText
+						value="#{verificacionMetasController.nuevoMeta.denominacion}"
+						tabindex="4" maxlength="500" styleClass="txt" style="width:510px;" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>Relación con POI <h:outputText value="*"
+						styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<p:inputText
+						value="#{verificacionMetasController.nuevoMeta.relacionPOI}"
+						tabindex="5" maxlength="500" styleClass="txt" style="width:510px;" />
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+
+		<f:facet name="footer">
+			<table style="width: 100%">
+				<tr>
+					<td align="left"><p:commandButton value="Guardar"
+							icon="ui-icon-disk" disabled="#{verificacionMetasController.swFlujo}"
+							update="messages,dtMetas,pnlObservacion2,dtIncripcion,btnContinuar"
+							title="Editar Meta"
+							action="#{verificacionMetasController.guardarMeta}">
+						</p:commandButton></td>
+					<td align="right"><p:commandButton value="Continuar"
+							update="messages,dtMetas,pnlObservacion2,dtIncripcion"
+							id="btnContinuar" disabled="#{verificacionMetasController.swFlujo}"
+							action="#{verificacionMetasController.atenderFlujo}"
+							icon="ui-icon-circle-arrow-e" tabindex="12"
+							oncomplete="if (#{verificacionMetasController.swAprobar==false}){ dlgBuscarObs.hide();}" /></td>
+				</tr>
+			</table>
+		</f:facet>
+	</p:dialog>
+</h:body>
+</html>

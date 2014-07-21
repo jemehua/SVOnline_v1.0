@@ -1,0 +1,32 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.PuestoTipoVDao;
+import gob.servir.desempenio.model.PuestoTipoV;
+import gob.servir.desempenio.service.PuestoTipoVService;
+
+import java.util.List;
+
+import javax.faces.model.SelectItem;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+/**
+ * 
+ * @author Cristhian Munguia Martinez
+ */
+@Service
+public class PuestoTipoVServiceImpl implements PuestoTipoVService {
+
+	@Autowired
+	private PuestoTipoVDao puestoTipoVDao;
+
+	public PuestoTipoV find(Long id) {
+		return puestoTipoVDao.find(id);
+	}
+	
+	public List<SelectItem> getComboPuestoTipo() {
+		return puestoTipoVDao.getComboPuestoTipo();
+	}
+
+}

@@ -1,0 +1,52 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.GerentePublicoVDao;
+import gob.servir.desempenio.model.GerentePublicoV;
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua García
+ */
+@Repository
+public class GerentePublicoVDaoImpl implements GerentePublicoVDao {
+
+	@PersistenceContext
+	private EntityManager em;
+
+	public GerentePublicoV find(String codGerente) {
+		return em.find(GerentePublicoV.class, codGerente);
+	}
+
+	@Transactional
+	public GerentePublicoV save(GerentePublicoV obj) {
+		try {
+			em.persist(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<GerentePublicoV> getListaGerentePublico() {
+		Query q = null;
+		try {
+			q = em.createNamedQuery("GerentePublicoV.getAllListaGerentePublico");
+			return q.getResultList();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+}

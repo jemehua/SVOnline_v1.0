@@ -1,0 +1,9 @@
+package gob.servir.desempenio.service;
+
+import gob.servir.desempenio.model.Mensaje;
+
+public interface JavaMailService {
+	
+	public abstract String enviar(Mensaje mensaje, String to);
+	
+}

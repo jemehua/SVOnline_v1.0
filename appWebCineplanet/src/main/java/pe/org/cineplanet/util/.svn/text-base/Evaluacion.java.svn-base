@@ -1,0 +1,76 @@
+package gob.servir.desempenio.util;
+
+import java.util.List;
+
+import gob.servir.desempenio.dto.Resultado;
+import gob.servir.desempenio.model.EvaluacionCompetencias;
+import gob.servir.desempenio.model.EvaluacionMetas;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+public class Evaluacion {
+
+	public Evaluacion() {
+
+	}
+
+	public static Resultado procesarEvaluacion(
+			List<EvaluacionMetas> listEvaMetas,
+			List<EvaluacionCompetencias> listEvaComp) {
+
+		double promedioMetas = 0;
+		double promedioCompetencias = 0;
+		double promedioFinal = 0;
+		String descripcion = "";
+		Resultado resultado = new Resultado();
+
+		double sumaMetas = 0;
+
+		for (EvaluacionMetas row : listEvaMetas) {
+			if (row.getPorcentaje() != null)
+				sumaMetas += row.getPorcentaje();
+		}
+
+		double sumaComp = 0;
+
+		for (EvaluacionCompetencias row : listEvaComp) {
+			if (row.getPorcentaje() != null)
+				sumaComp += row.getPorcentaje();
+		}
+
+		if (sumaMetas != 0) {
+			// promedioMetas = (double) sumaMetas / listEvaMetas.size();
+			// promedioMetas = sumaMetas;
+			promedioMetas = StringUtils.redondear(sumaMetas);
+		}
+		if (sumaComp != 0) {
+			promedioCompetencias = (double) sumaComp / listEvaComp.size();
+			promedioCompetencias = StringUtils.redondear(promedioCompetencias);
+		}
+		if (promedioMetas != 0 && promedioCompetencias != 0) {
+			promedioFinal = (promedioMetas + promedioCompetencias) / 2;
+			promedioFinal = StringUtils.redondear(promedioFinal);
+		}
+
+		if (promedioFinal > 100 && promedioFinal <= 120)
+			descripcion = "Superó el objetivo";
+		else if (promedioFinal > 90 && promedioFinal <= 100)
+			descripcion = "Cumplió el objetivo";
+		else if (promedioFinal > 80 && promedioFinal <= 90)
+			descripcion = "Cumplió en parte el objetivo";
+		else if (promedioFinal > 50 && promedioFinal <= 80)
+			descripcion = "No cumplió con el objetivo";
+		else
+			descripcion = "";
+
+		resultado.setPromedioMetas(promedioMetas);
+		resultado.setPromedioCompetencias(promedioCompetencias);
+		resultado.setPromedioFinal(promedioFinal);
+		resultado.setDescripcion(descripcion);
+
+		return resultado;
+	}
+
+}

@@ -1,0 +1,93 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.PlanDesarrolloDao;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.PlanDesarrollo;
+import gob.servir.desempenio.model.PlanDesarrolloPK;
+import gob.servir.desempenio.service.PlanDesarrolloService;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua García
+ */
+@Service
+public class PlanDesarrolloServiceImpl implements PlanDesarrolloService {
+
+	@Autowired
+	private PlanDesarrolloDao planDesarrolloDao;
+
+	@Transactional
+	public PlanDesarrollo find(PlanDesarrolloPK id) {
+		return planDesarrolloDao.find(id);
+	}
+
+	@Transactional
+	public PlanDesarrollo save(PlanDesarrollo obj) {
+		return planDesarrolloDao.save(obj);
+	}
+
+	@Transactional
+	public PlanDesarrollo edit(PlanDesarrollo obj) {
+		return planDesarrolloDao.edit(obj);
+
+	}
+
+	public List<PlanDesarrollo> getListaPlanDesarrollo() {
+		return planDesarrolloDao.getListaPlanDesarrollo();
+	}
+
+	public Long getMaxId(Long idCompetencia, Long idCampania,
+			String codGerente, Long idPuesto) {
+		return planDesarrolloDao.getMaxId(idCompetencia, idCampania,
+				codGerente, idPuesto);
+	}
+
+	public List<PlanDesarrollo> getListaPlanDesarrollo(Long idCompetencia,
+			Long idCampania, String codGerente, Long idPuesto) {
+		return planDesarrolloDao.getListaPlanDesarrollo(idCompetencia,
+				idCampania, codGerente, idPuesto);
+	}
+
+	public List<PlanDesarrollo> getListaPlanDesarrollo(Long idCampania,
+			String codGerente, Long idPuesto) {
+		return planDesarrolloDao.getListaPlanDesarrollo(idCampania, codGerente,
+				idPuesto);
+	}
+
+<<<<<<< .mine
+	/*
+	 * public List<PlanDesarrollo> getListaPlanDesarrolloVerificacion( Long
+	 * idCampania, String codGerente, Long idPuesto) { return
+	 * planDesarrolloDao.getListaPlanDesarrolloVerificacion
+	 * (idCampania,codGerente,idPuesto); }
+	 */
+=======
+	public List<PlanDesarrollo> getListaPlanDesarrollo(InscripcionPK id,
+			boolean aprobacion) {
+>>>>>>> .r945
+
+<<<<<<< .mine
+	public List<PlanDesarrollo> getListaPlanDesarrolloVerificacionDesaporbados(
+			Long idCampania, String codGerente, Long idPuesto) {
+
+		return planDesarrolloDao
+				.getListaPlanDesarrolloVerificacionDesaporbados(idCampania,
+						codGerente, idPuesto);
+=======
+		return planDesarrolloDao.getListaPlanDesarrollo(id, aprobacion);
+>>>>>>> .r945
+	}
+
+	public Integer getCantidadPlanesDesaprobados(Long idCampania,
+			String codGerente, Long idPuesto) {
+		return planDesarrolloDao.getCantidadPlanesDesaprobados(idCampania,
+				codGerente, idPuesto);
+	}
+
+}

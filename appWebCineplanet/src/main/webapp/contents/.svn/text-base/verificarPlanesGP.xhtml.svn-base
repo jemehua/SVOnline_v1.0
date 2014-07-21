@@ -1,0 +1,374 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+	<h:outputStylesheet name="css/cssContent.css" />
+	<script type="text/javascript">
+		PrimeFaces.locales['es'] = {
+			closeText : 'Cerrar',
+			prevText : 'Anterior',
+			nextText : 'Siguiente',
+			monthNames : [ 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo',
+					'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre',
+					'Noviembre', 'Diciembre' ],
+			monthNamesShort : [ 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+					'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic' ],
+			dayNames : [ 'Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves',
+					'Viernes', 'Sábado' ],
+			dayNamesShort : [ 'Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab' ],
+			dayNamesMin : [ 'D', 'L', 'M', 'M', 'J', 'V', 'S' ],
+			weekHeader : 'Semana',
+			firstDay : 1,
+			isRTL : false,
+			showMonthAfterYear : false,
+			yearSuffix : '',
+			timeOnlyTitle : 'Sólo hora',
+			timeText : 'Tiempo',
+			hourText : 'Hora',
+			minuteText : 'Minuto',
+			secondText : 'Segundo',
+			currentText : 'Fecha actual',
+			ampm : false,
+			month : 'Mes',
+			week : 'Semana',
+			day : 'Día',
+			allDayText : 'Todo el día'
+		};
+	</script>
+</h:head>
+<h:body>
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datosLabel" header="Modificación de Planes">
+		<p:focus context="datosLabel" />
+		<p:spacer height="10" />
+		<p:panelGrid id="panelGerentePublico" styleClass="panelGrid">
+			<p:row>
+				<p:column width="30">#{messages.lblCampania}
+				</p:column>
+				<p:column width="70">
+					<h:outputLabel
+						value="#{verificarPlanesGPController.inscripcion.campania}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblGerentePublico}
+				</p:column>
+				<p:column>
+					<h:outputLabel
+						value="#{verificarPlanesGPController.inscripcion.asignacionGerenteV}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblPuesto}
+				</p:column>
+				<p:column>
+					<h:outputText
+						value="#{verificarPlanesGPController.inscripcion.puestoTipoV}" />
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+
+		<p:spacer height="10" />
+
+		<!-- 	METAS -->
+
+		<p:dataTable var="planmeta"
+			value="#{verificarPlanesGPController.listaPlanMetasVerificacion}"
+			id="dtMetas" rows="7" emptyMessage="#{messages.msgEmptyMessage}">
+			<f:facet name="header">  
+            Lista de Metas Desaprobados
+            </f:facet>
+
+			<p:column headerText="#{messages.lblCodigo}" style="width:10%">
+				<h:outputText value="#{planmeta.meta.id.idMeta}" />
+			</p:column>
+			<p:column headerText="Tipo Meta"
+				style="width:15%; white-space: normal">
+				<h:outputText value="#{planmeta.meta.tipo}" />
+			</p:column>
+			<p:column headerText="Meta" style="width:30%; white-space: normal;text-align : justify;">
+				<h:outputText value="#{planmeta.meta.denominacion}" />
+			</p:column>
+			<p:column headerText="Relación POI"
+				style="width:30%; white-space: normal;text-align: justify;">
+				<h:outputText value="#{planmeta.meta.relacionPOI}" />
+			</p:column>
+
+			<p:column headerText="Peso (%)" style="width:8%">
+				<h:outputText value="#{planmeta.meta.peso}" />
+			</p:column>
+			<p:column headerText="#{messages.lblOpciones}" style="width:10%">
+				<p:commandButton value="" icon="ui-icon-pencil" id="btnModPlanMe"
+					update=":frm:pnlEditPlanMeta" oncomplete="editDialogMeta.show()"
+					title="Editar" action="verificarPlanesGPController.verificarEstadoFlujo">
+					<f:setPropertyActionListener value="#{planmeta}"
+						target="#{verificarPlanesGPController.planMetas}" />
+				</p:commandButton>
+				<pe:tooltip for="btnModPlanMe" value="Modificar Plan de Metas"
+					showEffect="fadeIn" hideEffect="fadeIn" atPosition="top center"
+					myPosition="bottom center" />
+			</p:column>
+			<f:facet name="footer">
+				<div class="mensaje">Seleccione un registro para modificar
+					Plan de Acción</div>
+			</f:facet>
+		</p:dataTable>
+
+		<p:spacer height="10" />
+
+		<!-- 	PLAN DE DESARROLLO -->
+
+		<p:dataTable var="planDesarrollo"
+			value="#{verificarPlanesGPController.listaPlanDesarrolloVerificacion}"
+			id="dtCompetencias" rows="7"
+			emptyMessage="#{messages.msgEmptyMessage}">
+
+			<f:facet name="header">  
+            Lista de Competencias Desaprobados [Brecha > 0]
+            </f:facet>
+
+			<p:column headerText="#{messages.lblCodigo}"
+				style="width:10%; white-space: normal">
+				<h:outputText
+					value="#{planDesarrollo.evaluacionInicial.id.idCompetencia}" />
+			</p:column>
+			<p:column headerText="Competencia"
+				style="width:60%; white-space: normal">
+				<h:outputText
+					value="#{planDesarrollo.evaluacionInicial.competencia.competencia.denominacion}" />
+			</p:column>
+			<p:column headerText="Nivel Deseado"
+				style="width:10%; white-space: normal">
+				<h:outputText
+					value="#{planDesarrollo.evaluacionInicial.competencia.nivelDeseado}" />
+			</p:column>
+			<p:column headerText="Eval.Inicial"
+				style="width:10%; white-space: normal">
+				<h:outputText value="#{planDesarrollo.evaluacionInicial.nota}" />
+			</p:column>
+			<p:column headerText="Brecha" style="width:10%; white-space: normal">
+				<h:outputText value="#{planDesarrollo.evaluacionInicial.brecha}" />
+			</p:column>
+			<p:column headerText="#{messages.lblOpciones}" style="width:10%">
+				<p:commandButton value="" icon="ui-icon-pencil" id="btnModPlanDe"
+					update=":frm:pnlEditPlanDesarrollo" action="verificarPlanesGPController.verificarEstadoFlujo"
+					oncomplete="editDialogCompetencia.show()" title="Editar">
+					<f:setPropertyActionListener value="#{planDesarrollo}"
+						target="#{verificarPlanesGPController.planDesarrollo}" />
+				</p:commandButton>
+				<pe:tooltip for="btnModPlanDe" value="Modificar Plan de Desarrollo"
+					showEffect="fadeIn" hideEffect="fadeIn" atPosition="top center"
+					myPosition="bottom center" />
+			</p:column>
+			<f:facet name="footer">
+				<div class="mensaje">Seleccione un registro para modificar
+					Plan de Competencias</div>
+			</f:facet>
+		</p:dataTable>
+
+		<p:separator id="s1" />
+
+		<table style="width: 100%">
+			<tr>
+				<td align="left"><p:commandButton value="Guardar"
+						id="btnGuardar"
+						action="#{verificarPlanesGPController.grabarEstadoInscripcion}"
+						update="messages" icon="ui-icon-disk" tabindex="11"
+						disabled="#{verificarPlanesGPController.swFlujo}" /></td>
+				<td align="right"><p:commandButton value="Continuar" onclick="confirmacion.show()"						
+						id="btnFlujo" 
+						icon="ui-icon-circle-arrow-e" tabindex="12"
+						disabled="#{verificarPlanesGPController.swFlujo}" /></td>
+			</tr>
+
+		</table>
+
+	</p:panel>
+
+	<!-- 	Dialog PLan Metas -->
+
+	<p:dialog id="dlgEditPlanMeda" header="Modificar Plan de Acción"
+		widgetVar="editDialogMeta" modal="true" resizable="false" width="680"
+		showEffect="clip" closable="true" hideEffect="fold">
+		<p:panel id="pnlEditPlanMeta">
+			<p:focus context="pnlEditPlanMeta" />
+			<p:panelGrid styleClass="panelGrid">
+				<p:row>
+					<p:column>
+						<h:outputText value="Estado" />
+					</p:column>
+					<p:column>
+						<p:column headerText="Estado" style="width:10%">
+							<h:outputText
+								value="#{verificarPlanesGPController.planMetas.aprobacion.equals('true')?'Aprobado':'Desaprobado'}" />
+						</p:column>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<h:outputText value="Observacion" />
+					</p:column>
+					<p:column>
+						<h:outputText id="txtObservacion"
+							value="#{verificarPlanesGPController.planMetas.observacion}"
+							maxlength="1000" style="width:510px;color:blue;text-align: justify;" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<h:outputText value="Plan de Acción" />
+						<h:outputText value="*" styleClass="obligatorio" />
+					</p:column>
+					<p:column>
+						<p:inputText
+							value="#{verificarPlanesGPController.planMetas.descripcionPlan}"
+							maxlength="500" styleClass="txt" style="width:510px;" />
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+			<f:facet name="footer">
+				<p:commandButton id="btnObservacionMeta"
+					update="dtMetas,messages,btnObservacionMeta"
+					value="#{messages.btnModificar}"
+					disabled="#{verificarPlanesGPController.swFlujo}"
+					actionListener="#{verificarPlanesGPController.modificarPlanMeta}"
+					icon="ui-icon-disk" oncomplete="editDialogMeta.hide()" />
+			</f:facet>
+		</p:panel>
+	</p:dialog>
+
+	<!-- 	Dialog Plan de Desarrollo -->
+
+	<p:dialog id="dlgEditPlanDesarrollo"
+		header="Modificar Plan de Desarrollo"
+		widgetVar="editDialogCompetencia" modal="true" resizable="false"
+		width="680" showEffect="clip" closable="true" hideEffect="fold">
+		<p:panel id="pnlEditPlanDesarrollo">
+			<p:focus context="pnlEditPlanDesarrollo" />
+
+			<p:panelGrid styleClass="panelGrid">
+               <p:row>
+					<p:column>
+						<h:outputText value="Estado" />
+					</p:column>
+					<p:column>
+						<p:column headerText="Estado" style="width:10%">
+							<h:outputText
+								value="#{verificarPlanesGPController.planDesarrollo.aprobacion.equals('true')?'Aprobado':'Desaprobado'}" />
+						</p:column>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column width="30">Competencia
+					</p:column>
+					<p:column width="70">
+						<h:outputLabel
+							value="#{verificarPlanesGPController.planDesarrollo.evaluacionInicial.competencia.competencia.denominacion}" />
+					</p:column>
+				</p:row>				
+				<p:row>
+					<p:column>Observacion<h:outputText value="*"
+							styleClass="obligatorio" />
+					</p:column>
+					<p:column>
+					<p:inputTextarea id="txtObservacionComp"
+							value="#{verificarPlanesGPController.planDesarrollo.observacion}"
+							readonly="true"
+							rows="5" cols="100" autoResize="false" maxlength="3000"
+							style="width:510px;color:blue;text-align: justify;" />
+						
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column width="30">Actividad de Capacitación<h:outputText
+							value="*" styleClass="obligatorio" />
+					</p:column>
+					<p:column>
+						<p:inputText
+							value="#{verificarPlanesGPController.planDesarrollo.actCapacitacion}"
+							maxlength="500" styleClass="txt" style="width:510px;" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column width="30">Fecha Culminación Capacitación<h:outputText
+							value="*" styleClass="obligatorio" />
+					</p:column>
+					<p:column>
+						<p:column>
+							<p:calendar id="hastaC" locale="es"
+						value="#{verificarPlanesGPController.planDesarrollo.fechaFinCapacitacion}"
+						showOn="button" navigator="true" tabindex="2" pattern="dd/MM/yyyy">
+						<f:convertDateTime type="date" dateStyle="short"
+							pattern="dd/MM/yyyy" />
+					</p:calendar>
+						</p:column>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>Actividad de Entrenamiento<h:outputText
+							value="*" styleClass="obligatorio" />
+					</p:column>
+					<p:column>
+						<p:inputText
+							value="#{verificarPlanesGPController.planDesarrollo.actEntrenamiento}"
+							maxlength="500" styleClass="txt" style="width:510px;" />
+					</p:column>
+				</p:row>
+
+				<p:row>
+					<p:column>Fecha Culminación Entrenamiento<h:outputText value="*"
+							styleClass="obligatorio" />
+					</p:column>
+					<p:column>
+						 <p:calendar id="hastaE" locale="es"
+						value="#{verificarPlanesGPController.planDesarrollo.fechaFinEntrenamiento}"
+						showOn="button" navigator="true" tabindex="4" pattern="dd/MM/yyyy">
+						<f:convertDateTime type="date" dateStyle="short"
+							pattern="dd/MM/yyyy" />
+					</p:calendar>
+					</p:column>
+				</p:row>
+
+			</p:panelGrid>
+			<f:facet name="footer">
+				<p:commandButton update="dtCompetencias" id="btnObservacionComp"
+					value="#{messages.btnModificar}"
+					disabled="#{verificarPlanesGPController.swFlujo}"
+					actionListener="#{verificarPlanesGPController.modificarPlanCompetencia}"
+					icon="ui-icon-disk" oncomplete="editDialogCompetencia.hide()" />
+
+			</f:facet>
+		</p:panel>
+	</p:dialog>
+	<p:confirmDialog message="¿Estás seguro de continuar?"
+		showEffect="fade" hideEffect="fade" header="Modificación de Planes"
+		widgetVar="confirmacion">
+		<table style="width: 100%">
+			<tr>
+				<td align="center"><p:commandButton value="Si"
+						style="width:50px" styleClass="ui-confirmdialog-yes"
+						icon="ui-icon-check" oncomplete="confirmacion.hide()"
+						update="dtCompetencias,dtMetas,messages,btnGuardar,btnFlujo" action="#{verificarPlanesGPController.atenderFlujo}">
+					</p:commandButton> <p:spacer width="10" /> <p:commandButton value="No"
+						style="width:50px" styleClass="ui-confirmdialog-no"
+						icon="ui-icon-close" onclick="confirmacion.hide()" /></td>
+			</tr>
+		</table>
+	</p:confirmDialog>
+
+</h:body>
+<p:ajaxStatus style="width:64px;height:64px;position:fixed;right:5px;bottom:5px" id="ajaxStatusPanel">  
+    <f:facet name="start">  
+        <p:graphicImage value="./images/loading.gif" /> 
+    </f:facet>  
+      
+    <f:facet name="complete">  
+        <h:outputText value="" />  
+    </f:facet>  
+</p:ajaxStatus> 
+</html>

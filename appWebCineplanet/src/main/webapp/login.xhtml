@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<title>#{messages.accesoSistema}</title>
+	<h:outputStylesheet name="css/cssLoguin.css" />
+	<h:outputStylesheet name="css/cssContent.css" />
+
+	<link href="./resources/js/jquery.realperson.css" rel="stylesheet"
+		type="text/css" />
+	<script type="text/javascript"
+		src="./resources/js/jquery.realperson.js"></script>
+	<script type="text/javascript" src="./resources/js/captcha.js"></script>
+	<style type="text/css">
+.ui-panel {
+	font-size: 0.72em;
+}
+</style>
+</h:head>
+<h:body> 
+	<h:form id="loginForm" prependId="false">
+		<p:growl id="messages" showDetail="true" life="40000"
+			showSummary="false" />
+		<div class="contenedor">
+			<div class="der">
+				<div class="tituloLogin">#{messages.accesoSistema}</div>
+				<div class="fila">
+					#{messages.usuario}
+					<h:outputText value="*" styleClass="obligatorio" />
+				</div>
+				<div class="fila">
+					<p:inputText id="j_username" value="#{loginController.username}"
+						style="width:305px;" />
+				</div>
+				<div class="fila">
+					#{messages.clave}
+					<h:outputText value="*" styleClass="obligatorio" />
+				</div>
+				<div class="fila">
+					<p:password id="j_password" value="#{loginController.clave}"
+						style="width:305px;" />
+				</div>
+				<div class="fila">
+					<p:commandLink id="pass" oncomplete="editDialog.show()">
+						<h:outputText value="¿Has olvidado tu contraseña?"
+							style="font-size:7pt;" />
+					</p:commandLink>
+				</div>
+				<div class="fila">
+					#{messages.msgCaptcha}
+					<h:outputText value="*" styleClass="obligatorio" />
+				</div>
+				<div class="captcha">
+					<table width="30%">
+						<tr>
+							<td colspan="3" align="center"><input type="text"
+								id="defaultReal" name="defaultReal"
+								placeholder="Ingrese el código" width="10px"
+								onkeyup="toUpper(this)" size="12" /></td>
+						</tr> 
+					</table>
+				</div>
+				<div class="boton">
+					<p:commandButton ajax="false" id="login" icon="ui-icon-locked"
+						action="#{loginController.login}" value="Ingresar" />
+				</div>
+			</div>
+		</div>
+
+
+		<!-- dlg recuperar contraseña -->
+		<p:dialog id="dlgEdit" header="Recupera tu contraseña"
+			widgetVar="editDialog" modal="true" resizable="false" width="450"
+			showEffect="clip" closable="true" hideEffect="fold">
+
+			<p:panel id="pnlEdit">
+
+				<p:focus context="pnlEdit" />
+				<p:panelGrid styleClass="panelGrid">
+					<p:row>
+						<p:column>
+							Nombre de usuario
+							<h:outputText value="*" styleClass="obligatorio" />
+						</p:column>
+						<p:column>
+							<p:inputText value="#{loginController.user}" maxlength="60"
+								styleClass="txt" tabindex="1">
+							</p:inputText>
+						</p:column>
+					</p:row>
+					<!--  <p:row>
+						<p:column>Correo electrónico <h:outputText value="*"
+								styleClass="obligatorio" />
+						</p:column>
+						<p:column>
+							<p:inputText value="#{loginController.correo}" maxlength="60"
+								styleClass="txt" tabindex="2" />
+						</p:column>
+					</p:row>-->
+
+				</p:panelGrid>
+				<f:facet name="footer">
+					<p:commandButton update="pnlEdit, messages" value="Enviar"
+						actionListener="#{loginController.recuperarClave}" tabindex="2"
+						icon="ui-icon-mail-closed" oncomplete="editDialog.hide()" />
+				</f:facet>
+			</p:panel>
+		</p:dialog>
+	</h:form>
+</h:body>
+
+<p:ajaxStatus
+	style="width:64px;height:64px;position:fixed;right:5px;bottom:5px"
+	id="ajaxStatusPanel">
+	<f:facet name="start">
+		<p:graphicImage value="./images/loading.gif" />
+	</f:facet>
+
+	<f:facet name="complete">
+		<h:outputText value="" />
+	</f:facet>
+</p:ajaxStatus>
+
+</html>

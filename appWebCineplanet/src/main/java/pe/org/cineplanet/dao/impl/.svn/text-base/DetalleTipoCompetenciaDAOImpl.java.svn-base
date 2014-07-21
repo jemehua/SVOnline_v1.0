@@ -1,0 +1,39 @@
+package gob.servir.desempenio.daoImpl;
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.springframework.stereotype.Repository;
+
+import gob.servir.desempenio.dao.DetalleTipoCompetenciaDAO;
+import gob.servir.desempenio.model.DetalleTipoCompetencia;
+
+@Repository
+public class DetalleTipoCompetenciaDAOImpl implements DetalleTipoCompetenciaDAO {
+	@PersistenceContext
+	private EntityManager em;
+	
+	@SuppressWarnings("unchecked")
+	public List<DetalleTipoCompetencia> find(Long id) {
+			Query q = null;
+			try {
+				q = (Query) em
+						.createQuery("select d from DetalleTipoCompetencia d where d.estado =:estado and d.id.idTipoCompetencia =:id ORDER BY d.id.idDetalle DESC");
+				q.setParameter("estado", "A");
+				q.setParameter("id", id);
+			
+				return q.getResultList();
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			} finally {
+				if (em != null) {
+					em.close();
+				}
+			}
+		}
+
+	}

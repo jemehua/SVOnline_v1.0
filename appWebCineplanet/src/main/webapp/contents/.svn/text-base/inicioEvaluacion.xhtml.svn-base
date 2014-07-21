@@ -1,0 +1,154 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<h:outputStylesheet name="css/cssContent.css" />
+</h:head>
+<h:body>
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datos" header="Inicio de Evaluación">
+		<p:focus context="datos" />
+
+		<table cellpadding="2" cellspacing="2">
+			<tr>
+				<td>#{messages.lblCampania}</td>
+				<td><p:selectOneMenu id="comboCampania"
+						value="#{inicioEvaluacionController.campaniaSelec}"
+						style="width:280px;" tabindex="1">
+						<f:selectItems value="#{inicioEvaluacionController.comboCampania}" />
+						<p:ajax update="dtGerente,btnIniciarTodos" process="comboCampania"
+							event="change" />
+					</p:selectOneMenu></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>#{messages.lblProceso}</td>
+				<td><p:selectOneMenu id="comboProceso"
+						value="#{inicioEvaluacionController.procesoSelec}"
+						style="width:280px;" tabindex="2">
+						<f:selectItems value="#{inicioEvaluacionController.comboProceso}" />
+						<p:ajax update="dtGerente,btnIniciarTodos" process="comboProceso"
+							event="change" />
+					</p:selectOneMenu></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>Estado</td>
+				<td><p:selectOneMenu id="comboEstado"
+						value="#{inicioEvaluacionController.estadoSelec}"
+						style="width:280px;" tabindex="3">
+						<f:selectItems value="#{inicioEvaluacionController.comboEstado}" />
+						<p:ajax update="dtGerente,btnIniciarTodos" process="comboEstado"
+							event="change" />
+					</p:selectOneMenu></td>
+				<td><p:commandButton id="btnIniciarTodos" value="Iniciar Todos"
+						icon="ui-icon-seek-end" onclick="confirmacionTodos.show()"
+						tabindex="4" title="Iniciar todos"
+						disabled="#{inicioEvaluacionController.swBtnTodos}">
+					</p:commandButton> <p:spacer width="5" /> <p:commandButton
+						value="#{messages.btnCancelar}" update="datos"
+						action="#{inicioEvaluacionController.limpiar}"
+						icon="ui-icon-close" tabindex="5" /></td>
+			</tr>
+		</table>
+
+		<p:dataTable var="flujo"
+			value="#{inicioEvaluacionController.listaFlujo}" id="dtGerente"
+			scrollable="true" scrollHeight="235" paginator="true" rows="10"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			emptyMessage="#{messages.msgEmptyMessage}">
+
+			<f:facet name="header">    
+            	Gerentes Públicos Inscritos
+            	</f:facet>
+
+			<p:column headerText="#{messages.lblCodigo}" style="width:20%"
+				filterBy="#{flujo.inscripcion.asignacionGerenteV.cod_gerente}">
+				<h:outputText
+					value="#{flujo.inscripcion.asignacionGerenteV.cod_gerente}" />
+			</p:column>
+			<p:column headerText="Nombres" style="width:20%"
+				filterBy="#{flujo.inscripcion.asignacionGerenteV.nombres}">
+				<h:outputText
+					value="#{flujo.inscripcion.asignacionGerenteV.nombres}" />
+			</p:column>
+			<p:column headerText="Ap.Paterno" style="width:20%"
+				filterBy="#{flujo.inscripcion.asignacionGerenteV.ap_paterno}">
+				<h:outputText
+					value="#{flujo.inscripcion.asignacionGerenteV.ap_paterno}" />
+			</p:column>
+			<p:column headerText="Ap.Materno" style="width:15%">
+				<h:outputText
+					value="#{flujo.inscripcion.asignacionGerenteV.ap_materno}" />
+			</p:column>
+			<p:column headerText="DNI" style="width:9%">
+				<h:outputText value="#{flujo.inscripcion.asignacionGerenteV.dni}" />
+			</p:column>
+			<p:column headerText="Estado" style="width:8%">
+				<h:outputText
+					value="#{flujo.estado.equals('P')?'Pendiente':flujo.estado.equals('I')? 'Iniciado':flujo.estado.equals('AT')?'Terminado':'Cancelado'} " />
+			</p:column>
+			<p:column headerText="#{messages.lblOpciones}" style="width:8%">
+				<p:commandButton value="" icon="ui-icon-play"
+					onclick="confirmacion.show()" update=":frm:btnFlujo"
+					title="Iniciar proceso"
+					disabled="#{flujo.estado.equals('P')?'False':'True'}"
+					action="#{inicioEvaluacionController.selectflujo}">
+					<f:setPropertyActionListener
+						target="#{inicioEvaluacionController.flujoSelec}" value="#{flujo}" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+	</p:panel>
+
+	<p:confirmDialog message="¿Estás seguro de continuar?"
+		showEffect="fade" hideEffect="fade" header="Inicio de Evaluación"
+		widgetVar="confirmacion">
+		<table style="width: 100%">
+			<tr>
+				<td align="center"><p:commandButton value="Si" id="btnFlujo"
+						style="width:50px" styleClass="ui-confirmdialog-yes"
+						icon="ui-icon-check" oncomplete="confirmacion.hide()"
+						update=":frm:dtGerente,:frm:messages"
+						action="#{inicioEvaluacionController.ejecutarProceso}">
+					</p:commandButton> <p:spacer width="10" /> <p:commandButton value="No"
+						style="width:50px" styleClass="ui-confirmdialog-no"
+						icon="ui-icon-close" onclick="confirmacion.hide()" /></td>
+			</tr>
+		</table>
+	</p:confirmDialog>
+
+	<p:confirmDialog message="¿Estás seguro de continuar?"
+		showEffect="fade" hideEffect="fade" header="Inicio de Evaluación"
+		widgetVar="confirmacionTodos">
+		<table style="width: 100%">
+			<tr>
+				<td align="center"><p:commandButton value="Si"
+						style="width:50px" styleClass="ui-confirmdialog-yes"
+						icon="ui-icon-check" oncomplete="confirmacionTodos.hide()"
+						update=":frm:dtGerente,:frm:messages"
+						action="#{inicioEvaluacionController.ejecutarTodos}">
+					</p:commandButton> <p:spacer width="10" /> <p:commandButton value="No"
+						style="width:50px" styleClass="ui-confirmdialog-no"
+						icon="ui-icon-close" onclick="confirmacionTodos.hide()" /></td>
+			</tr>
+		</table>
+	</p:confirmDialog>
+
+</h:body>
+<p:ajaxStatus
+	style="width:64px;height:64px;position:fixed;right:5px;bottom:5px"
+	id="ajaxStatusPanel">
+	<f:facet name="start">
+		<p:graphicImage value="./images/loading.gif" />
+	</f:facet>
+
+	<f:facet name="complete">
+		<h:outputText value="" />
+	</f:facet>
+</p:ajaxStatus>
+</html>

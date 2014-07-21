@@ -1,0 +1,162 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.MetaDao;
+import gob.servir.desempenio.dao.ProcesoDao;
+import gob.servir.desempenio.model.Campania;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.Meta;
+import gob.servir.desempenio.model.MetaPK;
+import gob.servir.desempenio.model.PlanMetas;
+import gob.servir.desempenio.model.PlanMetasPK;
+import gob.servir.desempenio.model.Proceso;
+import gob.servir.desempenio.util.Constantes;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.faces.model.SelectItem;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Repository
+public class MetaDaoImpl implements MetaDao {
+	@PersistenceContext
+	private EntityManager em;
+
+	public Meta find(MetaPK id) {
+		try {
+			return em.find(Meta.class, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Meta save(Meta obj) {
+		try {
+			em.persist(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Meta edit(Meta obj) {
+		try {
+			return em.merge(obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Meta> getListaMeta() {
+		Query q = null;
+		q = (Query) em.createQuery("select m from Meta m order by m.id.idMeta");
+		// q.setParameter("estado", "A");
+
+		try {
+			return q.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Meta> getListaMetas(InscripcionPK id) {
+		Query q = em.createNamedQuery("Meta.getListByCampaniaAndGerente");
+		q.setParameter("idCampania", id.getIdCampania());
+		q.setParameter("idGerente", id.getIdGerentePublico());
+		q.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+
+			List<Object[]> listaObjetos = new ArrayList<Object[]>();
+
+			listaObjetos = q.getResultList();
+
+			List<Meta> listaMetas = new ArrayList<Meta>();
+
+			for (Object[] row : listaObjetos) {
+				Meta meta = new Meta();
+				meta.setId((MetaPK) row[0]);
+				meta.setTipo((String) row[1]);
+				meta.setDenominacion((String) row[2]);
+				meta.setRelacionPOI((String) row[3]);
+				meta.setPeso((Integer) row[4]);
+				meta.setAprobacion((Boolean) row[5]);
+				meta.setObservacion((String) row[6]);
+				meta.setEstado((String) row[7]);
+
+				listaMetas.add(meta);
+			}
+
+			return listaMetas;
+
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Meta> getListaMetaObservacion(Long idCampania, String idGerente) {
+		Query q = null;
+		q = (Query) em
+				.createQuery("select m from Meta m where m.id.idCampania =:idCampania and m.id.idGerentePublico =:idGerente and m.aprobacion=:aprobacion order by m.tipo");
+		q.setParameter("idCampania", idCampania);
+		q.setParameter("idGerente", idGerente);
+		q.setParameter("aprobacion", false);
+		try {
+			return q.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public Long getMaxId(Long idCampania, String idGerente) {
+		Query q = null;
+
+		q = (Query) em
+				.createQuery("select max(m.id.idMeta) from Meta m where m.id.idCampania =:idCampania and m.id.idGerentePublico =:idGerente ");
+		q.setParameter("idCampania", idCampania);
+		q.setParameter("idGerente", idGerente);
+		try {
+
+			return (Long) q.getSingleResult() + 1L;
+		} catch (Exception e) {
+			// e.printStackTrace();
+			return 1L;
+		}
+	}
+
+	public String actualizarAprobacion(MetaPK id, boolean aprobacion) {
+		Query q = null;
+
+		q = (Query) em
+				.createQuery("UPDATE FROM Meta m SET m.aprobacion = :aprobacion WHERE m.id.idCampania =:idCampania AND m.id.idGerentePublico =:idGerente ");
+		q.setParameter("idCampania", id.getIdCampania());
+		q.setParameter("idGerente", id.getIdGerentePublico());
+		q.setParameter("aprobacion", aprobacion);
+		try {
+			return (String) q.getSingleResult();
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+}

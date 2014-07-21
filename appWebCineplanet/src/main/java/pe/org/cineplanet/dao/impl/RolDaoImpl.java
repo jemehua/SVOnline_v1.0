@@ -1,0 +1,101 @@
+package pe.org.cineplanet.dao.impl;
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.faces.model.SelectItem;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import pe.org.cineplanet.dao.RolDao;
+import pe.org.cineplanet.model.jpa.Rol;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Repository
+public class RolDaoImpl implements RolDao {
+	@PersistenceContext
+	private EntityManager em;
+
+	public Rol find(Long id) {
+		return em.find(Rol.class, id);
+	}
+
+	@Transactional
+	public Rol save(Rol obj) {
+		try {
+			em.persist(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Rol edit(Rol obj) {
+		try {
+			return em.merge(obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<Rol> getListaRol() {
+
+		TypedQuery<Rol> tq = em.createNamedQuery("Rol.getAllListaRol",
+				Rol.class);
+
+		try {
+			return tq.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<Rol> getListaRolByNombre(String nombre) {
+
+		TypedQuery<Rol> tq = em.createNamedQuery("Rol.getListaRolByNombre",
+				Rol.class);
+
+		tq.setParameter("nombre", nombre);
+		try {
+			return tq.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<SelectItem> getComboRol() {
+
+		List<SelectItem> listaCombo = new ArrayList<SelectItem>();
+		List<Rol> lista = new ArrayList<Rol>();
+		try {
+			lista = getListaRol();
+		} catch (Exception as) {
+			as.printStackTrace();
+			SelectItem fila = new SelectItem(0L, "Seleccione rol");
+			listaCombo.add(fila);
+			return listaCombo;
+		}
+		SelectItem fila = new SelectItem(0L, "Seleccione rol");
+		listaCombo.add(fila);
+
+		for (Rol tipo : lista) {
+			fila = new SelectItem(tipo.getIdRol(), tipo.getNombre());
+			listaCombo.add(fila);
+		}
+		return listaCombo;
+	}
+
+}

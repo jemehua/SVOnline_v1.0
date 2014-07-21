@@ -1,0 +1,509 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.model.DetalleFlujoPK;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.Meta;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.CampaniaService;
+import gob.servir.desempenio.service.DetalleFlujoService;
+import gob.servir.desempenio.service.FlujoService;
+import gob.servir.desempenio.service.InscripcionService;
+import gob.servir.desempenio.service.MetaService;
+import gob.servir.desempenio.util.Constantes;
+import gob.servir.desempenio.util.Message;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
+
+import org.primefaces.event.SelectEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+
+@Component("verificacionMetasController")
+@Scope("session")
+public class VerificacionMetasController implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private static final Logger logger = LoggerFactory
+			.getLogger(MetasController.class);
+
+	@Autowired
+	private LoginController loginController;
+	@Autowired
+	private CampaniaService campaniaService;
+	@Autowired
+	private MetaService metaService;
+	@Autowired
+	private InscripcionService inscripcionService;
+	@Autowired
+	private FlujoService flujoService;
+	@Autowired
+	private DetalleFlujoService detalleFlujoService;
+
+	private Usuario userSesion = null;
+	private Message message = new Message();
+
+	private List<SelectItem> comboCampania = new ArrayList<SelectItem>();
+	private Long campaniaSelec = 0L;
+
+	private String nombreGerente = "";
+	private boolean swBtnObservacion = false;
+	private boolean swAprobar = true;
+	private boolean swModificarMetas = true;
+
+	private Meta nuevoMeta = new Meta();
+	private List<Meta> listaMetas = new ArrayList<Meta>();
+
+	private List<Inscripcion> listaInscripcion = new ArrayList<Inscripcion>();
+	private Inscripcion inscripcionSelec = null;
+	private Inscripcion inscripcionSelec2 = null;
+
+	private boolean swFlujo = true;
+	private boolean swContinuar = true;
+
+	public VerificacionMetasController() {
+
+	}
+
+	@PostConstruct
+	public void cargar() {
+		validarSesion();
+		verificarEstadoFlujo();
+		buscarListaGerentes();
+	}
+
+	public void verificarEstadoFlujo() {
+		if (inscripcionSelec == null) {
+			swFlujo = true;
+		} else {
+			String detalle = detalleFlujoService
+					.getEstadoDetalleFlujo(new DetalleFlujoPK(inscripcionSelec
+							.getId().getIdCampania(), inscripcionSelec.getId()
+							.getIdGerentePublico(), Constantes.PROCESO1,
+							Constantes.P1_VERIFICAR_REVISAR_OBS));
+
+			if (detalle != null) {
+				if (detalle.equalsIgnoreCase(Constantes.ATENDIDO))
+					swFlujo = true;
+				else
+					swFlujo = false;
+			} else
+				swFlujo = true;
+		}
+	}
+
+	public boolean isSwContinuar() {
+		return swContinuar;
+	}
+
+	public void setSwContinuar(boolean swContinuar) {
+		this.swContinuar = swContinuar;
+	}
+
+	public boolean isSwModificarMetas() {
+		return swModificarMetas;
+	}
+
+	public void setSwModificarMetas(boolean swModificarMetas) {
+		this.swModificarMetas = swModificarMetas;
+	}
+
+	public boolean isSwFlujo() {
+		return swFlujo;
+	}
+
+	public void setSwFlujo(boolean swFlujo) {
+		this.swFlujo = swFlujo;
+	}
+
+	public boolean isSwAprobar() {
+		return swAprobar;
+	}
+
+	public void setSwAprobar(boolean swAprobar) {
+		this.swAprobar = swAprobar;
+	}
+
+	public void getInscripcion() {
+		Inscripcion ins = inscripcionService.getInscripcionUsuario(userSesion);
+		if (ins != null)
+			inscripcionSelec = ins;
+	}
+
+	public void setInscripcion(Inscripcion inscripcion) {
+		this.inscripcionSelec = inscripcion;
+	}
+
+	public boolean isSwBtnObservacion() {
+		return swBtnObservacion;
+	}
+
+	public void setSwBtnObservacion(boolean swBtnObservacion) {
+		this.swBtnObservacion = swBtnObservacion;
+	}
+
+	public void buscarListaGerentes() {
+		listaInscripcion.clear();
+		// Metas
+		if (campaniaSelec != 0L)
+			listaInscripcion = inscripcionService.getListaInscripcion(
+					campaniaSelec, 3);
+	}
+
+	public List<Inscripcion> getListaInscripcion() {
+		return listaInscripcion;
+	}
+
+	public void setListaInscripcion(List<Inscripcion> listaInscripcion) {
+		this.listaInscripcion = listaInscripcion;
+	}
+
+	public Meta getNuevoMeta() {
+		return nuevoMeta;
+	}
+
+	public void setNuevoMeta(Meta nuevoMeta) {
+		this.nuevoMeta = nuevoMeta;
+	}
+
+	public Inscripcion getInscripcionSelec() {
+		return inscripcionSelec;
+	}
+
+	public void setInscripcionSelec(Inscripcion inscripcionSelec) {
+		this.inscripcionSelec = inscripcionSelec;
+	}
+
+	public Inscripcion getInscripcionSelec2() {
+		return inscripcionSelec2;
+	}
+
+	public void setInscripcionSelec2(Inscripcion inscripcionSelec2) {
+		this.inscripcionSelec2 = inscripcionSelec2;
+	}
+
+	public String getNombreGerente() {
+		return nombreGerente;
+	}
+
+	public void setNombreGerente(String nombreGerente) {
+		this.nombreGerente = nombreGerente;
+	}
+
+	public List<Meta> getListaMetas() {
+		listaMetas.clear();
+		if (inscripcionSelec2 != null) {
+			listaMetas = metaService.getListaMetasAprobacion(
+					inscripcionSelec2.getId(), Constantes.FALSE);
+		}
+
+		return listaMetas;
+	}
+
+	public void setListaMetas(List<Meta> listaMetas) {
+		this.listaMetas = listaMetas;
+	}
+
+	public List<SelectItem> getComboCampania() {
+		comboCampania = campaniaService.getComboCampania();
+		return comboCampania;
+	}
+
+	public void setComboCampania(List<SelectItem> comboCampania) {
+		this.comboCampania = comboCampania;
+	}
+
+	public Long getCampaniaSelec() {
+		return campaniaSelec;
+	}
+
+	public void setCampaniaSelec(Long campaniaSelec) {
+		this.campaniaSelec = campaniaSelec;
+	}
+
+	public void validarSesion() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		
+		userSesion = (Usuario) context.getExternalContext().getSessionMap()
+				.get(loginController.getUsername());
+
+		if (userSesion == null) {
+			String ctxPath = context.getExternalContext()
+					.getRequestContextPath();
+			try {
+				context.getExternalContext().redirect(ctxPath + "/login.jsf");
+			} catch (Exception e) {
+				//e.printStackTrace();
+			}
+		}
+	}
+
+	public boolean validarAgregar() {
+
+		if (inscripcionSelec == null) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Seleccione Gerente Público"));
+			return false;
+		}
+
+		return true;
+	}
+
+	public void guardar() {
+		validarSesion();
+
+		if (!validarGuardar())
+			return;
+
+		try {
+
+			InscripcionPK id = new InscripcionPK(inscripcionSelec.getId()
+					.getIdCampania(), inscripcionSelec.getId()
+					.getIdGerentePublico());
+
+			Inscripcion inscripcionResp = inscripcionService.find(id);
+
+			inscripcionResp.setUsuarioModifica(userSesion.getUsuario());
+
+			if (validarAprovacion())
+				inscripcionResp.setEstadoMetas("A");
+			else
+				inscripcionResp.setEstadoMetas("D");
+
+			inscripcionService.edit(inscripcionResp);
+
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+							message.getMessage("msgRegistrar")));
+			limpiar();
+		} catch (Exception e) {
+			logger.info("ERRROR AL REGISTRAR META");
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+							message.getMessage("msgRegistrarError")));
+		}
+	}
+
+	public boolean validarGuardar() {
+
+		if (inscripcionSelec == null) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Seleccione Gerente Público"));
+			return false;
+		}
+
+		return true;
+	}
+
+	private boolean validarAprovacion() {
+
+		for (Meta row : listaMetas) {
+			if (row.isAprobacion() == false)
+				return false;
+		}
+
+		return true;
+	}
+
+	private void aprovacion() {
+
+		for (Meta row : listaMetas) {
+			row.setAprobacion(Constantes.TRUE);
+			metaService.edit(row);
+		}
+
+	}
+
+	public void limpiar() {
+		nuevoMeta = new Meta();
+		inscripcionSelec = null;
+		nombreGerente = "";
+	}
+
+	public void limpiarAgregar() {
+		nuevoMeta = new Meta();
+	}
+
+	public void activarObservacion(Meta obj) {
+		if (obj.isAprobacion() == false) {
+			swBtnObservacion = true;
+			obj.setAprobacion(true);
+			metaService.edit(obj);
+
+		} else {
+			swBtnObservacion = false;
+			obj.setAprobacion(false);
+			metaService.edit(obj);
+		}
+	}
+
+	public void grabarObservacion() {
+		metaService.edit(nuevoMeta);
+	}
+
+	public void cargarObservaciones(Inscripcion insc) {
+		inscripcionSelec = insc;
+		verificarEstadoFlujo();
+	}
+
+	public void guardarMeta() {
+
+		validarSesion();
+
+		if (!validarMeta())
+			return;
+
+		try {
+			nuevoMeta.setFechaModificacion(new Date());
+			nuevoMeta.setUsuarioModifica(userSesion.getUsuario());
+			nuevoMeta.setEstadoModificacionMeta(false);
+			metaService.edit(nuevoMeta);
+
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+							message.getMessage("msgModificar")));
+
+		} catch (Exception e) {
+			logger.info("ERRROR AL MODIFICAR META");
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+							message.getMessage("msgAgregarError")));
+		}
+
+		nuevoMeta = new Meta();
+
+	}
+
+	public void verificarEstadoMetas() {
+		swAprobar = true;
+		if (metaService.getCantidadMetasModificados(inscripcionSelec.getId(),
+				Constantes.TRUE, Constantes.FALSE) == 0)
+			swAprobar = false;
+		else {
+			swAprobar = true;
+
+			if (swContinuar) {
+				FacesContext.getCurrentInstance().addMessage(
+						null,
+						new FacesMessage(FacesMessage.SEVERITY_WARN,
+								"ADVERTENCIA",
+								"Modificar todas la metas observadas"));
+			}
+
+		}
+
+	}
+
+	public void onRowSelect(SelectEvent event) {
+		nuevoMeta = ((Meta) event.getObject());
+	}
+
+	public boolean validarMeta() {
+
+		String txtObligatorio = message.getMessage("msgTxtObligatorio");
+
+		if (nuevoMeta.getId() == null) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Seleccione un registro"));
+			return false;
+		}
+
+		if (nuevoMeta.getDenominacion().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+
+		if (nuevoMeta.getRelacionPOI().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+
+		if (nuevoMeta.getFechaFinMeta() == null) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							message.getMessage("msgTxtObligatorio")));
+			return false;
+		}
+
+		return true;
+	}
+
+	public void atenderFlujo() {
+		validarSesion();
+		aprovacion();
+		aprobacionMeta();
+
+		try {
+			DetalleFlujoPK idDetalle = new DetalleFlujoPK(inscripcionSelec
+					.getId().getIdCampania(), inscripcionSelec.getId()
+					.getIdGerentePublico(), Constantes.PROCESO1,
+					Constantes.P1_VERIFICAR_REVISAR_OBS);
+
+			flujoService.atenderFlujo(idDetalle, userSesion.getUsuario());
+			FacesContext
+					.getCurrentInstance()
+					.addMessage(
+							null,
+							new FacesMessage(FacesMessage.SEVERITY_INFO,
+									"EXITO",
+									"Se ha procesado la Revisión y Verificación de Metas"));
+		} catch (Exception e) {
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+							"Ha ocurrido un error"));
+		}
+		buscarListaGerentes();
+	}
+
+	public void aprobacionMeta() {
+
+		if (swAprobar == false) {
+			Inscripcion ins = new Inscripcion();
+			ins=inscripcionService.find(inscripcionSelec.getId());			
+			ins.setEstadoMetas("A");
+			inscripcionService.edit(ins);
+		}
+	}
+
+}

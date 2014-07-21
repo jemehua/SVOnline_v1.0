@@ -1,0 +1,25 @@
+package gob.servir.desempenio.dao;
+
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.UltimaCampaniaGp;
+import gob.servir.desempenio.model.UltimaCampaniaGpPK;
+
+import java.util.List;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+public interface UltimaCampaniaGpDao {
+	
+	public abstract UltimaCampaniaGp find(UltimaCampaniaGpPK id);
+	
+	public abstract UltimaCampaniaGp save(UltimaCampaniaGp obj);
+	
+	public abstract UltimaCampaniaGp edit(UltimaCampaniaGp obj);
+	
+	public abstract List<UltimaCampaniaGp> getListaUltimaCampaniaGp(InscripcionPK id);
+	
+	public abstract List<UltimaCampaniaGp> getListaUltimaCampaniaGp(String codGerente);
+
+}

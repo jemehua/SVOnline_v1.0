@@ -1,0 +1,66 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.MensajeDao;
+import gob.servir.desempenio.model.Actividad;
+import gob.servir.desempenio.model.Mensaje;
+import gob.servir.desempenio.model.MensajePK;
+import gob.servir.desempenio.service.MensajeService;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Service
+public class MensajeServiceImpl implements MensajeService {
+
+	@Autowired
+	private MensajeDao mensajeDao;
+
+	@Transactional
+	public Mensaje find(MensajePK id) {
+		return mensajeDao.find(id);
+	}
+
+	@Transactional
+	public Mensaje save(Mensaje obj) {
+		return mensajeDao.save(obj);
+	}
+
+	@Transactional
+	public Mensaje edit(Mensaje obj) {
+		return mensajeDao.edit(obj);
+	}
+
+	public List<Mensaje> getListaMensaje() {
+		return mensajeDao.getListaMensaje();
+	}
+
+	public List<Mensaje> getListaMensaje(Long idAct, Long idProceso,
+			Long idCampania) {
+		return mensajeDao.getListaMensaje(idAct, idProceso, idCampania);
+	}
+	
+	public List<Mensaje> getListaMensajeTipo(Long idAct, Long idProceso,
+			Long idCampania, String tipo) {
+		return mensajeDao.getListaMensajeTipo(idAct, idProceso, idCampania,tipo);
+	}
+
+	public Long getIdMax(Long idActividad, Long idProceso, Long idCampania) {
+		return mensajeDao.getIdMax(idActividad, idProceso, idCampania);
+	}
+
+	public Mensaje getMensaje(Actividad act) {
+		return mensajeDao.getMensaje(act);
+	}
+
+	public Mensaje getMensajePrincipal(Long idAct, Long idProceso, Long idCampania) {
+		return mensajeDao.getMensajePrincipal(idAct, idProceso, idCampania);
+	}
+
+}

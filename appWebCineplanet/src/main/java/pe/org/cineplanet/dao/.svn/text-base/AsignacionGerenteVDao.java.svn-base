@@ -1,0 +1,20 @@
+package gob.servir.desempenio.dao;
+
+
+import gob.servir.desempenio.model.AsignacionGerenteV;
+
+import java.util.List;
+
+/**
+ * 
+ * @author Hever Pumallihua García
+ */
+public interface AsignacionGerenteVDao {
+
+	public abstract AsignacionGerenteV find(String codGerente);
+	
+	public abstract List<AsignacionGerenteV> getListaAsignacionGerente();
+	
+	public abstract List<AsignacionGerenteV> getListaAsignacionGerente(String codGerente);
+
+}

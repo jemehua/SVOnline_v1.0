@@ -1,0 +1,348 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.model.DetalleFlujo;
+import gob.servir.desempenio.model.DetalleFlujoPK;
+import gob.servir.desempenio.model.EvaluacionCompetencias;
+import gob.servir.desempenio.model.EvaluacionCompetenciasPK;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.PlanDesarrollo;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.CampaniaService;
+import gob.servir.desempenio.service.DetalleFlujoService;
+import gob.servir.desempenio.service.EvaluacionCompetenciasService;
+import gob.servir.desempenio.service.FlujoService;
+import gob.servir.desempenio.service.InscripcionService;
+import gob.servir.desempenio.service.PlanDesarrolloService;
+import gob.servir.desempenio.util.Constantes;
+import gob.servir.desempenio.util.Message;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Component("cualitativaCompetenciasController")
+@Scope("session")
+public class CualitativaCompetenciasController {
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(CualitativaCompetenciasController.class);
+
+	@Autowired
+	private CampaniaService campaniaService;
+	@Autowired
+	private InscripcionService inscripcionService;
+	@Autowired
+	private PlanDesarrolloService planDesarrolloService;
+	@Autowired
+	private EvaluacionCompetenciasService evaluacionCualitativaService;
+	@Autowired
+	private FlujoService flujoService;
+	@Autowired
+	private DetalleFlujoService detalleFlujoService;
+
+	private PlanDesarrollo planDesarrolloSelec = null;
+
+	private EvaluacionCompetencias cualitativa = null;
+
+	private Usuario userSesion = null;
+	private Message message = new Message();
+
+	private Inscripcion inscripcionSelec = null;
+
+	private List<PlanDesarrollo> listaPlanDesarrollo = new ArrayList<PlanDesarrollo>();
+
+	private boolean swFlujo = true;
+
+	public CualitativaCompetenciasController() {
+		super();
+	}
+
+	@PostConstruct
+	public void cargar() {
+		validarSesion();
+		getInscripcion();
+		verificarEstadoFlujo();
+	}
+
+	public void verificarEstadoFlujo() {
+
+		if (inscripcionSelec == null) {
+			swFlujo = false;
+		} else {
+			DetalleFlujo detalle = detalleFlujoService.find(new DetalleFlujoPK(
+					inscripcionSelec.getId().getIdCampania(), inscripcionSelec.getId()
+							.getIdGerentePublico(), Constantes.PROCESO2,
+					Constantes.P2_CUALITATIVA_COMPETENCIAS));
+
+			if (detalle != null) {
+				if (detalle.getEstado().equalsIgnoreCase("AT"))
+					swFlujo = true;
+				else
+					swFlujo = false;
+			} else
+				swFlujo = true;
+		}
+
+	}
+
+	public boolean isSwFlujo() {
+		return swFlujo;
+	}
+
+	public void setSwFlujo(boolean swFlujo) {
+		this.swFlujo = swFlujo;
+	}
+
+	public Inscripcion getInscripcionSelec() {
+		return inscripcionSelec;
+	}
+
+	public void setInscripcionSelec(Inscripcion inscripcionSelec) {
+		this.inscripcionSelec = inscripcionSelec;
+	}
+
+	public PlanDesarrollo getPlanDesarrolloSelec() {
+		return planDesarrolloSelec;
+	}
+
+	public void setPlanDesarrolloSelec(PlanDesarrollo planDesarrolloSelec) {
+		this.planDesarrolloSelec = planDesarrolloSelec;
+	}
+
+	public List<PlanDesarrollo> getListaPlanDesarrollo() {
+
+		if (inscripcionSelec != null) {
+
+			listaPlanDesarrollo = planDesarrolloService.getListaPlanDesarrollo(
+					inscripcionSelec.getId().getIdCampania(), inscripcionSelec.getId()
+							.getIdGerentePublico(), inscripcionSelec
+							.getPuestoTipoV().getId_puesto_tipo());
+		}
+		return listaPlanDesarrollo;
+	}
+
+	public void setListaPlanDesarrollo(List<PlanDesarrollo> listaPlanDesarrollo) {
+		this.listaPlanDesarrollo = listaPlanDesarrollo;
+	}
+
+	public EvaluacionCompetencias getCualitativa() {
+		if (planDesarrolloSelec != null) {
+			EvaluacionCompetencias evaluacionCompetenciasTemp;
+			EvaluacionCompetenciasPK id01 = new EvaluacionCompetenciasPK(
+					planDesarrolloSelec.getId().getIdCompetencia(),
+					planDesarrolloSelec.getId().getIdCampania(),
+					planDesarrolloSelec.getId().getIdGerentePublico(),
+					planDesarrolloSelec.getId().getIdPuesto());
+			evaluacionCompetenciasTemp = evaluacionCualitativaService
+					.find(id01);
+
+			if (evaluacionCompetenciasTemp != null) {
+				cualitativa = evaluacionCompetenciasTemp;
+			} else {
+				cualitativa = new EvaluacionCompetencias();
+			}
+
+		}
+
+		return cualitativa;
+	}
+
+	public void setCualitativa(EvaluacionCompetencias cualitativa) {
+		this.cualitativa = cualitativa;
+	}
+
+	public void getInscripcion() {
+
+		Inscripcion ins = inscripcionService.getInscripcionUsuario(userSesion);
+		if (ins != null) {
+			inscripcionSelec = ins;
+		}
+
+	}
+
+	public void validarSesion() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		userSesion = (Usuario) context.getExternalContext().getSessionMap()
+				.get("userSesion");
+
+		if (userSesion == null) {
+			String ctxPath = context.getExternalContext()
+					.getRequestContextPath();
+			try {
+				context.getExternalContext().redirect(ctxPath + "/login.jsf");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void guardar() {
+
+		validarSesion();
+
+		if (!validarDatos())
+			return;
+
+		try {
+
+			if (cualitativa.getId() != null) {
+
+				cualitativa.setFechaModificacion(new Date());
+				cualitativa.setUsuarioModifica(userSesion.getUsuario());
+
+				evaluacionCualitativaService.edit(cualitativa);
+
+			} else {
+
+				EvaluacionCompetenciasPK id = new EvaluacionCompetenciasPK(
+						planDesarrolloSelec.getId().getIdCompetencia(),
+						planDesarrolloSelec.getId().getIdCampania(),
+						planDesarrolloSelec.getId().getIdGerentePublico(),
+						planDesarrolloSelec.getId().getIdPuesto());
+
+				cualitativa.setId(id);
+				cualitativa.setFechaCreacion(new Date());
+				cualitativa.setUsuarioRegistra(userSesion.getUsuario());
+				cualitativa.setEstado("A");
+
+				evaluacionCualitativaService.save(cualitativa);
+
+			}
+
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+							message.getMessage("msgRegistrar")));
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "ERROR",
+							message.getMessage("msgRegistrarError")));
+		}
+		limpiar();
+	}
+
+	public boolean validarDatos() {
+
+		if (planDesarrolloSelec == null) {
+			FacesContext
+					.getCurrentInstance()
+					.addMessage(
+							null,
+							new FacesMessage(FacesMessage.SEVERITY_WARN,
+									"ADVERTENCIA",
+									"Seleccione un registro de la lista de Competencias"));
+			return false;
+		}
+
+		if (cualitativa.getDescripcion().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Ingrese Evaluación Cualitativa"));
+			return false;
+		}
+
+		return true;
+	}
+
+	public void limpiar() {
+
+		cualitativa = null;
+		planDesarrolloSelec = null;
+
+	}
+
+	public void atenderFlujo() {
+
+		validarSesion();
+
+		if (!validarAtenderFlujo())
+			return;
+
+		try {
+			DetalleFlujoPK idDetalle = new DetalleFlujoPK(inscripcionSelec.getId()
+					.getIdCampania(),
+					inscripcionSelec.getId().getIdGerentePublico(),
+					Constantes.PROCESO2, Constantes.P2_CUALITATIVA_COMPETENCIAS);
+
+			flujoService.atenderFlujo(idDetalle, userSesion.getUsuario());
+			FacesContext
+					.getCurrentInstance()
+					.addMessage(
+							null,
+							new FacesMessage(
+									FacesMessage.SEVERITY_INFO,
+									"EXITO",
+									"Se ha procesado la Evaluación Cualitativa de Competencias para el Gerente Público"));
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "ERROR",
+							"Ha ocurrido un error"));
+		}
+		limpiar();
+	}
+
+	public boolean validarAtenderFlujo() {
+
+		if (inscripcionSelec == null) {
+			return false;
+		}
+
+		if (verificarEvaCompetencias()) {
+			FacesContext
+					.getCurrentInstance()
+					.addMessage(
+							null,
+							new FacesMessage(FacesMessage.SEVERITY_WARN,
+									"ADVERTENCIA",
+									"Registre su evaluación cualitativa para cada competencia"));
+			return false;
+		}
+
+		return true;
+	}
+
+	public boolean verificarEvaCompetencias() {
+
+		List<EvaluacionCompetencias> listVerificacion = new ArrayList<EvaluacionCompetencias>();
+
+		List<EvaluacionCompetencias> list = evaluacionCualitativaService
+				.getListaEvaluacionCualitativa(inscripcionSelec.getId()
+						.getIdCampania(), inscripcionSelec.getId()
+						.getIdGerentePublico(), inscripcionSelec.getPuestoTipoV()
+						.getId_puesto_tipo());
+
+		for (EvaluacionCompetencias row : list) {
+			if (row.getDescripcion() != null) {
+				listVerificacion.add(row);
+			}
+		}
+
+		if (listVerificacion.size() != listaPlanDesarrollo.size())
+			return true;
+
+		return false;
+	}
+
+}

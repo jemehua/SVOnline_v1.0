@@ -1,0 +1,524 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.model.DetalleFlujoPK;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.PlanMetas;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.CampaniaService;
+import gob.servir.desempenio.service.DetalleFlujoService;
+import gob.servir.desempenio.service.FlujoService;
+import gob.servir.desempenio.service.InscripcionService;
+import gob.servir.desempenio.service.PlanMetasService;
+import gob.servir.desempenio.util.Constantes;
+import gob.servir.desempenio.util.TemplateReporteServir;
+
+import java.awt.Color;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
+import org.primefaces.model.UploadedFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import com.lowagie.text.Document;
+import com.lowagie.text.Element;
+import com.lowagie.text.Font;
+import com.lowagie.text.FontFactory;
+import com.lowagie.text.HeaderFooter;
+import com.lowagie.text.PageSize;
+import com.lowagie.text.Phrase;
+import com.lowagie.text.Rectangle;
+import com.lowagie.text.pdf.BaseFont;
+import com.lowagie.text.pdf.GrayColor;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+
+@Component("adjuntarPlanesGPController")
+@Scope("session")
+public class AdjuntarPlanesGPController implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private static final Logger logger = LoggerFactory
+			.getLogger(AdjuntarPlanesGPController.class);
+
+	@Autowired
+	private CampaniaService campaniaService;
+	@Autowired
+	private InscripcionService inscripcionService;
+	@Autowired
+	private PlanMetasService planMetasService;
+	@Autowired
+	private FlujoService flujoService;
+	@Autowired
+	private DetalleFlujoService detalleFlujoService;
+
+	private Usuario userSesion = null;
+	// private Message message = new Message();
+
+	private Inscripcion inscripcionSelec = null;
+	private List<PlanMetas> listaPlanMetas = new ArrayList<PlanMetas>();
+
+	private boolean swFlujo = true;
+
+	// fileUpload
+	private String fileName = "";
+	private byte[] bFile;
+	private String msgDoc = "";
+
+	private FacesMessage msg = null;
+
+	public AdjuntarPlanesGPController() {
+
+	}
+
+	@PostConstruct
+	public void cargar() {
+		validarSesion();
+		getInscripcion();
+		verificarEstadoFlujo();
+	}
+
+	public void getInscripcion() {
+		Inscripcion ins = inscripcionService.getInscripcionUsuario(userSesion);
+		if (ins != null) 
+			inscripcionSelec = ins;
+	}
+
+	public void verificarEstadoFlujo() {
+		if (inscripcionSelec == null) {
+			swFlujo = true;
+		} else {
+			DetalleFlujoPK id = new DetalleFlujoPK(inscripcionSelec.getId()
+					.getIdCampania(), inscripcionSelec.getId()
+					.getIdGerentePublico(), Constantes.PROCESO1,
+					Constantes.P1_VB);
+
+			String estado = detalleFlujoService.getEstadoDetalleFlujo(id);
+
+			if (estado != null) {
+				if (estado.equals(Constantes.ATENDIDO))
+					swFlujo = true;
+				else
+					swFlujo = false;
+			} else
+				swFlujo = true;
+		}
+	}
+
+	public boolean isSwFlujo() {
+		return swFlujo;
+	}
+
+	public void setSwFlujo(boolean swFlujo) {
+		this.swFlujo = swFlujo;
+	}
+
+	public String getMsgDoc() {
+		return msgDoc;
+	}
+
+	public void setMsgDoc(String msgDoc) {
+		this.msgDoc = msgDoc;
+	}
+
+	public Inscripcion getInscripcionSelec() {
+		return inscripcionSelec;
+	}
+
+	public void setInscripcionSelec(Inscripcion inscripcionSelec) {
+		this.inscripcionSelec = inscripcionSelec;
+	}
+
+	public List<PlanMetas> getListaPlanMetas() {
+		if (inscripcionSelec != null)
+			listaPlanMetas = planMetasService.getListaPlanMetas(
+					inscripcionSelec.getId(), Constantes.TRUE);
+		return listaPlanMetas;
+	}
+
+	public void setListaPlanMetas(List<PlanMetas> listaPlanMetas) {
+		this.listaPlanMetas = listaPlanMetas;
+	}
+
+	public void validarSesion() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		userSesion = (Usuario) context.getExternalContext().getSessionMap()
+				.get("userSesion");
+
+		if (userSesion == null) {
+			String ctxPath = context.getExternalContext()
+					.getRequestContextPath();
+			try {
+				context.getExternalContext().redirect(ctxPath + "/login.jsf");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void guardar() {
+		validarSesion();
+
+		if (!validarGuardar()) {
+			FacesContext.getCurrentInstance().addMessage(null, msg);
+			return;
+		}
+
+		try {
+
+			Inscripcion inscripcion = inscripcionService.find(inscripcionSelec
+					.getId());
+
+			if (inscripcion != null) {
+				inscripcion.setFileName(fileName.trim());
+				inscripcion.setDocumento(bFile);
+				inscripcion.setUsuarioModifica(userSesion.getUsuario());
+				inscripcionService.edit(inscripcion);
+
+				msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+						"Registro exitoso.");
+			}
+			limpiar();
+		} catch (Exception e) {
+			e.printStackTrace();
+			msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+					"Error al registrar.");
+		}
+		FacesContext.getCurrentInstance().addMessage(null, msg);
+	}
+
+	public boolean validarGuardar() {
+
+		if (inscripcionSelec == null) {
+			msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+					"Por favor, salga del sistema e inicie sesión nuevamente.");
+			return false;
+		}
+
+		if (fileName.length() == 0 || bFile == null) {
+			msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+					"Adjunte documento escaneado.");
+			return false;
+		}
+
+		return true;
+	}
+
+	public void limpiar() {
+		fileName = "";
+		bFile = null;
+		msgDoc = "";
+	}
+
+	public void atenderFlujo() {
+
+		validarSesion();
+
+		if (!validarAtenderFlujo()) {
+			FacesContext.getCurrentInstance().addMessage(null, msg);
+			return;
+		}
+
+		try {
+			DetalleFlujoPK idDetalle = new DetalleFlujoPK(inscripcionSelec
+					.getId().getIdCampania(), inscripcionSelec.getId()
+					.getIdGerentePublico(), Constantes.PROCESO1,
+					Constantes.P1_VB);
+
+			flujoService.atenderFlujo(idDetalle, userSesion.getUsuario());
+			msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+					"Se ha adjuntado metas e indicadores.");
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+					"Se ha producido un error.");
+		}
+		FacesContext.getCurrentInstance().addMessage(null, msg);
+		limpiar();
+		verificarEstadoFlujo();
+	}
+
+	public boolean validarAtenderFlujo() {
+
+		if (inscripcionSelec == null) {
+			msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+					"Por favor, salga del sistema e inicie sesión nuevamente.");
+			return false;
+		}
+
+		if (verificarEvaMetas()) {
+			msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+					"Primero adjunte el documento escaneado.");
+			return false;
+		}
+
+		return true;
+	}
+
+	public boolean verificarEvaMetas() {
+
+		Inscripcion inscripcion = inscripcionService.find(inscripcionSelec
+				.getId());
+
+		if (inscripcion.getFileName() == null
+				&& inscripcion.getDocumento() == null)
+			return true;
+		return false;
+	}
+
+	public void handleFileUpload(FileUploadEvent event) {
+		msgDoc = "";
+		try {
+			UploadedFile fu = event.getFile();
+			fileName = fu.getFileName();
+			bFile = fu.getContents();
+			msgDoc = fileName + " cargado con exito.";
+		} catch (Exception e) {
+			e.printStackTrace();
+			msgDoc = "Error al cargar archivo" + fileName;
+		}
+	}
+
+	private StreamedContent listaPlanMetasArchivoDescarga;
+
+	public StreamedContent getListaPlanMetasArchivoDescarga() {
+		return this.generarReporte();
+	}
+
+	public void setListaPlanMetasArchivoDescarga(
+			StreamedContent listaPlanMetasArchivoDescarga) {
+		this.listaPlanMetasArchivoDescarga = listaPlanMetasArchivoDescarga;
+	}
+
+	public StreamedContent generarReporte() {
+		validarSesion();
+		StreamedContent pdfFile = null;
+		try {
+
+			Document document2 = new Document();
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			PdfWriter.getInstance(document2, baos);
+
+			TemplateReporteServir reporteItext = new TemplateReporteServir();
+			HeaderFooter header = reporteItext.headerServir();
+			document2.setHeader(header);
+			HeaderFooter footer = reporteItext.footerServir();
+			document2.setFooter(footer);
+			document2.setPageSize(PageSize.A4);
+//			document2.setMargins(10.0F, 10.0F, 40.0F, 21.0F);
+//			document2.setMarginMirroringTopBottom(false);
+			document2.open();
+			
+			PdfPTable tableSpace1 = reporteItext.tableSpace1();
+			document2.add(tableSpace1);
+
+			Font FONTtabla2 = new Font(Font.NORMAL, 12, Font.BOLD,
+					new GrayColor(0f));
+			Font FONTtitulo = new Font(Font.NORMAL, 14, Font.BOLD | Font.UNDERLINE, new GrayColor(0f));
+
+			PdfPTable table2 = new PdfPTable(2);
+			float[] anchoTabla2Celda = { 4.5f, 10f };
+			table2.setWidths(anchoTabla2Celda);
+			table2.setTotalWidth(500.0F);
+			table2.setLockedWidth(true);
+			
+			PdfPCell titulo = new PdfPCell(new Phrase("PLAN DE ACCIÓN DE METAS", FONTtitulo));
+			titulo.setBorder(Rectangle.NO_BORDER);
+			titulo.setColspan(2);
+			titulo.setHorizontalAlignment(Element.ALIGN_CENTER);
+			table2.addCell(titulo);
+			
+			PdfPCell espacioT = new PdfPCell(new Phrase(" ", FONTtitulo));
+			espacioT.setBorder(Rectangle.NO_BORDER);
+			espacioT.setColspan(2);
+			espacioT.setHorizontalAlignment(Element.ALIGN_CENTER);
+			table2.addCell(espacioT);
+			
+			String cadCampania = "CAMPAÑA :";
+			String denominacion = inscripcionSelec.getCampania()
+					.getDenominacion()
+					+ " "
+					+ inscripcionSelec.getCampania().getAnio()
+					+ " "
+					+ inscripcionSelec.getCampania().getPostAnio();
+			PdfPCell cellCampania = new PdfPCell(new Phrase(cadCampania,
+					FONTtabla2));
+			cellCampania.setHorizontalAlignment(Element.ALIGN_LEFT);
+			cellCampania.setBorder(Rectangle.NO_BORDER);
+			table2.addCell(cellCampania);
+			PdfPCell cellCampaniaDenominacion = new PdfPCell(new Phrase(
+					denominacion));
+			cellCampaniaDenominacion.setHorizontalAlignment(Element.ALIGN_LEFT);
+			cellCampaniaDenominacion.setBorder(Rectangle.NO_BORDER);
+			table2.addCell(cellCampaniaDenominacion);
+
+			String generado = "GERENTE PUBLICO :";
+			String usuarioGenerado = userSesion.getNombre() + " "
+					+ userSesion.getApPaterno() + " "
+					+ userSesion.getApMaterno();
+			PdfPCell cellAutor = new PdfPCell(new Phrase(generado, FONTtabla2));
+			cellAutor.setBorder(Rectangle.NO_BORDER);
+			cellAutor.setHorizontalAlignment(Element.ALIGN_LEFT);
+			table2.addCell(cellAutor);
+			PdfPCell cellAutorUsuario = new PdfPCell(
+					new Phrase(usuarioGenerado));
+			cellAutorUsuario.setBorder(Rectangle.NO_BORDER);
+			cellAutorUsuario.setHorizontalAlignment(Element.ALIGN_LEFT);
+			table2.addCell(cellAutorUsuario);
+
+			SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy",
+					new Locale("ES"));
+			String fecha = "FECHA EMISION :";
+			String fechaCell = formatoFecha.format(new Date());
+			PdfPCell cellfecha = new PdfPCell(new Phrase(fecha, FONTtabla2));
+			cellfecha.setHorizontalAlignment(Element.ALIGN_LEFT);
+			cellfecha.setBorder(Rectangle.NO_BORDER);
+			table2.addCell(cellfecha);
+			PdfPCell cellfechaCell = new PdfPCell(new Phrase(fechaCell));
+			cellfechaCell.setHorizontalAlignment(Element.ALIGN_LEFT);
+			cellfechaCell.setBorder(Rectangle.NO_BORDER);
+			table2.addCell(cellfechaCell);
+			document2.add(table2);
+
+			PdfPTable tablaSpace2 = reporteItext.tableSpace1();
+			document2.add(tablaSpace2);
+
+			Font FONT = new Font(Font.NORMAL, 10, Font.BOLD, new GrayColor(1f));
+//			Font FONT1 = new Font(Font.NORMAL, 10, Font.NORMAL, new GrayColor(
+//					0f));
+			Font FONT3 = new Font(Font.NORMAL, 12, Font.BOLD, new GrayColor(0f));
+			String path = "/resources/ttf/LiberationSans-Regular.ttf";
+			String ruta = FacesContext.getCurrentInstance().getExternalContext().getRealPath(path);
+			BaseFont bf1 = BaseFont.createFont(ruta, BaseFont.CP1250, BaseFont.EMBEDDED);
+		    Font FONT1 = new Font(bf1, 10);
+		    
+			PdfPTable tablaLista = new PdfPTable(6);
+			tablaLista.setHeaderRows(1);
+			float[] anchoCelda = {1.4f, 2f, 5f, 5f, 1.3f, 5f};
+			tablaLista.setWidths(anchoCelda); 
+			tablaLista.setTotalWidth(500.0F);
+			tablaLista.setLockedWidth(true);
+			
+			PdfPCell celHeader = new PdfPCell(new Phrase("PLAN DE METAS", FONT3));
+			celHeader.setBorder(Rectangle.NO_BORDER);
+			celHeader.setColspan(6);
+			celHeader.setHorizontalAlignment(Element.ALIGN_LEFT);
+			tablaLista.addCell(celHeader);
+
+			
+			if(!listaPlanMetas.isEmpty()){							
+				PdfPCell celLista1Header = new PdfPCell(new Phrase("CODIGO", FONT));
+
+				celLista1Header.setBackgroundColor(Color.GRAY);
+				celLista1Header.setHorizontalAlignment(Element.ALIGN_CENTER);
+				tablaLista.addCell(celLista1Header);
+				PdfPCell celLista2Header = new PdfPCell(new Phrase("TIPO META",
+						FONT));
+				celLista2Header.setBackgroundColor(Color.GRAY);
+				celLista2Header.setHorizontalAlignment(Element.ALIGN_CENTER);
+				tablaLista.addCell(celLista2Header);
+				
+				PdfPCell celLista6Header = new PdfPCell(new Phrase("META",FONT));
+				celLista6Header.setBackgroundColor(Color.GRAY);
+				celLista6Header.setHorizontalAlignment(Element.ALIGN_CENTER);
+				tablaLista.addCell(celLista6Header);
+				
+				PdfPCell celLista3Header = new PdfPCell(new Phrase(
+						"RELACION POI", FONT));
+				celLista3Header.setBackgroundColor(Color.GRAY);
+				celLista3Header.setHorizontalAlignment(Element.ALIGN_CENTER);
+				tablaLista.addCell(celLista3Header);
+				PdfPCell celLista4Header = new PdfPCell(new Phrase("PESO %",
+						FONT));
+				celLista4Header.setBackgroundColor(Color.GRAY);
+				celLista4Header.setHorizontalAlignment(Element.ALIGN_CENTER);
+				tablaLista.addCell(celLista4Header);
+				PdfPCell celLista5Header = new PdfPCell(new Phrase(
+						"PLAN DE ACCION", FONT));
+				celLista5Header.setBackgroundColor(Color.GRAY);
+				celLista5Header.setHorizontalAlignment(Element.ALIGN_CENTER);
+				tablaLista.addCell(celLista5Header);
+
+				for (PlanMetas planMetas : listaPlanMetas) {
+					PdfPCell celLista1 = new PdfPCell(new Phrase(
+							String.valueOf(planMetas.getId().getIdMeta()),
+							FONT1));
+					celLista1.setHorizontalAlignment(Element.ALIGN_CENTER);
+					tablaLista.addCell(celLista1);
+					PdfPCell celLista2 = new PdfPCell(new Phrase(planMetas
+							.getMeta().getTipo(), FONT1));
+					celLista2.setHorizontalAlignment(Element.ALIGN_CENTER);
+					tablaLista.addCell(celLista2);
+
+					PdfPCell celLista6 = new PdfPCell(new Phrase(
+							planMetas.getMeta().getDenominacion(), FONT1));
+					celLista6.setHorizontalAlignment(Element.ALIGN_JUSTIFIED);
+					tablaLista.addCell(celLista6);
+					
+					PdfPCell celLista3 = new PdfPCell(new Phrase(planMetas
+							.getMeta().getRelacionPOI(), FONT1));
+					celLista3.setHorizontalAlignment(Element.ALIGN_JUSTIFIED);
+					tablaLista.addCell(celLista3);
+					
+					PdfPCell celLista4 = new PdfPCell(new Phrase(
+							String.valueOf(planMetas.getMeta().getPeso()),
+							FONT1));
+					celLista4.setHorizontalAlignment(Element.ALIGN_CENTER);
+					tablaLista.addCell(celLista4);
+					PdfPCell celLista5 = new PdfPCell(new Phrase(
+							planMetas.getDescripcionPlan(), FONT1));
+					celLista5.setHorizontalAlignment(Element.ALIGN_JUSTIFIED);
+					tablaLista.addCell(celLista5);
+
+				}
+			}
+
+			document2.add(tablaLista);
+
+			PdfPTable tableSpace2 = reporteItext.tableSpace2();
+			document2.add(tableSpace2);
+
+			PdfPTable tablaFirma = reporteItext.tablaFirma();
+			document2.add(tablaFirma);
+
+			document2.close();
+
+			byte[] bytes = baos.toByteArray();
+			baos.close();
+			String fileName = userSesion.getApPaterno() + fechaCell + ".pdf";
+			pdfFile = new DefaultStreamedContent(
+					new ByteArrayInputStream(bytes), "application/pdf",
+					fileName);
+
+		} catch (Exception e) {
+			System.err.println("pdf error" + e.toString());
+		}
+
+		return pdfFile;
+	}
+
+}

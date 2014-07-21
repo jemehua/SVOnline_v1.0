@@ -1,0 +1,63 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.MetaDao;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.Meta;
+import gob.servir.desempenio.model.MetaPK;
+import gob.servir.desempenio.service.MetaService;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Service
+public class MetaServiceImpl implements MetaService {
+
+	@Autowired
+	private MetaDao metaDao;
+
+	@Transactional
+	public Meta find(MetaPK id) {
+		return metaDao.find(id);
+	}
+
+	@Transactional
+	public Meta save(Meta obj) {
+		return metaDao.save(obj);
+	}
+
+	@Transactional
+	public Meta edit(Meta obj) {
+		return metaDao.edit(obj);
+	}
+
+	public List<Meta> getListaMeta() {
+		return metaDao.getListaMeta();
+	}
+
+	public List<Meta> getListaMetas(InscripcionPK id) {
+		return metaDao.getListaMetas(id);
+	}
+
+	public List<Meta> getListaMetasAprobacion(InscripcionPK id,
+			boolean aprobacion) {
+		return metaDao.getListaMetasAprobacion(id, aprobacion);
+	}
+
+	public Long getMaxId(InscripcionPK id) {
+		return metaDao.getMaxId(id);
+	}
+
+	public Integer getCantidadMetasModificados(InscripcionPK inspk,boolean modificado,
+			boolean aprobacion) {
+	
+		return metaDao.getCantidadMetasModificados(inspk,modificado,aprobacion);
+	}
+
+}

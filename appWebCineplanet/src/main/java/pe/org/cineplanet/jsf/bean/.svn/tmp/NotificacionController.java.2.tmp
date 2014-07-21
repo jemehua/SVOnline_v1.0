@@ -1,0 +1,587 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.model.DetalleFlujo;
+import gob.servir.desempenio.model.DetalleFlujoPK;
+import gob.servir.desempenio.model.DetalleInscripcion;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.Mensaje;
+import gob.servir.desempenio.model.Notificacion;
+import gob.servir.desempenio.model.NotificacionPK;
+import gob.servir.desempenio.model.ParametroSistema;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.CampaniaService;
+import gob.servir.desempenio.service.DetalleFlujoService;
+import gob.servir.desempenio.service.DetalleInscripcionService;
+import gob.servir.desempenio.service.InscripcionService;
+import gob.servir.desempenio.service.JavaMailService;
+import gob.servir.desempenio.service.MensajeService;
+import gob.servir.desempenio.service.NotificacionService;
+import gob.servir.desempenio.service.ParametroSistemaService;
+import gob.servir.desempenio.service.UsuarioService;
+import gob.servir.desempenio.util.Constantes;
+import gob.servir.desempenio.util.FormatTemplateMessage;
+import gob.servir.desempenio.util.Message;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+/**
+ * 
+ * @author Hever Pumallihua Garcia
+ */
+@Component("notificacionController")
+@Scope("session")
+public class NotificacionController {
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(NotificacionController.class);
+
+	@Autowired
+	private CampaniaService campaniaService;
+	@Autowired
+	private InscripcionService inscripcionService;
+	@Autowired
+	private NotificacionService notificacionService;
+	@Autowired
+	private DetalleFlujoService detalleFlujoService;
+	@Autowired
+	private MensajeService mensajeService;
+	@Autowired
+	private JavaMailService javaMailService;
+	@Autowired
+	private UsuarioService usuarioService;
+	@Autowired
+	private DetalleInscripcionService detalleInscripcionService;
+	@Autowired
+	private ParametroSistemaService parametroSistemaService;
+
+	//private Message message = new Message();
+
+	private Usuario userSesion = null;
+	private List<SelectItem> comboCampania = new ArrayList<SelectItem>();
+	private Long campaniaSelec = 0L;
+
+	private List<DetalleFlujo> listaDetalleFlujo = new ArrayList<DetalleFlujo>();
+	private List<Notificacion> listaNotificacion = new ArrayList<Notificacion>();
+	// Buscar gp
+	private Inscripcion inscripcionSelec = null;
+	private String nombreGerente = null;
+	private List<Inscripcion> listaGerentePublico = new ArrayList<Inscripcion>();
+	private boolean swBtnBuscar = true;
+	private String valorBusqueda = "";
+	//private static final String ACTIVIDAD_TEMPORIZADA = "T";
+
+	private DetalleFlujo detalleFlujo = null;
+	private List<Mensaje> listaMensaje = new ArrayList<Mensaje>();
+	private Mensaje mensajeSelec = null;
+	private boolean swEditar = false;
+	
+	Notificacion notificacion = new Notificacion();
+	NotificacionPK notificacionPK = new NotificacionPK();
+	private boolean swGP = false;
+	private boolean swJI = false;
+	private boolean swTE = false;
+
+	private String estado;
+
+	public String getEstado() {
+
+		return estado;
+	}
+
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
+
+	public NotificacionController() {
+		super();
+	}
+
+	public boolean isSwEditar() {
+		return swEditar;
+	}
+
+	public void setSwEditar(boolean swEditar) {
+		this.swEditar = swEditar;
+	}
+
+	public List<Mensaje> getListaMensaje() {
+		listaMensaje.clear();
+		if (detalleFlujo != null) {
+			listaMensaje = mensajeService.getListaMensajeTipo(detalleFlujo
+					.getId().getIdActividad(), detalleFlujo.getId()
+					.getIdProceso(), detalleFlujo.getId().getIdCampania(), "S");
+		}
+		return listaMensaje;
+	}
+
+	public void setListaMensaje(List<Mensaje> listaMensaje) {
+		this.listaMensaje = listaMensaje;
+	}
+
+	public Mensaje getMensajeSelec() {
+		return mensajeSelec;
+	}
+
+	public void setMensajeSelec(Mensaje mensajeSelec) {
+		this.mensajeSelec = mensajeSelec;
+	}
+
+	public DetalleFlujo getDetalleFlujo() {
+		return detalleFlujo;
+	}
+
+	public void setDetalleFlujo(DetalleFlujo detalleFlujo) {
+		this.detalleFlujo = detalleFlujo;
+	}
+
+	public List<SelectItem> getComboCampania() {
+		comboCampania = campaniaService.getComboCampania();
+		return comboCampania;
+	}
+
+	public void setComboCampania(List<SelectItem> comboCampania) {
+		this.comboCampania = comboCampania;
+	}
+
+	public Long getCampaniaSelec() {
+
+		if (campaniaSelec == 0L) {
+			inscripcionSelec = null;
+			nombreGerente = null;
+		}
+		return campaniaSelec;
+	}
+
+	public void setCampaniaSelec(Long campaniaSelec) {
+		this.campaniaSelec = campaniaSelec;
+	}
+
+	public Inscripcion getInscripcionSelec() {
+		return inscripcionSelec;
+	}
+
+	public void setInscripcionSelec(Inscripcion inscripcionSelec) {
+		this.inscripcionSelec = inscripcionSelec;
+	}
+
+	public String getNombreGerente() {
+		return nombreGerente;
+	}
+
+	public void setNombreGerente(String nombreGerente) {
+		this.nombreGerente = nombreGerente;
+	}
+
+	public List<Inscripcion> getListaGerentePublico() {
+
+		listaGerentePublico.clear();
+
+		if (campaniaSelec != 0L) {
+			// 0=todos
+			if (valorBusqueda.equalsIgnoreCase(""))
+				listaGerentePublico = inscripcionService.getListaGerentePublico(
+						campaniaSelec);
+			else
+				listaGerentePublico = inscripcionService.getListaInscripcion(
+						campaniaSelec, valorBusqueda);
+		}
+		return listaGerentePublico;
+	}
+
+	public void setListaGerentePublico(List<Inscripcion> listaGerentePublico) {
+		this.listaGerentePublico = listaGerentePublico;
+	}
+
+	public boolean isSwBtnBuscar() {
+		if (campaniaSelec != 0L)
+			swBtnBuscar = false;
+		else
+			swBtnBuscar = true;
+		return swBtnBuscar;
+	}
+
+	public void setSwBtnBuscar(boolean swBtnBuscar) {
+		this.swBtnBuscar = swBtnBuscar;
+	}
+
+	public String getValorBusqueda() {
+		return valorBusqueda;
+	}
+
+	public void setValorBusqueda(String valorBusqueda) {
+		this.valorBusqueda = valorBusqueda;
+	}
+
+	public boolean isSwGP() {
+		return swGP;
+	}
+
+	public void setSwGP(boolean swGP) {
+		this.swGP = swGP;
+	}
+
+	public boolean isSwJI() {
+		return swJI;
+	}
+
+	public void setSwJI(boolean swJI) {
+		this.swJI = swJI;
+	}
+
+	public boolean isSwTE() {
+		return swTE;
+	}
+
+	public void setSwTE(boolean swTE) {
+		this.swTE = swTE;
+	}
+
+	public List<DetalleFlujo> getListaDetalleFlujo() {
+		listaDetalleFlujo.clear();
+		if (campaniaSelec != 0L && inscripcionSelec != null)
+			listaDetalleFlujo = detalleFlujoService.getListaDetalleFlujoTemp(inscripcionSelec.getId());
+		return listaDetalleFlujo;
+	}
+
+	public void setListaDetalleFlujo(List<DetalleFlujo> listaDetalleFlujo) {
+		this.listaDetalleFlujo = listaDetalleFlujo;
+	}
+
+	public List<Notificacion> getListaNotificacion() {
+		listaNotificacion.clear();
+		if (campaniaSelec != 0L && inscripcionSelec != null
+				&& detalleFlujo != null)
+			listaNotificacion = notificacionService
+					.getListaNotificacion(detalleFlujo.getId());
+
+		return listaNotificacion;
+	}
+
+	public void setListaNotificacion(List<Notificacion> listaNotificacion) {
+		this.listaNotificacion = listaNotificacion;
+	}
+
+	public void validarSesion() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		userSesion = (Usuario) context.getExternalContext().getSessionMap()
+				.get("userSesion");
+
+		if (userSesion == null) {
+			String ctxPath = context.getExternalContext()
+					.getRequestContextPath();
+			try {
+				context.getExternalContext().redirect(ctxPath + "/login.jsf");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void limpiar() {
+		inscripcionSelec = null;
+		nombreGerente = "";
+		swBtnBuscar = true;
+		campaniaSelec = 0L;
+	}
+
+	public void limpiarMensajes() {
+		swGP = false;
+		swJI = false;
+		swTE = false;
+	}
+
+	public void reenviarMensaje() {
+		validarSesion();
+		try {
+			
+			DetalleInscripcion detalleInscripcion = null;
+			ParametroSistema param = parametroSistemaService.find(Constantes.ID_URL_CONFIRMACION);
+			StringBuilder para = new StringBuilder();
+			
+			if (detalleFlujo.getId().getIdProceso() == 1 || detalleFlujo.getId().getIdProceso() == 2) {
+
+				Usuario usuario = new Usuario();
+				usuario.setApPaterno(inscripcionSelec.getAsignacionGerenteV().getAp_paterno().toLowerCase());
+				usuario.setDni(inscripcionSelec.getAsignacionGerenteV().getDni());
+
+				mensajeSelec.setCuerpo(FormatTemplateMessage.textMessage(
+						mensajeSelec.getCuerpo(), new DetalleFlujoPK(
+								detalleFlujo.getId().getIdCampania(),
+								detalleFlujo.getId().getIdGerentePublico(),
+								detalleFlujo.getId().getIdProceso(),
+								detalleFlujo.getId().getIdActividad() + 1L),
+						usuario, param.getValor(),inscripcionSelec.getCampania().getAnio()+inscripcionSelec.getCampania().getPostAnio()));
+				
+				// Validando Correo		
+
+				if (inscripcionSelec.getAsignacionGerenteV().getMail_01().trim() != null)
+					para.append(inscripcionSelec.getAsignacionGerenteV().getMail_01().trim());
+				if (inscripcionSelec.getAsignacionGerenteV().getMail_02().trim() != null) {
+					if(para.length() > 0)
+						para.append(", ");
+					para.append(inscripcionSelec.getAsignacionGerenteV().getMail_02().trim());
+				}
+				if (inscripcionSelec.getAsignacionGerenteV().getMail_03().trim() != null) {
+					if(para.length() > 0)
+						para.append(", ");
+					para.append(inscripcionSelec.getAsignacionGerenteV().getMail_03().trim());
+				}
+
+				if (mensajeSelec != null && para.length() > 0) {
+
+					javaMailService.enviar(mensajeSelec, para.toString());
+					detalleFlujo.setNroEnvios(detalleFlujo.getNroEnvios() + 1);
+					notificacion();
+					notificacionService.save(notificacion);
+					detalleFlujoService.edit(detalleFlujo);
+				}
+
+			}
+
+			if (detalleFlujo.getId().getIdProceso() == 3) {
+
+				if (detalleFlujo.getEstadoEvaFinalGP()!=null) {
+					if (detalleFlujo.getEstadoEvaFinalGP().equalsIgnoreCase("GP") && swGP == true) {
+						
+					Usuario usuario = new Usuario();
+					usuario.setApPaterno(inscripcionSelec.getAsignacionGerenteV().getAp_paterno().toLowerCase());
+					usuario.setDni(inscripcionSelec.getAsignacionGerenteV().getDni());
+
+					mensajeSelec.setCuerpo(FormatTemplateMessage.textMessage(
+							mensajeSelec.getCuerpo(),
+							new DetalleFlujoPK(detalleFlujo.getId()
+									.getIdCampania(), detalleFlujo.getId()
+									.getIdGerentePublico(), detalleFlujo
+									.getId().getIdProceso(), detalleFlujo
+									.getId().getIdActividad() + 1L), usuario,
+							param.getValor(),inscripcionSelec.getCampania().getAnio()+inscripcionSelec.getCampania().getPostAnio()));
+					
+					// Validando Correo
+						
+						
+						if (inscripcionSelec.getAsignacionGerenteV().getMail_01().trim() != null)
+							para.append(inscripcionSelec.getAsignacionGerenteV().getMail_01().trim());
+						if (inscripcionSelec.getAsignacionGerenteV().getMail_02().trim() != null) {
+							if(para.length() > 0)
+								para.append(", ");
+							para.append(inscripcionSelec.getAsignacionGerenteV().getMail_02().trim());
+						}
+						if (inscripcionSelec.getAsignacionGerenteV().getMail_03().trim() != null) {
+							if(para.length() > 0)
+								para.append(", ");
+							para.append(inscripcionSelec.getAsignacionGerenteV().getMail_03().trim());
+						}
+
+						if (mensajeSelec != null && para.length() > 0) {
+
+							javaMailService.enviar(mensajeSelec, para.toString());
+							detalleFlujo.setNroEnvios(detalleFlujo.getNroEnvios() + 1);
+							notificacion();
+							notificacionService.save(notificacion);
+							detalleFlujoService.edit(detalleFlujo);
+						}
+			
+					}
+				}
+
+				if (detalleFlujo.getEstadoEvaFinalJI()!=null) {
+					if (detalleFlujo.getEstadoEvaFinalJI().equalsIgnoreCase("JI") && swJI == true) {
+
+					detalleInscripcion = detalleInscripcionService.getListaDetalleInscripcion(inscripcionSelec.getId().getIdCampania(),
+									inscripcionSelec.getId().getIdGerentePublico()).get(0);
+					
+					
+						if (detalleInscripcion.getJefeInmediato() != null) {
+
+							Usuario usuario = new Usuario();
+							usuario.setApPaterno(detalleInscripcion.getJefeInmediato().getApPaterno()
+									.toLowerCase());
+							usuario.setDni(detalleInscripcion.getJefeInmediato().getDni());
+	
+							mensajeSelec.setCuerpo(FormatTemplateMessage.textMessage(mensajeSelec.getCuerpo(),
+											new DetalleFlujoPK(detalleFlujo.getId()
+													.getIdCampania(), detalleFlujo
+													.getId().getIdGerentePublico(),
+													detalleFlujo.getId()
+															.getIdProceso(),
+													detalleFlujo.getId()
+															.getIdActividad() + 4L),
+											usuario, param.getValor(),inscripcionSelec.getCampania().getAnio()));
+							
+							// Validando Correo JI													
+							if (detalleInscripcion.getJefeInmediato().getCorreo1().trim() != null)
+								para.append(detalleInscripcion.getJefeInmediato().getCorreo1().trim());
+							if (detalleInscripcion.getJefeInmediato().getCorreo2().trim() != null) {
+								if(para.length() > 0)
+									para.append(", ");
+								para.append(detalleInscripcion.getJefeInmediato().getCorreo2().trim());
+							
+							}
+
+					} else if (detalleInscripcion.getJefeInmediatoV() != null) {
+
+							Usuario usuario = new Usuario();
+							usuario.setApPaterno(detalleInscripcion.getJefeInmediatoV().getApellido_paterno().toLowerCase());
+							usuario.setDni(detalleInscripcion.getJefeInmediatoV().getNumero_documento());
+	
+							mensajeSelec
+									.setCuerpo(FormatTemplateMessage.textMessage(
+											mensajeSelec.getCuerpo(),
+											new DetalleFlujoPK(detalleFlujo.getId()
+													.getIdCampania(), detalleFlujo
+													.getId().getIdGerentePublico(),
+													detalleFlujo.getId()
+															.getIdProceso(),
+													detalleFlujo.getId()
+															.getIdActividad() + 4L),
+											usuario, param.getValor(),inscripcionSelec.getCampania().getAnio()));
+							// Validando Correo
+														
+							if (detalleInscripcion.getJefeInmediatoV().getCorreo_electronico_trabajo().trim() != null)
+								para.append(detalleInscripcion.getJefeInmediatoV().getCorreo_electronico_trabajo().trim());
+							if (detalleInscripcion.getJefeInmediatoV().getCorreo_electronico_personal().trim() != null) {
+								if(para.length() > 0)
+									para.append(", ");
+								para.append(detalleInscripcion.getJefeInmediatoV().getCorreo_electronico_personal().trim());
+							}
+							
+						}
+						
+						if (mensajeSelec != null && para.length() > 0) {
+
+							javaMailService.enviar(mensajeSelec, para.toString());
+							detalleFlujo.setNroEnvios(detalleFlujo.getNroEnvios() + 1);
+							notificacion();
+							notificacionService.save(notificacion);
+							detalleFlujoService.edit(detalleFlujo);
+						}					
+
+					}
+				}
+				// TE
+				if (detalleFlujo.getEstadoEvaFinalTE()!=null) {
+					if (detalleFlujo.getEstadoEvaFinalTE().equalsIgnoreCase("TE") && swTE == true) {
+					
+					detalleInscripcion = detalleInscripcionService.getListaDetalleInscripcion(inscripcionSelec.getId().getIdCampania(),inscripcionSelec.getId().getIdGerentePublico()).get(0);
+
+					if (detalleInscripcion.getTitularEntidad() != null) {
+
+						Usuario usuario = new Usuario();
+						usuario.setApPaterno(detalleInscripcion.getTitularEntidad().getApPaterno().toLowerCase());
+						usuario.setDni(detalleInscripcion.getTitularEntidad().getNroDocTE());
+
+						mensajeSelec
+								.setCuerpo(FormatTemplateMessage.textMessage(
+										mensajeSelec.getCuerpo(),
+										new DetalleFlujoPK(detalleFlujo.getId()
+												.getIdCampania(), detalleFlujo
+												.getId().getIdGerentePublico(),
+												detalleFlujo.getId()
+														.getIdProceso(),
+												detalleFlujo.getId()
+														.getIdActividad() + 7L),
+										usuario, param.getValor(),inscripcionSelec.getCampania().getAnio()));
+						// Validando Correo JI
+												
+						if (detalleInscripcion.getTitularEntidad().getCorreoTrabajo().trim() != null)
+							para.append(detalleInscripcion.getTitularEntidad().getCorreoTrabajo().trim());
+						if (detalleInscripcion.getTitularEntidad().getCorreoPersonal().trim() != null) {
+							if(para.length() > 0)
+								para.append(", ");
+							para.append(detalleInscripcion.getTitularEntidad().getCorreoPersonal().trim());
+						}
+						
+
+					} else if (detalleInscripcion.getEntidadDestinoV() != null) {
+
+						if (detalleInscripcion.getEntidadDestinoV().getTe_numero_documento() != null) {
+							Usuario usuario = new Usuario();
+							usuario.setApPaterno(detalleInscripcion.getEntidadDestinoV().getTe_apellido_paterno().toLowerCase());
+							usuario.setDni(detalleInscripcion.getEntidadDestinoV().getTe_numero_documento());
+
+							mensajeSelec
+									.setCuerpo(FormatTemplateMessage.textMessage(
+											mensajeSelec.getCuerpo(),
+											new DetalleFlujoPK(
+													detalleFlujo.getId()
+															.getIdCampania(),
+													detalleFlujo
+															.getId()
+															.getIdGerentePublico(),
+													detalleFlujo.getId()
+															.getIdProceso(),
+													detalleFlujo.getId()
+															.getIdActividad() + 7L),
+											usuario, param.getValor(),inscripcionSelec.getCampania().getAnio()));
+							
+							// Validando Correo						
+							
+							if (detalleInscripcion.getEntidadDestinoV().getTe_correo_electronico_trabajo().trim() != null)
+								para.append(detalleInscripcion.getEntidadDestinoV().getTe_correo_electronico_trabajo().trim());
+							if (detalleInscripcion.getEntidadDestinoV().getTe_correo_electronico_personal().trim() != null) {
+								if(para.length() > 0)
+									para.append(", ");
+								para.append(detalleInscripcion.getEntidadDestinoV().getTe_correo_electronico_personal().trim());
+							}
+
+							}
+						}
+					
+						if (mensajeSelec != null && para.length() > 0) {
+
+							javaMailService.enviar(mensajeSelec,para.toString());
+							detalleFlujo.setNroEnvios(detalleFlujo.getNroEnvios() + 1);
+							notificacion();
+							notificacionService.save(notificacion);
+							detalleFlujoService.edit(detalleFlujo);
+						}
+					}
+				}
+
+			}
+			
+			limpiarMensajes();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+							"Mensanje Reenviado "));
+
+		} catch (Exception e) {
+			logger.info("ERRROR AL REENVIAR MENSAJE");
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+							"Mensaje no Reenviado"));
+		}
+	}
+	
+	public void notificacion(){
+		
+		notificacionPK.setIdActividad(detalleFlujo.getId().getIdActividad());
+		notificacionPK.setIdCampania(detalleFlujo.getId().getIdCampania());
+		notificacionPK.setIdGerentePublico(detalleFlujo.getId().getIdGerentePublico());
+		notificacionPK.setIdProceso(detalleFlujo.getId().getIdProceso());
+		notificacionPK.setIdMensaje(mensajeSelec.getId().getIdMensaje());
+		notificacionPK.setIdNotificacion(notificacionService.getMaxId(detalleFlujo.getId()));
+		notificacion.setId(notificacionPK);
+		notificacion.setEstado(Constantes.ACTIVO);
+		notificacion.setUsuarioRegistra(userSesion.getUsuario());
+		notificacion.setFechaCreacion(new Date());
+		
+	}
+
+}

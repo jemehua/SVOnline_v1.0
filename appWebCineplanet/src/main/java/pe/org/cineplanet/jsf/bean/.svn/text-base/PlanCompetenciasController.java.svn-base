@@ -1,0 +1,394 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.model.DetalleFlujoPK;
+import gob.servir.desempenio.model.EvaluacionInicial;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.PlanDesarrollo;
+import gob.servir.desempenio.model.PlanDesarrolloPK;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.DetalleFlujoService;
+import gob.servir.desempenio.service.EvaluacionInicialService;
+import gob.servir.desempenio.service.FlujoService;
+import gob.servir.desempenio.service.InscripcionService;
+import gob.servir.desempenio.service.PlanDesarrolloService;
+import gob.servir.desempenio.util.Constantes;
+import gob.servir.desempenio.util.Message;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+
+import org.primefaces.event.SelectEvent;
+import org.primefaces.event.UnselectEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Component("planCompetenciasController")
+@Scope("session")
+public class PlanCompetenciasController {
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(PlanCompetenciasController.class);
+
+	@Autowired
+	private LoginController loginController;
+	@Autowired
+	private InscripcionService inscripcionService;
+	@Autowired
+	private EvaluacionInicialService evaInicialService;
+	@Autowired
+	private PlanDesarrolloService planDesarrolloService;
+	@Autowired
+	private FlujoService flujoService;
+	@Autowired
+	private DetalleFlujoService detalleFlujoService;
+
+	private EvaluacionInicial evaInicialSelec = null;
+	private String competencia = "";
+
+	private Usuario userSesion = null;
+	private Message message = new Message();
+
+	private Inscripcion inscripcionSelec = null;
+	private List<EvaluacionInicial> listaCompetencias = new ArrayList<EvaluacionInicial>();
+	private PlanDesarrollo planDesarrollo = new PlanDesarrollo();
+
+	
+	private boolean swFlujo = true;
+
+	public PlanCompetenciasController() {
+		// super();
+	}
+
+	@PostConstruct
+	public void cargar() {
+		validarSesion();
+		getInscripcion();
+		verificarEstadoFlujo();
+		buscarCompetencias();
+	}
+	
+	public boolean verificarEstadoFlujo() {
+		if (inscripcionSelec == null) {
+			swFlujo = false;
+		} else {
+			String estado = detalleFlujoService
+					.getEstadoDetalleFlujo(new DetalleFlujoPK(inscripcionSelec
+							.getId().getIdCampania(), inscripcionSelec.getId()
+							.getIdGerentePublico(), Constantes.PROCESO1,
+							Constantes.P1_PLAN_COMPETENCIAS));
+			if (estado != null) {
+				if (estado.equalsIgnoreCase(Constantes.ATENDIDO))
+					swFlujo = true;
+				else
+					swFlujo = false;
+			} else
+				swFlujo = true;
+		}
+		return swFlujo;
+	}
+
+	public boolean isSwFlujo() {
+		return swFlujo;
+	}
+
+	public void setSwFlujo(boolean swFlujo) {
+		this.swFlujo = swFlujo;
+	}
+
+	public PlanDesarrollo getPlanDesarrollo() {
+		return planDesarrollo;
+	}
+
+	public void setPlanDesarrollo(PlanDesarrollo planDesarrollo) {
+		this.planDesarrollo = planDesarrollo;
+	}
+
+	public void buscarCompetencias() {
+		listaCompetencias.clear();
+		// brecha > 0
+		if (inscripcionSelec != null){
+			listaCompetencias = evaInicialService.getListaEvaluacionInicial(
+					inscripcionSelec.getId(), 2);
+			
+			if (listaCompetencias.size()==0)
+			listaCompetencias = evaInicialService
+					.getListaEvaluacionInicial(inscripcionSelec.getId(), 1);
+		
+		}
+	}
+
+	public String getCompetencia() {
+		return competencia;
+	}
+
+	public void setCompetencia(String competencia) {
+		this.competencia = competencia;
+	}
+
+	public EvaluacionInicial getEvaInicialSelec() {
+		return evaInicialSelec;
+	}
+
+	public void setEvaInicialSelec(EvaluacionInicial evaInicialSelec) {
+		this.evaInicialSelec = evaInicialSelec;
+	}
+
+	public void getInscripcion() {
+		Inscripcion ins = inscripcionService.getInscripcionUsuario(userSesion);
+		if (ins != null)
+			inscripcionSelec = ins;
+	}
+
+	public Inscripcion getInscripcionSelec() {
+		return inscripcionSelec;
+	}
+
+	public void setInscripcionSelec(Inscripcion inscripcionSelec) {
+		this.inscripcionSelec = inscripcionSelec;
+	}
+
+	public List<EvaluacionInicial> getListaCompetencias() {
+		return listaCompetencias;
+	}
+
+	public void setListaCompetencias(List<EvaluacionInicial> listaCompetencias) {
+		this.listaCompetencias = listaCompetencias;
+	}
+
+	public void validarSesion() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		
+		userSesion = (Usuario) context.getExternalContext().getSessionMap()
+				.get(loginController.getUsername());
+
+		if (userSesion == null) {
+			String ctxPath = context.getExternalContext()
+					.getRequestContextPath();
+			try {
+				context.getExternalContext().redirect(ctxPath + "/login.jsf");
+			} catch (Exception e) {
+				//e.printStackTrace();
+			}
+		}
+	}
+
+	public void guardar() {
+
+		validarSesion();
+
+		if (!validarDatos())
+			return;
+
+		PlanDesarrolloPK id = null;
+
+		try {
+			if (planDesarrollo.getId() != null) {
+
+				planDesarrollo.setUsuarioModifica(userSesion.getUsuario());
+
+				planDesarrolloService.edit(planDesarrollo);
+
+			} else {
+
+				id = new PlanDesarrolloPK(evaInicialSelec.getId()
+						.getIdCompetencia(), evaInicialSelec.getId()
+						.getIdCampania(), evaInicialSelec.getId()
+						.getIdGerentePublico(), evaInicialSelec.getId()
+						.getIdPuesto());
+
+				// planDesarrollo = new PlanDesarrollo();
+				planDesarrollo.setId(id);
+				planDesarrollo.setUsuarioRegistra(userSesion.getUsuario());
+				planDesarrollo.setEstado(Constantes.ACTIVO);
+				planDesarrollo.setAprobacion(true);
+
+				planDesarrolloService.save(planDesarrollo);
+
+			}
+
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+							message.getMessage("msgRegistrar")));
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+							message.getMessage("msgRegistrarError")));
+		}
+		limpiar();
+	}
+
+	public boolean validarDatos() {
+
+		if (evaInicialSelec == null) {
+			FacesContext
+					.getCurrentInstance()
+					.addMessage(
+							null,
+							new FacesMessage(FacesMessage.SEVERITY_WARN,
+									"ADVERTENCIA",
+									"Seleccione un registro de la lista de Competencias"));
+			return false;
+		}
+
+		if (planDesarrollo.getActCapacitacion().trim().equalsIgnoreCase("")
+				&& planDesarrollo.getActEntrenamiento().trim()
+						.equalsIgnoreCase("")) {
+			FacesContext
+					.getCurrentInstance()
+					.addMessage(
+							null,
+							new FacesMessage(FacesMessage.SEVERITY_WARN,
+									"ADVERTENCIA",
+									"Ingrese actividad de capacitación / entrenamiento"));
+			return false;
+		}
+
+		if (planDesarrollo.getFechaFinCapacitacion() == null) {
+			FacesContext
+					.getCurrentInstance()
+					.addMessage(
+							null,
+							new FacesMessage(FacesMessage.SEVERITY_WARN,
+									"ADVERTENCIA",
+									"Ingrese Fecha de Culminación para Act.Capacitación"));
+			return false;
+		}
+
+		if (planDesarrollo.getId() == null) {
+			if (verificarRegistroPlan() == 2) {
+				FacesContext
+						.getCurrentInstance()
+						.addMessage(
+								null,
+								new FacesMessage(
+										FacesMessage.SEVERITY_WARN,
+										"ADVERTENCIA",
+										"Solo esta permitido registrar plan de desarrollo como máximo para 2 competencias"));
+				return false;
+			}
+		}
+
+		if (planDesarrollo.getFechaFinEntrenamiento() == null) {
+			FacesContext
+					.getCurrentInstance()
+					.addMessage(
+							null,
+							new FacesMessage(FacesMessage.SEVERITY_WARN,
+									"ADVERTENCIA",
+									"Ingrese Fecha de Culminación para Act.Entrenamiento"));
+			return false;
+		}
+
+		return true;
+	}
+
+	public void limpiar() {
+
+		planDesarrollo = new PlanDesarrollo();
+		evaInicialSelec = null;
+		competencia = "";
+		
+		cargar();
+
+	}
+
+	public void onRowSelect(SelectEvent event) {
+		if (evaInicialSelec != null) {
+			competencia = evaInicialSelec.getCompetencia().getCompetencia()
+					.getDenominacion();
+
+			PlanDesarrolloPK id00 = new PlanDesarrolloPK(evaInicialSelec
+					.getId().getIdCompetencia(), evaInicialSelec.getId()
+					.getIdCampania(), evaInicialSelec.getId()
+					.getIdGerentePublico(), evaInicialSelec.getId()
+					.getIdPuesto());
+
+			PlanDesarrollo plan = planDesarrolloService.find(id00);
+
+			if (plan != null)
+				planDesarrollo = plan;
+			else
+				planDesarrollo = new PlanDesarrollo();
+		}
+	}
+
+	public void onRowUnselect(UnselectEvent event) {
+
+	}
+
+	public void atenderFlujo() {
+		validarSesion();
+
+		if (!validarAtenderFlujo())
+			return;
+
+		try {
+
+			DetalleFlujoPK idDetalle = new DetalleFlujoPK(inscripcionSelec
+					.getId().getIdCampania(), inscripcionSelec.getId()
+					.getIdGerentePublico(), Constantes.PROCESO1,
+					Constantes.P1_PLAN_COMPETENCIAS);
+
+			flujoService.atenderFlujo(idDetalle, userSesion.getUsuario());
+			FacesContext
+					.getCurrentInstance()
+					.addMessage(
+							null,
+							new FacesMessage(FacesMessage.SEVERITY_INFO,
+									"EXITO",
+									"Se ha procesado el registro de plan de desarrollo de competencias"));
+
+			cargar();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+							"Ha ocurrido un error"));
+		}
+	}
+
+	public boolean validarAtenderFlujo() {
+
+		if (inscripcionSelec.getId() == null)
+			return false;
+
+		if (verificarRegistroPlan() == 0) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Registre su plan de desarrollo de comptencias "));
+			return false;
+		}
+
+		return true;
+	}
+
+	public Integer verificarRegistroPlan() {
+
+		List<PlanDesarrollo> listPlan = planDesarrolloService
+				.getListaPlanDesarrollo(inscripcionSelec.getId()
+						.getIdCampania(), inscripcionSelec.getId()
+						.getIdGerentePublico(), inscripcionSelec
+						.getPuestoTipoV().getId_puesto_tipo());
+
+		return listPlan.size();
+	}
+}

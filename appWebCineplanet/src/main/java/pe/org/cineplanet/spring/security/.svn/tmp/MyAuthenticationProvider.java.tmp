@@ -1,0 +1,235 @@
+<<<<<<< .mine
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package gob.servir.desempenio.security;
+
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.UsuarioService;
+import gob.servir.desempenio.util.Constantes;
+import gob.servir.desempenio.util.Seguridad;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.faces.context.FacesContext;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.GrantedAuthorityImpl;
+//import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+public class MyAuthenticationProvider implements AuthenticationProvider {
+
+	@Autowired
+	private UsuarioService usuarioService;
+
+	public Authentication authenticate(Authentication authentication)
+			throws AuthenticationException {
+		
+		Authentication auth = null;
+		String username = authentication.getName();
+		String password = authentication.getCredentials().toString();
+		
+		List<Usuario> listUsuario = usuarioService.getListByUsername(username);
+		
+		for(Usuario usr : listUsuario){
+			String plainText="";
+			try {
+				plainText = Seguridad.decrypt(usr.getPassword());
+			} catch (Exception e) {
+			}
+			
+			if (plainText.equalsIgnoreCase(password)) {
+
+				List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();
+				
+				if(usr.getRol().getIdRol() == Constantes.ROL_ADM)
+					grantedAuths.add(new GrantedAuthorityImpl("ROLE_ADMIN"));
+				if(usr.getRol().getIdRol() == Constantes.ROL_EVA)
+					grantedAuths.add(new GrantedAuthorityImpl("ROLE_EVALUADOR"));
+				if(usr.getRol().getIdRol() == Constantes.ROL_GP)
+					grantedAuths.add(new GrantedAuthorityImpl("ROLE_GP"));
+				if(usr.getRol().getIdRol() == Constantes.ROL_JI)
+					grantedAuths.add(new GrantedAuthorityImpl("ROLE_JI"));
+				if(usr.getRol().getIdRol() == Constantes.ROL_TE)
+					grantedAuths.add(new GrantedAuthorityImpl("ROLE_TE"));
+				if(usr.getRol().getIdRol() == Constantes.ROL_JI_AND_TE)
+					grantedAuths.add(new GrantedAuthorityImpl("ROLE_JI_TE"));
+				// grantedAuths.add(new SimpleGrantedAuthority("Gerente Público"));
+
+				FacesContext ctx = FacesContext.getCurrentInstance();
+				ctx.getExternalContext().getSessionMap().put(usr.getUsuario(), usr);
+
+				auth = new UsernamePasswordAuthenticationToken(
+						username, password, grantedAuths);
+				break;
+			} else 
+				auth = null;
+		}
+		
+		return auth;
+		
+	}
+
+	public boolean supports(Class<?> authentication) {
+		return authentication.equals(UsernamePasswordAuthenticationToken.class);
+	}
+
+}
+=======
+///*
+// * To change this template, choose Tools | Templates
+// * and open the template in the editor.
+// */
+//package gob.servir.desempenio.security;
+//
+//import gob.servir.desempenio.dao.PermisoDao;
+//import gob.servir.desempenio.model.Permiso;
+//import gob.servir.desempenio.model.Usuario;
+//import gob.servir.desempenio.service.UsuarioService;
+//import gob.servir.desempenio.util.Seguridad;
+//
+//import java.util.ArrayList;
+//import java.util.List;
+//
+//import javax.faces.context.FacesContext;
+//
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.security.authentication.AuthenticationProvider;
+//import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+//import org.springframework.security.core.Authentication;
+//import org.springframework.security.core.AuthenticationException;
+//import org.springframework.security.core.GrantedAuthority;
+//import org.springframework.security.core.authority.GrantedAuthorityImpl;
+////import org.springframework.security.core.authority.SimpleGrantedAuthority;
+//import org.springframework.stereotype.Component;
+//
+///**
+// * 
+// * @author Hever Pumallihua
+// */
+//@Component("myAuthenticationProvider")
+//public class MyAuthenticationProvider implements AuthenticationProvider {
+//
+//	@Autowired
+//	private UsuarioService usuarioService;
+//	@Autowired
+//	private PermisoDao permisoDao;
+//
+//	private Usuario userSesion = new Usuario();
+//	private List<Permiso> listaPermisoAdm = new ArrayList<Permiso>();
+//	private List<Permiso> listaPermisoOpe = new ArrayList<Permiso>();
+//	private List<Permiso> listaPermisoMon = new ArrayList<Permiso>();
+//	private List<Permiso> listaPermisoNoti = new ArrayList<Permiso>();
+//	private List<Permiso> listaPermisoRep = new ArrayList<Permiso>();
+//
+//	public Authentication authenticate(Authentication authentication)
+//			throws AuthenticationException {
+//		String name = authentication.getName();
+//		String password = authentication.getCredentials().toString();
+//
+//		password = Seguridad.encriptar(password);
+//
+//		userSesion = usuarioService.findUsuarioByUsername(name, password);
+//		if (userSesion != null) {
+//			if (userSesion.getClave().equalsIgnoreCase(password)) {
+//
+//				// if (name.equals("admin") && password.equals("admin")) {
+//				List<GrantedAuthority> grantedAuths = new ArrayList();
+//				grantedAuths.add(new GrantedAuthorityImpl("Administrador"));
+//				grantedAuths.add(new GrantedAuthorityImpl("Evaluador"));
+//				grantedAuths.add(new GrantedAuthorityImpl("Gerente Público"));
+//				grantedAuths.add(new GrantedAuthorityImpl("Jefe Inmediato"));
+//				grantedAuths.add(new GrantedAuthorityImpl("Titular Entidad"));
+//				// grantedAuths.add(new
+//				// SimpleGrantedAuthority("Gerente Público"));
+//
+//				listaPermisoAdm = permisoDao.getListaPermiso(1L, userSesion
+//						.getRol().getIdRol());
+//				listaPermisoOpe = permisoDao.getListaPermiso(2L, userSesion
+//						.getRol().getIdRol());
+//				listaPermisoMon = permisoDao.getListaPermiso(3L, userSesion
+//						.getRol().getIdRol());
+//				listaPermisoNoti = permisoDao.getListaPermiso(4L, userSesion
+//						.getRol().getIdRol());
+//				listaPermisoRep = permisoDao.getListaPermiso(5L, userSesion
+//						.getRol().getIdRol());
+//
+//				FacesContext ctx = FacesContext.getCurrentInstance();
+//				String ctxPath = ctx.getExternalContext().getRequestContextPath();
+//				ctx.getExternalContext().getSessionMap().put("userSesion", userSesion);
+//
+//				Authentication auth = new UsernamePasswordAuthenticationToken(
+//						name, password, grantedAuths);
+//				return auth;
+//			} else {
+//				return null;
+//			}
+//		} else
+//			return null;
+//	}
+//
+//	public boolean supports(Class<?> authentication) {
+//		return authentication.equals(UsernamePasswordAuthenticationToken.class);
+//	}
+//
+//	public List<Permiso> getListaPermisoAdm() {
+//		return listaPermisoAdm;
+//	}
+//
+//	public void setListaPermisoAdm(List<Permiso> listaPermisoAdm) {
+//		this.listaPermisoAdm = listaPermisoAdm;
+//	}
+//
+//	public List<Permiso> getListaPermisoOpe() {
+//		return listaPermisoOpe;
+//	}
+//
+//	public void setListaPermisoOpe(List<Permiso> listaPermisoOpe) {
+//		this.listaPermisoOpe = listaPermisoOpe;
+//	}
+//
+//	public List<Permiso> getListaPermisoMon() {
+//		return listaPermisoMon;
+//	}
+//
+//	public void setListaPermisoMon(List<Permiso> listaPermisoMon) {
+//		this.listaPermisoMon = listaPermisoMon;
+//	}
+//
+//	public List<Permiso> getListaPermisoNoti() {
+//		return listaPermisoNoti;
+//	}
+//
+//	public void setListaPermisoNoti(List<Permiso> listaPermisoNoti) {
+//		this.listaPermisoNoti = listaPermisoNoti;
+//	}
+//
+//	public List<Permiso> getListaPermisoRep() {
+//		return listaPermisoRep;
+//	}
+//
+//	public void setListaPermisoRep(List<Permiso> listaPermisoRep) {
+//		this.listaPermisoRep = listaPermisoRep;
+//	}
+//
+//	public Usuario getUserSesion() {
+//		return userSesion;
+//	}
+//
+//	public void setUserSesion(Usuario userSesion) {
+//		this.userSesion = userSesion;
+//	}
+//
+//}
+>>>>>>> .r1664

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
+      http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
+	version="1.0">
+
+	<persistence-unit name="acme" transaction-type="RESOURCE_LOCAL">
+<!-- 		<persistence-unit name="acme" transaction-type="JTA"> -->
+<!-- 		<jta-data-source>java:jboss/datasources/Desempenio</jta-data-source> -->
+
+		<class>pe.org.cineplanet.model.jpa.ItemMenu</class>
+		<class>pe.org.cineplanet.model.jpa.Menu</class>
+		<class>pe.org.cineplanet.model.jpa.Permiso</class>
+		<class>pe.org.cineplanet.model.jpa.Rol</class>
+		<class>pe.org.cineplanet.model.jpa.Task</class>
+		<class>pe.org.cineplanet.model.jpa.Usuario</class>
+		
+		<class>pe.org.cineplanet.model.jpa.Agencia</class>
+		
+		<properties>
+<!-- 			<property name="hibernate.dialect" value="org.hibernate.dialect.Oracle10gDialect" /> -->
+			<property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" />
+		</properties>
+	</persistence-unit>
+
+</persistence>

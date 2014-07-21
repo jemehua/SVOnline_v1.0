@@ -1,0 +1,300 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.DetalleFlujoDao;
+import gob.servir.desempenio.model.Actividad;
+import gob.servir.desempenio.model.ActividadPK;
+import gob.servir.desempenio.model.Campania;
+import gob.servir.desempenio.model.DetalleFlujo;
+import gob.servir.desempenio.model.DetalleFlujoPK;
+import gob.servir.desempenio.model.DetalleFlujoV;
+import gob.servir.desempenio.model.Flujo;
+import gob.servir.desempenio.model.FlujoPK;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.Proceso;
+import gob.servir.desempenio.util.Constantes;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua Garcia
+ */
+@Repository
+public class DetalleFlujoDaoImpl implements DetalleFlujoDao {
+	@PersistenceContext
+	private EntityManager em;
+
+	public DetalleFlujo find(DetalleFlujoPK id) {
+		try {
+			return em.find(DetalleFlujo.class, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public DetalleFlujo save(DetalleFlujo obj) {
+		try {
+			em.persist(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public DetalleFlujo edit(DetalleFlujo obj) {
+		try {
+			return em.merge(obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<DetalleFlujo> getListaDetalleFlujo() {
+		TypedQuery<DetalleFlujo> tq = em.createNamedQuery(
+				"DetalleFlujo.getListAll", DetalleFlujo.class);
+		try {
+			return tq.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<DetalleFlujo> getListaDetalleFlujoTemp(InscripcionPK id) {
+		Query q = em
+				.createNamedQuery("DetalleFlujo.getListTempByCampaniaAndGerente");
+
+		q.setParameter("idCampania", id.getIdCampania());
+		q.setParameter("codGerente", id.getIdGerentePublico());
+		q.setParameter("tipo1", Constantes.TEMPORIZADOR);
+		q.setParameter("tipo2", Constantes.NOTIFICACION);
+
+		List<DetalleFlujo> listaDetalleFlujo = new ArrayList<DetalleFlujo>();
+
+		List<Object[]> listaObjetos = new ArrayList<Object[]>();
+
+		listaObjetos = q.getResultList();
+
+		for (Object[] row : listaObjetos) {
+			DetalleFlujo detalleFlujo = new DetalleFlujo();
+			detalleFlujo.setId((DetalleFlujoPK) row[0]);
+			detalleFlujo.setFechaCreacion((Date) row[1]);
+			detalleFlujo.setNroEnvios((Integer) row[2]);			
+			
+			Actividad actividad = new Actividad();
+			actividad.setNombre((String) row[3]);
+			
+			Proceso proceso = new Proceso();
+			proceso.setDenominacion((String) row[4]);			
+
+			actividad.setProceso(proceso);
+			detalleFlujo.setActividad(actividad);
+			
+			Flujo flujo = new Flujo();
+			Inscripcion inscripcion = new Inscripcion();
+			Campania campania = new Campania();
+			campania.setDenominacion((String) row[5]);
+			campania.setAnio((String) row[6]);
+			campania.setPostAnio((String) row[7]);
+			inscripcion.setCampania(campania);
+			flujo.setInscripcion(inscripcion);
+			detalleFlujo.setFlujo(flujo);
+			
+			
+
+			listaDetalleFlujo.add(detalleFlujo);
+		}
+
+		try {
+
+			
+
+			for (DetalleFlujo row : listaDetalleFlujo) {
+				DetalleFlujo detalleFlujo = null;
+				DetalleFlujoPK detalleFlujoPK = null;
+
+				if (row.getId().getIdProceso() == Constantes.PROCESO3) {
+
+					if (row.getId().getIdActividad() == 1L) {
+
+						detalleFlujoPK = new DetalleFlujoPK(row.getId()
+								.getIdCampania(), row.getId()
+								.getIdGerentePublico(), row.getId()
+								.getIdProceso(),
+								row.getId().getIdActividad() + 1L);
+						detalleFlujo = find(detalleFlujoPK);
+
+						row.setEstadoNotificacion(Constantes.ATENDIDO);
+
+						if (detalleFlujo != null) {
+							if (detalleFlujo.getEstado().equalsIgnoreCase(
+									Constantes.EN_ESPERA)) {
+								row.setEstadoNotificacion(Constantes.EN_ESPERA);
+							}
+						}
+
+						detalleFlujoPK = new DetalleFlujoPK(row.getId()
+								.getIdCampania(), row.getId()
+								.getIdGerentePublico(), row.getId()
+								.getIdProceso(),
+								row.getId().getIdActividad() + 4L);
+						detalleFlujo = find(detalleFlujoPK);
+						if (detalleFlujo != null) {
+							if (detalleFlujo.getEstado().equalsIgnoreCase(
+									Constantes.EN_ESPERA)) {
+								row.setEstadoNotificacion(Constantes.EN_ESPERA);
+							}
+						}
+
+						detalleFlujoPK = new DetalleFlujoPK(row.getId()
+								.getIdCampania(), row.getId()
+								.getIdGerentePublico(), row.getId()
+								.getIdProceso(),
+								row.getId().getIdActividad() + 7L);
+						detalleFlujo = find(detalleFlujoPK);
+						if (detalleFlujo != null) {
+							if (detalleFlujo.getEstado().equalsIgnoreCase(
+									Constantes.EN_ESPERA)) {
+								row.setEstadoNotificacion(Constantes.EN_ESPERA);
+							}
+						}
+					}
+				} else {
+					if (row.getId().getIdActividad() == Constantes.P2_NOTIFICAR_GP
+							|| row.getId().getIdActividad() == Constantes.P1_NOTIFICAR_GP
+							|| row.getId().getIdActividad() == Constantes.P1_NOTIFICA_GP_METAS_FINALES) {
+						detalleFlujoPK = new DetalleFlujoPK(row.getId()
+								.getIdCampania(), row.getId()
+								.getIdGerentePublico(), row.getId()
+								.getIdProceso(),
+								row.getId().getIdActividad() + 1L);
+						detalleFlujo = find(detalleFlujoPK);
+						if (detalleFlujo != null) {
+							if (detalleFlujo.getEstado().equalsIgnoreCase(
+									Constantes.EN_ESPERA))
+								row.setEstadoNotificacion(Constantes.EN_ESPERA);
+							else
+								row.setEstadoNotificacion(Constantes.ATENDIDO);
+						}
+					}
+				}
+			}
+			return listaDetalleFlujo;
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<DetalleFlujo> getListaDetalleFlujo(FlujoPK id) {
+		Query q = em
+				.createNamedQuery("DetalleFlujo.getListByCampaniaAndGerenteAndProceso");
+
+		q.setParameter("idCampania", id.getIdCampania());
+		q.setParameter("codGerente", id.getIdGerentePublico());
+		q.setParameter("idProceso", id.getIdProceso());
+		try {
+
+			List<Object[]> listaObjetos = new ArrayList<Object[]>();
+
+			listaObjetos = q.getResultList();
+
+			List<DetalleFlujo> listaDetalleFlujo = new ArrayList<DetalleFlujo>();
+
+			for (Object[] row : listaObjetos) {
+				DetalleFlujo detalleFlujo = new DetalleFlujo();
+				detalleFlujo.setId((DetalleFlujoPK) row[0]);
+				detalleFlujo.setEstado((String) row[1]);
+
+				Actividad actividad = new Actividad();
+				actividad.setId((ActividadPK) row[2]);
+				actividad.setNombre((String) row[3]);
+				detalleFlujo.setActividad(actividad);
+
+				listaDetalleFlujo.add(detalleFlujo);
+			}
+
+			return listaDetalleFlujo;
+
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public String getEstadoDetalleFlujo(DetalleFlujoPK id) {
+		TypedQuery<String> tq = em.createNamedQuery(
+				"DetalleFlujo.getEstadoByPK", String.class);
+		tq.setParameter("idCampania", id.getIdCampania());
+		tq.setParameter("codGerente", id.getIdGerentePublico());
+		tq.setParameter("idProceso", id.getIdProceso());
+		tq.setParameter("idActividad", id.getIdActividad());
+		try {
+			return tq.getSingleResult();
+		} catch (Exception as) {
+			// as.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<DetalleFlujoV> getListaDetalleFlujoV() {
+		TypedQuery<DetalleFlujoV> tq = em.createNamedQuery(
+				"DetalleFlujoV.getListAll", DetalleFlujoV.class);
+		try {
+			return tq.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<DetalleFlujo> getListaMonitoreoFlujo(InscripcionPK id) {
+		Query q = em
+				.createNamedQuery("DetalleFlujo.getListByCampaniaAndGerenteAndResponsable");
+
+		q.setParameter("idCampania", id.getIdCampania());
+		q.setParameter("codGerente", id.getIdGerentePublico());
+		q.setParameter("responsable", Constantes.MONITOREO_EVALUACION);
+		try {
+
+			List<Object[]> listaObjetos = new ArrayList<Object[]>();
+
+			listaObjetos = q.getResultList();
+
+			List<DetalleFlujo> listaDetalleFlujo = new ArrayList<DetalleFlujo>();
+
+			for (Object[] row : listaObjetos) {
+
+				DetalleFlujo detalleFlujo = new DetalleFlujo();
+				detalleFlujo.setId((DetalleFlujoPK) row[0]);
+				detalleFlujo.setEstado((String) row[1]);
+				detalleFlujo.setNroEnvios((Integer) row[2]);
+
+				listaDetalleFlujo.add(detalleFlujo);
+			}
+
+			return listaDetalleFlujo;
+
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+}

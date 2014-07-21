@@ -1,0 +1,60 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.TitularEntidadDao;
+import gob.servir.desempenio.model.TitularEntidad;
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Repository
+public class TitularEntidadDaoImpl implements TitularEntidadDao {
+	@PersistenceContext
+	private EntityManager em;
+
+	@Transactional
+	public TitularEntidad save(TitularEntidad obj) {
+		try {
+			em.persist(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public TitularEntidad edit(TitularEntidad obj) {
+		try {
+			return em.merge(obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public TitularEntidad find(String id) {
+
+		try {
+			return em.find(TitularEntidad.class, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+
+	}
+
+	public List<TitularEntidad> getListaTitularEntidad() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}

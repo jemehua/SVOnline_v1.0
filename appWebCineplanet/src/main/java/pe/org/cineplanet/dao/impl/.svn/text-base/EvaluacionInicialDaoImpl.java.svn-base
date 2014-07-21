@@ -1,0 +1,149 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.EvaluacionInicialDao;
+import gob.servir.desempenio.model.Competencia;
+import gob.servir.desempenio.model.EvaluacionInicial;
+import gob.servir.desempenio.model.EvaluacionInicialPK;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.util.Constantes;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Repository
+public class EvaluacionInicialDaoImpl implements EvaluacionInicialDao {
+	@PersistenceContext
+	private EntityManager em;
+
+	public EvaluacionInicial find(EvaluacionInicialPK id) {
+		try {
+			return em.find(EvaluacionInicial.class, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public EvaluacionInicial save(EvaluacionInicial obj) {
+		try {
+			em.persist(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public EvaluacionInicial edit(EvaluacionInicial obj) {
+		try {
+			return em.merge(obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<EvaluacionInicial> getListaEvaluacionInicial() {
+		Query q = null;
+		q = em.createNamedQuery("EvaluacionInicial.getAllListaEvaluacionInicial");
+
+		try {
+			return q.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<EvaluacionInicial> getListaEvaluacionInicial(InscripcionPK id,
+			int opcion) {
+		Query q = null;
+
+		if (opcion == 0) {
+			q = em.createNamedQuery("EvaluacionInicial.getListaEvaluacionInicial0");
+			
+		}
+		if (opcion == 1) {
+			q = em.createNamedQuery("EvaluacionInicial.getListaEvaluacionInicial1");			
+			q.setParameter("estado", Constantes.ACTIVO);
+		}
+		if (opcion == 2) {
+			q = em.createNamedQuery("EvaluacionInicial.getListaEvaluacionInicial2");
+			q.setParameter("brecha", 0);
+			q.setParameter("estado", Constantes.ACTIVO);
+		}
+		q.setParameter("idCampania", id.getIdCampania());
+		q.setParameter("codGerente", id.getIdGerentePublico());
+
+		try {
+
+			List<Object[]> listaObjetos = new ArrayList<Object[]>();
+
+			listaObjetos = q.getResultList();
+
+			List<EvaluacionInicial> listaEvaluacionInicial = new ArrayList<EvaluacionInicial>();
+
+			for (Object[] row : listaObjetos) {
+
+				EvaluacionInicial evaluacionInicial = new EvaluacionInicial();
+
+				evaluacionInicial.setCompetencia((Competencia) row[0]);
+				evaluacionInicial.setId((EvaluacionInicialPK) row[1]);
+				evaluacionInicial.setNota((Integer) row[2]);
+				evaluacionInicial.setBrecha((Integer) row[3]);
+				evaluacionInicial.setEstado((String) row[4]);
+
+				listaEvaluacionInicial.add(evaluacionInicial);
+			}
+
+			return listaEvaluacionInicial;
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public Integer getCountEvaluacionInicial(Inscripcion inscripcionSelec) {
+
+		Query q = null;
+		try {
+			q = (Query) em
+					.createQuery("SELECT COUNT(e.nota) "
+							+ "FROM EvaluacionInicial e "
+							+ "WHERE e.id.idCampania =:idCampania AND e.id.idGerentePublico =:idGerentePublico AND e.id.idPuesto =:idPuesto AND "
+							+ "e.nota IS NOT NULL AND e.estado =:estado");
+
+			q.setParameter("idCampania", inscripcionSelec.getId()
+					.getIdCampania());
+			q.setParameter("idGerentePublico", inscripcionSelec.getId()
+					.getIdGerentePublico());
+			q.setParameter("idPuesto", inscripcionSelec.getPuestoTipoV()
+					.getId_puesto_tipo());
+			q.setParameter("estado", Constantes.ACTIVO);
+
+			return ((Long) q.getSingleResult()).intValue();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return 0;
+		}
+
+	}
+
+}

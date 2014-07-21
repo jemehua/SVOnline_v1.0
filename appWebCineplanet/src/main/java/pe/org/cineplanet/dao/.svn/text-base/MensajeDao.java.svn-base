@@ -1,0 +1,34 @@
+package gob.servir.desempenio.dao;
+
+import gob.servir.desempenio.model.Actividad;
+import gob.servir.desempenio.model.Mensaje;
+import gob.servir.desempenio.model.MensajePK;
+
+import java.util.List;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+public interface MensajeDao {
+
+	public abstract Mensaje find(MensajePK id);
+
+	public abstract Mensaje save(Mensaje obj);
+
+	public abstract Mensaje edit(Mensaje obj);
+
+	public abstract List<Mensaje> getListaMensaje();
+	
+	public abstract List<Mensaje> getListaMensaje(Long idActividad, Long idProceso, Long idCampania);
+	
+	public abstract List<Mensaje> getListaMensajeTipo(Long idActividad, Long idProceso, Long idCampania, String Tipo);
+	
+	public abstract Mensaje getMensaje(Actividad act);
+
+	public abstract Long getIdMax(Long idActividad, Long idProceso, Long idCampania);
+	
+	public abstract Mensaje getMensajePrincipal(Long idActividad, Long idProceso, Long idCampania);
+	
+
+}

@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+	<h:outputStylesheet name="css/cssContent.css" />
+</h:head>
+<h:body>
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datos" header="Evaluación Cuantitativa de Competencias">
+		<p:spacer height="10" />
+		<p:panelGrid styleClass="panelGrid">
+			<p:row>
+				<p:column width="30">#{messages.lblCampania}<h:outputText
+						value="*" styleClass="obligatorio" />
+				</p:column>
+				<p:column width="70">
+					<h:outputLabel
+						value="#{cuantitativaCompetenciasController.inscripcionSelec.campania}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblGerentePublico}<h:outputText
+						value="*" styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<h:outputLabel
+						value="#{cuantitativaCompetenciasController.inscripcionSelec.asignacionGerenteV}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblPuesto}<h:outputText value="*"
+						styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<h:outputText
+						value="#{cuantitativaCompetenciasController.inscripcionSelec.puestoTipoV}" />
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+		<p:spacer height="10" />
+		<p:dataTable var="evaComp"
+			value="#{cuantitativaCompetenciasController.listaEvaluacionCompetencias}"
+			id="dtMetas"
+			selection="#{cuantitativaCompetenciasController.evaluacionCompetenciasSelec}"
+			selectionMode="single" rows="7" rowKey="#{evaComp.id.idCompetencia}"
+			emptyMessage="#{messages.msgEmptyMessage}">
+
+			<p:ajax event="rowSelect" update=":frm:pgPlan" immediate="true" />
+
+
+			<f:facet name="header">  
+            Lista de Competencias [Brecha > 0]
+            </f:facet>
+
+
+			<p:column headerText="#{messages.lblCodigo}" style="width:10%">
+				<h:outputText value="#{evaComp.id.idCompetencia}" />
+			</p:column>
+			<p:column headerText="Competencia" style="width:60%">
+				<h:outputText
+					value="#{evaComp.planDesarrollo.evaluacionInicial.competencia.competencia.denominacion}" />
+			</p:column>
+			<p:column headerText="Nivel Deseado" style="width:10%">
+				<h:outputText
+					value="#{evaComp.planDesarrollo.evaluacionInicial.competencia.nivelDeseado}" />
+			</p:column>
+			<p:column headerText="Eval.Inicial" style="width:10%">
+				<h:outputText
+					value="#{evaComp.planDesarrollo.evaluacionInicial.nota}" />
+			</p:column>
+			<p:column headerText="Brecha" style="width:10%">
+				<h:outputText
+					value="#{evaComp.planDesarrollo.evaluacionInicial.brecha}" />
+			</p:column>
+
+			<p:column headerText="Nota GP" style="width:10%">
+				<h:outputText
+					value="#{evaComp.notaGP}" />
+			</p:column>
+
+			<f:facet name="footer">
+				<div class="mensaje">Seleccione un registro e ingrese Plan de
+					Desarrollo de Comptencias</div>
+			</f:facet>
+
+		</p:dataTable>
+		<p:spacer height="10" />
+		<p:panelGrid id="pgPlan" styleClass="panelGrid">
+			<p:focus context="pgPlan" />
+			<p:row>
+				<p:column width="30">Competencia<h:outputText value="*"
+						styleClass="obligatorio" />
+				</p:column>
+				<p:column width="70">
+					<h:outputLabel
+						value="#{cuantitativaCompetenciasController.evaluacionCompetenciasSelec.planDesarrollo.evaluacionInicial.competencia.competencia.denominacion}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column width="30">Actividad de Capacitación<h:outputText
+						value="*" styleClass="obligatorio" />
+				</p:column>
+				<p:column width="70">
+					<h:outputLabel
+						value="#{cuantitativaCompetenciasController.evaluacionCompetenciasSelec.planDesarrollo.actCapacitacion}"
+						styleClass="txt" style="width:580px;" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>Actividad de Entrenamiento<h:outputText
+						value="*" styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<h:outputLabel
+						value="#{cuantitativaCompetenciasController.evaluacionCompetenciasSelec.planDesarrollo.actEntrenamiento}"
+						styleClass="txt" style="width:580px;" />
+				</p:column>
+			</p:row>
+
+
+			<p:row>
+				<p:column>Evaluación Cualitativa<h:outputText value="*"
+						styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<h:outputLabel
+						value="#{cuantitativaCompetenciasController.evaluacionCompetenciasSelec.descripcion}"
+						styleClass="txt" style="width:580px;" />
+				</p:column>
+			</p:row>
+
+			<p:row>
+				<p:column>Evaluación Anual (%)<h:outputText value="*"
+						styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<p:inputText id="porTxt"
+						value="#{cuantitativaCompetenciasController.evaluacionCompetenciasSelec.notaGP}"
+						tabindex="1" maxlength="1" styleClass="txt" style="width:125px;"
+						disabled="#{cuantitativaCompetenciasController.evaluacionCompetenciasSelec eq null ? true : false}" />
+					<pe:keyFilter for="porTxt" regEx="/[1-5]/" />
+					<pe:tooltip for="porTxt" value="Valores del 1 al 5"
+						showEffect="fadeIn" hideEffect="fadeIn" myPosition="left center"
+						atPosition="right center" />
+				</p:column>
+			</p:row>
+
+		</p:panelGrid>
+		<p:separator id="s1" />
+		<table style="width: 100%">
+			<tr>
+				<td align="left"><p:commandButton value="Guardar"
+						id="btnGuardar"
+						disabled="#{cuantitativaCompetenciasController.swFlujo}"
+						action="#{cuantitativaCompetenciasController.guardar}"
+						update="dtMetas,pgPlan,messages" icon="ui-icon-document"
+						tabindex="2" /> <p:commandButton value="#{messages.btnCancelar}"
+						update="dtMetas,pgPlan"
+						action="#{cuantitativaCompetenciasController.limpiar}"
+						icon="ui-icon-close" tabindex="3" /></td>
+				<td align="right"><p:commandButton value="Continuar"
+						id="btFlujo" update="datos,messages,btnGuardar,btFlujo"
+						action="#{cuantitativaCompetenciasController.atenderFlujo}"
+						icon="ui-icon-circle-arrow-e" tabindex="4"
+						disabled="#{cuantitativaCompetenciasController.swFlujo}" /></td>
+			</tr>
+		</table>
+		<p:separator id="s2" />
+	</p:panel>
+</h:body>
+</html>

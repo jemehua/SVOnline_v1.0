@@ -1,0 +1,131 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package gob.servir.desempenio.model;
+
+import java.io.Serializable;
+
+import javax.persistence.*;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Embeddable
+public class MensajePK implements Serializable {
+	private static final long serialVersionUID = 1L;
+
+	@Basic(optional = false)
+	@Column(name = "idMensaje")
+	private Long idMensaje;
+	@Basic(optional = false)
+	@Column(name = "idActividad")
+	private Long idActividad;
+	@Basic(optional = false)
+	@Column(name = "idProceso")
+	private Long idProceso;
+	@Basic(optional = false)
+	@Column(name = "idCampania")
+	private Long idCampania;
+
+	public MensajePK() {
+		super();
+	}
+
+	public MensajePK(Long idMensaje, Long idActividad, Long idProceso,
+			Long idCampania) {
+		super();
+		this.idMensaje = idMensaje;
+		this.idActividad = idActividad;
+		this.idProceso = idProceso;
+		this.idCampania = idCampania;
+	}
+
+	public Long getIdMensaje() {
+		return idMensaje;
+	}
+
+	public void setIdMensaje(Long idMensaje) {
+		this.idMensaje = idMensaje;
+	}
+
+	public Long getIdActividad() {
+		return idActividad;
+	}
+
+	public void setIdActividad(Long idActividad) {
+		this.idActividad = idActividad;
+	}
+
+	public Long getIdProceso() {
+		return idProceso;
+	}
+
+	public void setIdProceso(Long idProceso) {
+		this.idProceso = idProceso;
+	}
+
+	public Long getIdCampania() {
+		return idCampania;
+	}
+
+	public void setIdCampania(Long idCampania) {
+		this.idCampania = idCampania;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((idActividad == null) ? 0 : idActividad.hashCode());
+		result = prime * result
+				+ ((idCampania == null) ? 0 : idCampania.hashCode());
+		result = prime * result
+				+ ((idMensaje == null) ? 0 : idMensaje.hashCode());
+		result = prime * result
+				+ ((idProceso == null) ? 0 : idProceso.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MensajePK other = (MensajePK) obj;
+		if (idActividad == null) {
+			if (other.idActividad != null)
+				return false;
+		} else if (!idActividad.equals(other.idActividad))
+			return false;
+		if (idCampania == null) {
+			if (other.idCampania != null)
+				return false;
+		} else if (!idCampania.equals(other.idCampania))
+			return false;
+		if (idMensaje == null) {
+			if (other.idMensaje != null)
+				return false;
+		} else if (!idMensaje.equals(other.idMensaje))
+			return false;
+		if (idProceso == null) {
+			if (other.idProceso != null)
+				return false;
+		} else if (!idProceso.equals(other.idProceso))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "MensajePK [idMensaje=" + idMensaje + ", idActividad="
+				+ idActividad + ", idProceso=" + idProceso + ", idCampania="
+				+ idCampania + "]";
+	}
+
+}

@@ -1,0 +1,257 @@
+package gob.servir.desempenio.model;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+
+/**
+ * 
+ * @author Cristhian Munguia Martinez
+ */
+@Entity
+@NamedQueries({
+		@NamedQuery(name = "JefeInmediatoV.getAllListaJefeInmediato", query = "SELECT g FROM JefeInmediatoV g"),
+		@NamedQuery(name = "JefeInmediatoV.getNombreCompletoAndDni", query = "SELECT j.id_jefe_inmediato, j.numero_documento, CONCAT(j.nombres +' '+ j.apellido_paterno +' '+j.apellido_materno) "
+				+ "FROM JefeInmediatoV j WHERE j.id_jefe_inmediato =:id") })
+public class JefeInmediatoV implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	private Long id_jefe_inmediato;
+	@Column
+	private String numero_documento;
+	@Column
+	private String nombres;
+	@Column
+	private String apellido_paterno;
+	@Column
+	private String apellido_materno;
+	@Column
+	private String cargo;
+	@Column
+	private String telefono_oficina;
+	@Column
+	private String telefono_celular;
+	@Column
+	private String correo_electronico_trabajo;
+	@Column
+	private String correo_electronico_personal;
+
+	public JefeInmediatoV() {
+		super();
+	}
+
+	public Long getId_jefe_inmediato() {
+		return id_jefe_inmediato;
+	}
+
+	public void setId_jefe_inmediato(Long id_jefe_inmediato) {
+		this.id_jefe_inmediato = id_jefe_inmediato;
+	}
+
+	public String getNumero_documento() {
+		return numero_documento;
+	}
+
+	public void setNumero_documento(String numero_documento) {
+		this.numero_documento = numero_documento;
+	}
+
+	public String getNombres() {
+		return nombres;
+	}
+
+	public void setNombres(String nombres) {
+		this.nombres = nombres;
+	}
+
+	public String getApellido_paterno() {
+		return apellido_paterno;
+	}
+
+	public void setApellido_paterno(String apellido_paterno) {
+		this.apellido_paterno = apellido_paterno;
+	}
+
+	public String getApellido_materno() {
+		return apellido_materno;
+	}
+
+	public void setApellido_materno(String apellido_materno) {
+		this.apellido_materno = apellido_materno;
+	}
+
+	public String getCargo() {
+		return cargo;
+	}
+
+	public void setCargo(String cargo) {
+		this.cargo = cargo;
+	}
+
+	public String getTelefono_oficina() {
+		return telefono_oficina;
+	}
+
+	public void setTelefono_oficina(String telefono_oficina) {
+		this.telefono_oficina = telefono_oficina;
+	}
+
+	public String getTelefono_celular() {
+		return telefono_celular;
+	}
+
+	public void setTelefono_celular(String telefono_celular) {
+		this.telefono_celular = telefono_celular;
+	}
+
+	public String getCorreo_electronico_trabajo() {
+		return correo_electronico_trabajo;
+	}
+
+	public void setCorreo_electronico_trabajo(String correo_electronico_trabajo) {
+		this.correo_electronico_trabajo = correo_electronico_trabajo;
+	}
+
+	public String getCorreo_electronico_personal() {
+		return correo_electronico_personal;
+	}
+
+	public void setCorreo_electronico_personal(
+			String correo_electronico_personal) {
+		this.correo_electronico_personal = correo_electronico_personal;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime
+				* result
+				+ ((apellido_materno == null) ? 0 : apellido_materno.hashCode());
+		result = prime
+				* result
+				+ ((apellido_paterno == null) ? 0 : apellido_paterno.hashCode());
+		result = prime * result + ((cargo == null) ? 0 : cargo.hashCode());
+		result = prime
+				* result
+				+ ((correo_electronico_personal == null) ? 0
+						: correo_electronico_personal.hashCode());
+		result = prime
+				* result
+				+ ((correo_electronico_trabajo == null) ? 0
+						: correo_electronico_trabajo.hashCode());
+		result = prime
+				* result
+				+ ((id_jefe_inmediato == null) ? 0 : id_jefe_inmediato
+						.hashCode());
+		result = prime * result + ((nombres == null) ? 0 : nombres.hashCode());
+		result = prime
+				* result
+				+ ((numero_documento == null) ? 0 : numero_documento.hashCode());
+		result = prime
+				* result
+				+ ((telefono_celular == null) ? 0 : telefono_celular.hashCode());
+		result = prime
+				* result
+				+ ((telefono_oficina == null) ? 0 : telefono_oficina.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		JefeInmediatoV other = (JefeInmediatoV) obj;
+		if (apellido_materno == null) {
+			if (other.apellido_materno != null)
+				return false;
+		} else if (!apellido_materno.equals(other.apellido_materno))
+			return false;
+		if (apellido_paterno == null) {
+			if (other.apellido_paterno != null)
+				return false;
+		} else if (!apellido_paterno.equals(other.apellido_paterno))
+			return false;
+		if (cargo == null) {
+			if (other.cargo != null)
+				return false;
+		} else if (!cargo.equals(other.cargo))
+			return false;
+		if (correo_electronico_personal == null) {
+			if (other.correo_electronico_personal != null)
+				return false;
+		} else if (!correo_electronico_personal
+				.equals(other.correo_electronico_personal))
+			return false;
+		if (correo_electronico_trabajo == null) {
+			if (other.correo_electronico_trabajo != null)
+				return false;
+		} else if (!correo_electronico_trabajo
+				.equals(other.correo_electronico_trabajo))
+			return false;
+		if (id_jefe_inmediato == null) {
+			if (other.id_jefe_inmediato != null)
+				return false;
+		} else if (!id_jefe_inmediato.equals(other.id_jefe_inmediato))
+			return false;
+		if (nombres == null) {
+			if (other.nombres != null)
+				return false;
+		} else if (!nombres.equals(other.nombres))
+			return false;
+		if (numero_documento == null) {
+			if (other.numero_documento != null)
+				return false;
+		} else if (!numero_documento.equals(other.numero_documento))
+			return false;
+		if (telefono_celular == null) {
+			if (other.telefono_celular != null)
+				return false;
+		} else if (!telefono_celular.equals(other.telefono_celular))
+			return false;
+		if (telefono_oficina == null) {
+			if (other.telefono_oficina != null)
+				return false;
+		} else if (!telefono_oficina.equals(other.telefono_oficina))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("JefeInmediatoV [id_jefe_inmediato=");
+		builder.append(id_jefe_inmediato);
+		builder.append(", numero_documento=");
+		builder.append(numero_documento);
+		builder.append(", nombres=");
+		builder.append(nombres);
+		builder.append(", apellido_paterno=");
+		builder.append(apellido_paterno);
+		builder.append(", apellido_materno=");
+		builder.append(apellido_materno);
+		builder.append(", cargo=");
+		builder.append(cargo);
+		builder.append(", telefono_oficina=");
+		builder.append(telefono_oficina);
+		builder.append(", telefono_celular=");
+		builder.append(telefono_celular);
+		builder.append(", correo_electronico_trabajo=");
+		builder.append(correo_electronico_trabajo);
+		builder.append(", correo_electronico_personal=");
+		builder.append(correo_electronico_personal);
+		builder.append("]");
+		return builder.toString();
+	}
+
+}

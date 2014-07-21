@@ -1,0 +1,199 @@
+package gob.servir.desempenio.model;
+
+import java.io.Serializable;
+import java.util.Calendar;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Entity
+@NamedQueries({
+		@NamedQuery(name = "EvaluacionInicial.getAllListaEvaluacionInicial", query = "SELECT e FROM EvaluacionInicial e ORDER BY e.id.idCompetencia"),
+		@NamedQuery(name = "EvaluacionInicial.getListaEvaluacionInicial0", query = "SELECT e.competencia, e.id, e.nota, e.brecha, e.estado "
+				+ "FROM EvaluacionInicial e "
+				+ "WHERE e.id.idCampania =:idCampania AND e.id.idGerentePublico =:codGerente "
+				+ "ORDER BY e.id.idCompetencia"),
+		@NamedQuery(name = "EvaluacionInicial.getListaEvaluacionInicial1", query = "SELECT e.competencia, e.id, e.nota, e.brecha, e.estado "
+				+ "FROM EvaluacionInicial e "
+				+ "WHERE e.id.idCampania =:idCampania AND e.id.idGerentePublico =:codGerente AND e.estado =:estado "
+				+ "ORDER BY e.id.idCompetencia"),
+		@NamedQuery(name = "EvaluacionInicial.getListaEvaluacionInicial2", query = "SELECT e.competencia, e.id, e.nota, e.brecha, e.estado "
+				+ "FROM EvaluacionInicial e "
+				+ "WHERE e.id.idCampania =:idCampania AND e.id.idGerentePublico =:codGerente AND e.brecha >:brecha AND e.estado =:estado "
+				+ "ORDER BY e.id.idCompetencia") })
+public class EvaluacionInicial implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@EmbeddedId
+	private EvaluacionInicialPK id;
+	@Column
+	private Integer nota;
+	@Column
+	private Integer brecha;
+	@Column
+	private String usuarioRegistra;
+	@Column
+	private String usuarioModifica;
+	@Column
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date fechaCreacion;
+	@Column
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date fechaModificacion;
+	@Column
+	private String estado;
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumns({
+			@JoinColumn(name = "idPuesto", referencedColumnName = "idPuesto", insertable = false, updatable = false),
+			@JoinColumn(name = "idCompetencia", referencedColumnName = "idCompetencia", insertable = false, updatable = false) })
+	private Competencia competencia;
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumns({
+			@JoinColumn(name = "idCampania", referencedColumnName = "idCampania", insertable = false, updatable = false),
+			@JoinColumn(name = "idGerentePublico", referencedColumnName = "idGerentePublico", insertable = false, updatable = false) })
+	private Inscripcion inscripcion;
+
+	public EvaluacionInicial() {
+		super();
+	}
+
+	public EvaluacionInicialPK getId() {
+		return id;
+	}
+
+	public void setId(EvaluacionInicialPK id) {
+		this.id = id;
+	}
+
+	public Integer getNota() {
+		return nota;
+	}
+
+	public void setNota(Integer nota) {
+		this.nota = nota;
+	}
+
+	public Integer getBrecha() {
+		return brecha;
+	}
+
+	public void setBrecha(Integer brecha) {
+		this.brecha = brecha;
+	}
+
+	public String getUsuarioRegistra() {
+		return usuarioRegistra;
+	}
+
+	public void setUsuarioRegistra(String usuarioRegistra) {
+		this.usuarioRegistra = usuarioRegistra;
+	}
+
+	public String getUsuarioModifica() {
+		return usuarioModifica;
+	}
+
+	public void setUsuarioModifica(String usuarioModifica) {
+		this.usuarioModifica = usuarioModifica;
+	}
+
+	public Date getFechaCreacion() {
+		return fechaCreacion;
+	}
+
+	public void setFechaCreacion(Date fechaCreacion) {
+		this.fechaCreacion = fechaCreacion;
+	}
+
+	public Date getFechaModificacion() {
+		return fechaModificacion;
+	}
+
+	public void setFechaModificacion(Date fechaModificacion) {
+		this.fechaModificacion = fechaModificacion;
+	}
+
+	public String getEstado() {
+		return estado;
+	}
+
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
+
+	public Competencia getCompetencia() {
+		return competencia;
+	}
+
+	public void setCompetencia(Competencia competencia) {
+		this.competencia = competencia;
+	}
+
+	public Inscripcion getInscripcion() {
+		return inscripcion;
+	}
+
+	public void setInscripcion(Inscripcion inscripcion) {
+		this.inscripcion = inscripcion;
+	}
+
+	@PrePersist
+	private void putFechaCreacion() {
+		setFechaCreacion(new Date(Calendar.getInstance().getTime().getTime()));
+	}
+
+	@PreUpdate
+	private void putFechaModificacion() {
+		setFechaModificacion(new Date(Calendar.getInstance().getTime()
+				.getTime()));
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		EvaluacionInicial other = (EvaluacionInicial) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(nota);
+		return builder.toString();
+	}
+
+}

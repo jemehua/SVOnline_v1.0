@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+	<h:outputStylesheet name="css/cssContent.css" />
+	<script type="text/javascript">
+		function showStatusDescargaPlanes() {
+			statusDialog.show();
+		}
+		function hideStatusDescargaPlanes() {
+			statusDialog.hide();
+		}
+	</script>
+</h:head>
+<h:body>
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datos2"
+		header="Adjuntar Metas Alineadas al POI">
+		<p:focus context="datos2" />
+		<p:spacer height="10" />
+		<p:panelGrid styleClass="panelGrid">
+			<p:row>
+				<p:column width="30">#{messages.lblCampania}
+				</p:column>
+				<p:column width="70">
+					<h:outputLabel
+						value="#{adjuntarPlanesGPController.inscripcionSelec.campania}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblGerentePublico}
+				</p:column>
+				<p:column>
+					<h:outputLabel
+						value="#{adjuntarPlanesGPController.inscripcionSelec.asignacionGerenteV} " />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblPuesto}
+				</p:column>
+				<p:column>
+					<h:outputText
+						value="#{adjuntarPlanesGPController.inscripcionSelec.puestoTipoV}" />
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+		<p:spacer height="10" />
+		<p:dataTable var="meta"
+			value="#{adjuntarPlanesGPController.listaMetas}" id="dtMetas2"
+			rows="7" emptyMessage="#{messages.msgEmptyMessage}">
+
+			<f:facet name="header">  
+            Lista de Metas
+            </f:facet>
+
+			<p:column headerText="#{messages.lblCodigo}"
+				style="width:2%; white-space: normal;text-align: justify;">
+				<h:outputText value="#{meta.id.idMeta}" />
+			</p:column>
+			<p:column headerText="Tipo Meta"
+				style="width:10%; white-space: normal;text-align: justify;">
+				<h:outputText value="#{meta.tipo}" />
+			</p:column>
+			<p:column headerText="Meta"
+				style="width:30%; white-space: normal;text-align: justify;">
+				<h:outputText value="#{meta.denominacion}" />
+			</p:column>
+			<p:column headerText="Relación POI"
+				style="width:28%; white-space: normal;text-align: justify;">
+				<h:outputText value="#{meta.relacionPOI}" />
+			</p:column>
+			<p:column headerText="Peso (%)"
+				style="width:10%; white-space: normal;text-align: justify;">
+				<h:outputText value="#{meta.peso}" />
+			</p:column>
+			<p:column headerText="Fecha de culminación"
+				style="width:20%; white-space: normal;text-align: justify;">
+				<h:outputText value="#{meta.fechaFinMeta}">
+					<f:convertDateTime pattern="dd/MM/yyyy" />
+				</h:outputText>
+			</p:column>
+			
+		</p:dataTable>
+		<p:spacer height="10" />
+		<table style="width: 100%">
+			<tr>
+				<td align="left"><p:outputLabel>Descargar :</p:outputLabel> <p:commandLink
+						ajax="false"
+						onclick="PrimeFaces.monitorDownload(showStatusDescargaPlanes,hideStatusDescargaPlanes)">
+						<p:graphicImage value="./images/pdf.png" />
+						<p:fileDownload
+							value="#{adjuntarPlanesGPController.listaPlanMetasArchivoDescarga}" />
+					</p:commandLink></td>
+			</tr>
+		</table>
+		<p:dialog modal="true" widgetVar="statusDialog" header="Status"
+			draggable="false" closable="true">
+			<p:graphicImage value="./images/ajax-loader.gif" />
+		</p:dialog>
+
+		<p:spacer height="10" />
+		<p:panel id="pnlDoc"
+			header="Adjuntar Metas Alineadas al POI escaneado">
+			<p:fileUpload
+				fileUploadListener="#{adjuntarPlanesGPController.handleFileUpload}"
+				mode="advanced" update=":frm:msgDoc" multiple="false"
+				dragDropSupport="false" auto="true" label="Cargar archivo"
+				tabindex="2" sizeLimit="10000000" allowTypes="/(\.|\/)(pdf)$/" />
+			<f:facet name="footer">
+				Archivo : <h:outputText id="msgDoc"
+					value="#{adjuntarPlanesGPController.msgDoc}" style="color:red;" />
+				<p />
+				<h:outputText id="msgDocFormat"
+					value="Adjuntar documento en formato .pdf" style="color:blue;" />
+			</f:facet>
+		</p:panel>
+		<p:spacer height="20" />
+		<p:separator id="s1" />
+		<table style="width: 100%">
+			<tr>
+				<td align="left"><p:commandButton value="Guardar"
+						id="btn_guardar" action="#{adjuntarPlanesGPController.guardar}"
+						update="pnlDoc,messages" icon="ui-icon-disk" tabindex="3"
+						disabled="#{adjuntarPlanesGPController.swFlujo}" /> <p:spacer
+						width="5" /> <p:commandButton value="Cancelar"
+						update="pnlDoc,messages"
+						action="#{adjuntarPlanesGPController.limpiar}"
+						icon="ui-icon-close" tabindex="4" /></td>
+				<td align="right"><p:commandButton value="Continuar"
+						id="btFlujo" onclick="confirmacion.show()"
+						icon="ui-icon-circle-arrow-e" tabindex="5"
+						disabled="#{adjuntarPlanesGPController.swFlujo}" /></td>
+			</tr>
+		</table>
+		<p:separator id="s2" />
+	</p:panel>
+	<p:confirmDialog message="¿Estás seguro de continuar?"
+		showEffect="fade" hideEffect="fade" header="Adjuntar Metas Alineadas al POI"
+		widgetVar="confirmacion">
+		<table style="width: 100%">
+			<tr>
+				<td align="center"><p:commandButton value="Si"
+						style="width:50px" styleClass="ui-confirmdialog-yes"
+						icon="ui-icon-check" oncomplete="confirmacion.hide()"
+						update="messages,btn_guardar,btFlujo"
+						action="#{adjuntarPlanesGPController.atenderFlujo}">
+					</p:commandButton> <p:spacer width="10" /> <p:commandButton value="No"
+						style="width:50px" styleClass="ui-confirmdialog-no"
+						icon="ui-icon-close" onclick="confirmacion.hide()" /></td>
+			</tr>
+		</table>
+	</p:confirmDialog>
+</h:body>
+<p:ajaxStatus
+	style="width:64px;height:64px;position:fixed;right:5px;bottom:5px"
+	id="ajaxStatusPanel">
+	<f:facet name="start">
+		<p:graphicImage value="./images/loading.gif" />
+	</f:facet>
+
+	<f:facet name="complete">
+		<h:outputText value="" />
+	</f:facet>
+</p:ajaxStatus>
+</html>

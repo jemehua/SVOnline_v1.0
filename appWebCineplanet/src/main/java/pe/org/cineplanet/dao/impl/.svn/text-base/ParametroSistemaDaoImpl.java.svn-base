@@ -1,0 +1,51 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.ParametroSistemaDao;
+import gob.servir.desempenio.model.ParametroSistema;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Repository
+public class ParametroSistemaDaoImpl implements ParametroSistemaDao {
+	@PersistenceContext
+	private EntityManager em;
+
+	public ParametroSistema find(Long id) {
+		try {
+			return em.find(ParametroSistema.class, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public ParametroSistema save(ParametroSistema obj) {
+		try {
+			em.persist(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public ParametroSistema edit(ParametroSistema obj) {
+		try {
+			return em.merge(obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+}

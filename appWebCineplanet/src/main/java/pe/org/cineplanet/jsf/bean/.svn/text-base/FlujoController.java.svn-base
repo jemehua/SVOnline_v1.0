@@ -1,0 +1,227 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.model.DetalleFlujo;
+import gob.servir.desempenio.model.Flujo;
+import gob.servir.desempenio.model.FlujoPK;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.CampaniaService;
+import gob.servir.desempenio.service.DetalleFlujoService;
+import gob.servir.desempenio.service.FlujoService;
+import gob.servir.desempenio.service.InscripcionService;
+import gob.servir.desempenio.util.Constantes;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
+
+import org.primefaces.event.ToggleEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Component("flujoController")
+@Scope("session")
+public class FlujoController {
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(FlujoController.class);
+
+	@Autowired
+	private LoginController loginController;
+	@Autowired
+	private CampaniaService campaniaService;
+	@Autowired
+	private InscripcionService inscripcionService;
+	@Autowired
+	private FlujoService flujoService;
+	@Autowired
+	private DetalleFlujoService detalleFlujoService;
+
+	private Usuario userSesion = null;
+	// private Message message = new Message();
+
+	private List<SelectItem> comboCampania = new ArrayList<SelectItem>();
+	private Long campaniaSelec = 0L;
+
+	private List<Flujo> listaFlujo = new ArrayList<Flujo>();
+	private List<DetalleFlujo> listaDetalleFlujo = new ArrayList<DetalleFlujo>();
+	private Flujo flujoParam = null;
+
+	// Buscar gp
+	private Inscripcion inscripcionSelec = null;
+	private String nombreGerente = "";
+	private List<Inscripcion> listaGerentePublico = new ArrayList<Inscripcion>();
+	private List<Inscripcion> listaGerentePublicoFiltered = new ArrayList<Inscripcion>();
+	private boolean swBtnBuscar = true;
+
+
+	public FlujoController() {
+		super();
+	}
+
+	public List<SelectItem> getComboCampania() {
+		comboCampania = campaniaService.getComboCampania();
+		return comboCampania;
+	}
+
+	public void setComboCampania(List<SelectItem> comboCampania) {
+		this.comboCampania = comboCampania;
+	}
+
+	public Long getCampaniaSelec() {
+		return campaniaSelec;
+	}
+
+	public void setCampaniaSelec(Long campaniaSelec) {
+		this.campaniaSelec = campaniaSelec;
+	}
+
+	public Inscripcion getInscripcionSelec() {
+		return inscripcionSelec;
+	}
+
+	public void setInscripcionSelec(Inscripcion inscripcionSelec) {
+		this.inscripcionSelec = inscripcionSelec;
+	}
+
+	public String getNombreGerente() {
+		return nombreGerente;
+	}
+
+	public void setNombreGerente(String nombreGerente) {
+		this.nombreGerente = nombreGerente;
+	}
+
+	public List<Inscripcion> getListaGerentePublico() {
+		return listaGerentePublico;
+	}
+
+	public void setListaGerentePublico(List<Inscripcion> listaGerentePublico) {
+		this.listaGerentePublico = listaGerentePublico;
+	}
+	
+
+	public List<Inscripcion> getListaGerentePublicoFiltered() {
+		return listaGerentePublicoFiltered;
+	}
+
+	public void setListaGerentePublicoFiltered(
+			List<Inscripcion> listaGerentePublicoFiltered) {
+		this.listaGerentePublicoFiltered = listaGerentePublicoFiltered;
+	}
+
+	public boolean isSwBtnBuscar() {
+		if (campaniaSelec != 0L)
+			swBtnBuscar = false;
+		else
+			swBtnBuscar = true;
+		return swBtnBuscar;
+	}
+
+	public void setSwBtnBuscar(boolean swBtnBuscar) {
+		this.swBtnBuscar = swBtnBuscar;
+	}
+
+	public List<Flujo> getListaFlujo() {
+		listaFlujo.clear();
+		if (inscripcionSelec != null)
+			listaFlujo = flujoService.getListaFlujo(inscripcionSelec.getId());
+		return listaFlujo;
+	}
+
+	public void setListaFlujo(List<Flujo> listaFlujo) {
+		this.listaFlujo = listaFlujo;
+	}
+
+	public List<DetalleFlujo> getListaDetalleFlujo() {
+		listaDetalleFlujo.clear();
+
+		if (flujoParam != null)
+			listaDetalleFlujo = detalleFlujoService
+					.getListaDetalleFlujo(flujoParam.getId());
+		return listaDetalleFlujo;
+	}
+
+	public void setListaDetalleFlujo(List<DetalleFlujo> listaDetalleFlujo) {
+		this.listaDetalleFlujo = listaDetalleFlujo;
+	}
+
+	public void validarSesion() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		
+		userSesion = (Usuario) context.getExternalContext().getSessionMap()
+				.get(loginController.getUsername());
+
+		if (userSesion == null) {
+			String ctxPath = context.getExternalContext()
+					.getRequestContextPath();
+			try {
+				context.getExternalContext().redirect(ctxPath + "/login.jsf");
+			} catch (Exception e) {
+				//e.printStackTrace();
+			}
+		}
+	}
+
+	public void onRowToggle(ToggleEvent event) {
+		try {
+			flujoParam = ((Flujo) event.getData());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void limpiar() {
+		inscripcionSelec = null;
+		nombreGerente = "";
+	}
+
+	public void cancelarFlujo(FlujoPK id) {
+
+		validarSesion();
+
+		if (id == null)
+			return;
+
+		try {
+			Flujo flujo00 = flujoService.find(id);
+			
+			if(flujo00 != null){
+				flujo00.setEstado(Constantes.CANCELADO);
+				flujo00.setUsuarioModifica(userSesion.getUsuario());
+				flujoService.edit(flujo00);
+				FacesContext
+						.getCurrentInstance()
+						.addMessage(
+								null,
+								new FacesMessage(FacesMessage.SEVERITY_INFO,
+										"EXITO",
+										"Se ha cancelado la Evaluación para el Gerente Público"));
+			}
+		} catch (Exception e) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+							"Ha ocurrido un error"));
+		}
+	}
+	
+	public void buscarGerenteInscrito() {
+		listaGerentePublico.clear();
+		if (campaniaSelec != 0L)
+			listaGerentePublico = inscripcionService
+					.getListaGerentePublico(campaniaSelec);
+		listaGerentePublicoFiltered = listaGerentePublico;
+	}
+}

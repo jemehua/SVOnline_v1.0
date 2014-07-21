@@ -1,0 +1,166 @@
+package pe.org.cineplanet.util;
+
+import java.util.Properties;
+
+import javax.mail.Address;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
+public class Mail {
+
+	/*public static void main(String[] args) {
+		
+		Mail mail = new Mail();
+		if(mail.enviarEmail())
+			System.out.println("OK");
+		else
+			System.out.println("ERROR");
+		
+	}*/
+
+	public String enviarEmail(String str_Para, String str_Asunto, String str_Mensaje) {
+		
+		String resultado = null;
+		try {
+			// Propiedades de la conexión
+			Properties props = new Properties();
+			props.setProperty("mail.smtp.host", "smtp.gmail.com");
+			props.setProperty("mail.smtp.starttls.enable", "true");
+			props.setProperty("mail.smtp.port", "587");
+			props.setProperty("mail.smtp.auth", "true");
+
+			// Preparamos la sesion 
+			Session session = Session.getDefaultInstance(props);
+			session.setDebug(true);
+			
+			// Recoger los datos
+			String str_De = "desempenoggpp@servir.gob.pe";
+			String str_PwRemitente = "svr123!!";
+			//String str_Para = "hpumallihua@gmail.com, 2@servir.gob.pe";
+			//String str_Asunto = "prueba 3 enviar email";
+			//String str_Mensaje = "tiene que estar pa maniana";
+			// Obtenemos los destinatarios
+			String destinos[] = str_Para.split(",");
+
+			// Construimos el mensaje
+			MimeMessage message = new MimeMessage(session);
+
+			message.setFrom(new InternetAddress(str_De));
+
+			// Otra forma de especificar las direcciones de email
+			// a quienes se enviar el correo electronico
+			// Forma 1
+			// Address [] receptores = new Address []{
+			// new InternetAddress ("fuerenio@gmail.com"),
+			// new InternetAddress ("gonzasilve@gmail.com")
+			// };
+			// Forma 2
+			// Address [] receptores = new Address []{
+			// new InternetAddress ( str_De )
+			// };
+			// Forma 3
+			Address[] receptores = new Address[destinos.length];
+			int j = 0;
+			while (j < destinos.length) {
+				receptores[j] = new InternetAddress(destinos[j]);
+				j++;
+			}
+
+			// receptores.
+			message.addRecipients(javax.mail.Message.RecipientType.TO,
+					receptores);
+			message.addHeader("Disposition-Notification-To",str_De);
+			message.setSubject(str_Asunto);
+			message.setText(str_Mensaje);
+
+			// Lo enviamos.
+			Transport t = session.getTransport("smtp");
+			t.connect(str_De, str_PwRemitente);
+			t.sendMessage(message,
+					message.getRecipients(javax.mail.Message.RecipientType.TO));
+
+			// Cierre de la conexion.
+			t.close();
+		} catch (Exception e) {
+			//e.printStackTrace();
+			resultado = e.getMessage();
+		}
+		
+		return resultado;
+	}
+	
+	
+	/*public String enviarEmail(Mensaje mensaje, String para) {
+		
+		String resultado = null;
+		try {
+			// Propiedades de la conexión
+			Properties props = new Properties();
+			props.setProperty("mail.smtp.host", "smtp.gmail.com");
+			props.setProperty("mail.smtp.starttls.enable", "true");
+			props.setProperty("mail.smtp.port", "587");
+			props.setProperty("mail.smtp.auth", "true");
+
+			// Preparamos la sesion 
+			Session session = Session.getDefaultInstance(props);
+			session.setDebug(false);
+			
+			// Recoger los datos
+			String str_De = "programador2@servir.gob.pe";
+			String str_PwRemitente = "hpumall1hua";
+			//String str_Para = "hpumallihua@gmail.com, 2@servir.gob.pe";
+			//String str_Asunto = "prueba 3 enviar email";
+			//String str_Mensaje = "tiene que estar pa maniana";
+			// Obtenemos los destinatarios
+			String destinos[] = para.split(",");
+
+			// Construimos el mensaje
+			MimeMessage message = new MimeMessage(session);
+
+			message.setFrom(new InternetAddress(str_De));
+
+			// Otra forma de especificar las direcciones de email
+			// a quienes se enviar el correo electronico
+			// Forma 1
+			// Address [] receptores = new Address []{
+			// new InternetAddress ("fuerenio@gmail.com"),
+			// new InternetAddress ("gonzasilve@gmail.com")
+			// };
+			// Forma 2
+			// Address [] receptores = new Address []{
+			// new InternetAddress ( str_De )
+			// };
+			// Forma 3
+			Address[] receptores = new Address[destinos.length];
+			int j = 0;
+			while (j < destinos.length) {
+				receptores[j] = new InternetAddress(destinos[j]);
+				j++;
+			}
+
+			// receptores.
+			message.addRecipients(javax.mail.Message.RecipientType.TO,
+					receptores);
+			message.addHeader("Disposition-Notification-To",str_De);
+			message.setSubject(mensaje.getTitulo());
+			message.setText(mensaje.getCuerpo());
+
+			// Lo enviamos.
+			Transport t = session.getTransport("smtp");
+			t.connect(str_De, str_PwRemitente);
+			t.sendMessage(message,
+					message.getRecipients(javax.mail.Message.RecipientType.TO));
+
+			// Cierre de la conexion.
+			t.close();
+		} catch (Exception e) {
+			
+			resultado = e.getMessage();
+		}
+		
+		return resultado;
+	}*/
+
+}

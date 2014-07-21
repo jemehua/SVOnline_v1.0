@@ -1,0 +1,40 @@
+package gob.servir.desempenio.service;
+
+import gob.servir.desempenio.dto.Monitoreo;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.Usuario;
+
+import java.util.List;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+public interface InscripcionService {
+
+	public abstract Inscripcion find(InscripcionPK id);
+
+	public abstract Inscripcion save(Inscripcion obj);
+
+	public abstract Inscripcion edit(Inscripcion obj);
+
+	public abstract boolean delete(InscripcionPK inscripcionPk);
+
+	public abstract List<Inscripcion> getListaInscripcion();
+
+	public abstract List<Inscripcion> getListaGerentePublico(Long idCampania);
+
+	public abstract List<Inscripcion> getListaInscripcion(Long idCampania, int opcion);
+
+	public abstract Inscripcion getInscripcionUsuario(Usuario usuario);
+	
+	public abstract String validarInscripcion(InscripcionPK id);
+	
+	public abstract List<Inscripcion> getListaInscripcionActivo(String codGerente);
+	
+	public abstract List<Inscripcion> getListGpEvaCulminado(Long idCampania, Long idPuestoTipo, Long idEntidad);
+	
+	public abstract List<Monitoreo> getListaMonitoreo(Long idCampania);
+
+}

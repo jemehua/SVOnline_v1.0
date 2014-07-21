@@ -1,0 +1,60 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.TemporizadorDao;
+import gob.servir.desempenio.model.Temporizador;
+import gob.servir.desempenio.model.TemporizadorPK;
+import gob.servir.desempenio.service.TemporizadorService;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Service
+public class TemporizadorServiceImpl implements TemporizadorService {
+
+	@Autowired
+	private TemporizadorDao temporizadorDao;
+
+	@Transactional
+	public Temporizador find(TemporizadorPK id) {
+		return temporizadorDao.find(id);
+	}
+
+	@Transactional
+	public Temporizador save(Temporizador obj) {
+		return temporizadorDao.save(obj);
+	}
+
+	@Transactional
+	public Temporizador edit(Temporizador obj) {
+		return temporizadorDao.edit(obj);
+
+	} 
+	
+	public List<Temporizador> getListaTemporizador() {
+		return temporizadorDao.getListaTemporizador();
+	}
+	
+	public List<Temporizador> getListaTemporizador(Long idCampania) {
+		return temporizadorDao.getListaTemporizador(idCampania);
+	}
+	
+	public List<Temporizador> getListaTempByProcesoCampania(Long idCampania, Long idProceso) {
+		return temporizadorDao.getListaTempByProcesoCampania(idCampania, idProceso);
+	}
+	
+	public List<Temporizador> getListaTemporizador(Long idCampania, Long idProceso) {
+		return temporizadorDao.getListaTemporizador(idCampania, idProceso);
+	}
+	
+	public List<Temporizador> getListaTemporizador(Long idCampania, Long idProceso, Long idCronograma) {
+		return temporizadorDao.getListaTemporizador(idCampania, idProceso, idCronograma);
+	}
+
+}

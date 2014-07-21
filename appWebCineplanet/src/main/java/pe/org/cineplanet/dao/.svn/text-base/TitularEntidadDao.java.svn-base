@@ -1,0 +1,21 @@
+package gob.servir.desempenio.dao;
+
+import gob.servir.desempenio.model.TitularEntidad;
+
+import java.util.List;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+public interface TitularEntidadDao {
+
+	public abstract TitularEntidad save(TitularEntidad obj);
+
+	public abstract TitularEntidad find(String id);
+
+	public abstract TitularEntidad edit(TitularEntidad obj);
+
+	public abstract List<TitularEntidad> getListaTitularEntidad();
+
+}

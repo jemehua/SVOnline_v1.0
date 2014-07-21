@@ -1,0 +1,210 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package gob.servir.desempenio.model;
+
+import java.io.Serializable;
+import java.util.Date;
+
+import javax.persistence.*;
+
+/**
+ * 
+ * @author Cristhian Munguia Martinez
+ */
+@Entity
+@NamedQueries({
+		@NamedQuery(name = "AsignacionGerenteV.getListaAsignacionGerenteAll", query = "SELECT g "
+				+ "FROM AsignacionGerenteV g"),
+		@NamedQuery(name = "AsignacionGerenteV.getListaAsignacionGerente", query = "SELECT g "
+				+ "FROM AsignacionGerenteV g "
+				+ "WHERE g.cod_gerente =:codGerente ORDER BY fech_asignacion desc") })
+public class AsignacionGerenteV implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	private String cod_gerente;
+	@Column
+	private Long id_asignacion;
+	@Column
+	private String nombres;
+	@Column
+	private String ap_paterno;
+	@Column
+	private String ap_materno;
+	@Column
+	private String dni;
+	@Column
+	private String mail_01;
+	@Column
+	private String mail_02;
+	@Column
+	private String mail_03;
+	@Column
+	private Long id_puesto_tipo_principal;
+	@Column
+	private Long id_ed;
+	@Column
+	private Long id_jefe_inmediato;
+	@Column
+	private String te_numero_documento;
+	@Column
+	private Date fech_asignacion;
+
+	public AsignacionGerenteV() {
+	}
+
+	public String getCod_gerente() {
+		return cod_gerente;
+	}
+
+	public void setCod_gerente(String cod_gerente) {
+		this.cod_gerente = cod_gerente;
+	}
+
+	public Long getId_asignacion() {
+		return id_asignacion;
+	}
+
+	public void setId_asignacion(Long id_asignacion) {
+		this.id_asignacion = id_asignacion;
+	}
+
+	public String getNombres() {
+		return nombres;
+	}
+
+	public void setNombres(String nombres) {
+		this.nombres = nombres;
+	}
+
+	public String getAp_paterno() {
+		return ap_paterno;
+	}
+
+	public void setAp_paterno(String ap_paterno) {
+		this.ap_paterno = ap_paterno;
+	}
+
+	public String getAp_materno() {
+		return ap_materno;
+	}
+
+	public void setAp_materno(String ap_materno) {
+		this.ap_materno = ap_materno;
+	}
+
+	public String getDni() {
+		return dni;
+	}
+
+	public void setDni(String dni) {
+		this.dni = dni;
+	}
+
+	public String getMail_01() {
+		return mail_01;
+	}
+
+	public void setMail_01(String mail_01) {
+		this.mail_01 = mail_01;
+	}
+
+	public String getMail_02() {
+		return mail_02;
+	}
+
+	public void setMail_02(String mail_02) {
+		this.mail_02 = mail_02;
+	}
+
+	public String getMail_03() {
+		return mail_03;
+	}
+
+	public void setMail_03(String mail_03) {
+		this.mail_03 = mail_03;
+	}
+
+	public Long getId_puesto_tipo_principal() {
+		return id_puesto_tipo_principal;
+	}
+
+	public void setId_puesto_tipo_principal(Long id_puesto_tipo_principal) {
+		this.id_puesto_tipo_principal = id_puesto_tipo_principal;
+	}
+
+	public Long getId_ed() {
+		return id_ed;
+	}
+
+	public void setId_ed(Long id_ed) {
+		this.id_ed = id_ed;
+	}
+
+	public Long getId_jefe_inmediato() {
+		return id_jefe_inmediato;
+	}
+
+	public void setId_jefe_inmediato(Long id_jefe_inmediato) {
+		this.id_jefe_inmediato = id_jefe_inmediato;
+	}
+
+	public String getTe_numero_documento() {
+		return te_numero_documento;
+	}
+
+	public void setTe_numero_documento(String te_numero_documento) {
+		this.te_numero_documento = te_numero_documento;
+	}
+
+	public Date getFech_asignacion() {
+		return fech_asignacion;
+	}
+
+	public void setFech_asignacion(Date fech_asignacion) {
+		this.fech_asignacion = fech_asignacion;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((cod_gerente == null) ? 0 : cod_gerente.hashCode());
+		result = prime * result
+				+ ((id_asignacion == null) ? 0 : id_asignacion.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		AsignacionGerenteV other = (AsignacionGerenteV) obj;
+		if (cod_gerente == null) {
+			if (other.cod_gerente != null)
+				return false;
+		} else if (!cod_gerente.equals(other.cod_gerente))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(nombres);
+		builder.append(" ");
+		builder.append(ap_paterno);
+		builder.append(" ");
+		builder.append(ap_materno);
+		return builder.toString();
+	}
+
+}

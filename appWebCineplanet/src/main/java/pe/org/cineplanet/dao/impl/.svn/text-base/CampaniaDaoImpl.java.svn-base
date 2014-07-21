@@ -1,0 +1,279 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.CampaniaDao;
+import gob.servir.desempenio.model.Actividad;
+import gob.servir.desempenio.model.Campania;
+import gob.servir.desempenio.model.Cronograma;
+import gob.servir.desempenio.model.CronogramaPK;
+import gob.servir.desempenio.model.Temporizador;
+import gob.servir.desempenio.model.TemporizadorPK;
+import gob.servir.desempenio.service.ActividadService;
+import gob.servir.desempenio.util.Constantes;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.faces.model.SelectItem;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Repository("campaniaDao")
+public class CampaniaDaoImpl implements CampaniaDao {
+	@PersistenceContext
+	private EntityManager em;
+	private final static int cantidadProcesos = 3;
+
+	@Autowired
+	private ActividadService actividadService;
+
+	public Campania find(Long id) {
+		try {
+			return em.find(Campania.class, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Campania save(Campania obj) {
+		try {
+			em.persist(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Campania saveTotal(Campania obj) {
+		try {
+			em.persist(obj);
+
+			Cronograma cronograma = null;
+			CronogramaPK id = null;
+			Long idProceso = 0L;
+
+			for (int i = 0; i < cantidadProcesos; i++) {
+				idProceso += 1;
+				id = new CronogramaPK(idProceso, idProceso, obj.getIdCampania());
+
+				cronograma = new Cronograma();
+				cronograma.setId(id);
+				cronograma.setFechaCreacion(new Date());
+				cronograma.setUsuarioRegistra(obj.getUsuarioRegistra());
+				// cronograma.setEstado("A");
+
+				em.persist(cronograma);
+
+				List<Actividad> listaActividad = actividadService
+						.getListaActTemporizado(idProceso);
+
+				Temporizador temporizador = null;
+				TemporizadorPK id00 = null;
+
+				for (Actividad row : listaActividad) {
+
+					id00 = new TemporizadorPK(idProceso, obj.getIdCampania(),
+							row.getId().getIdActividad(), row.getId()
+									.getIdProceso());
+
+					temporizador = new Temporizador();
+
+					temporizador.setId(id00);
+					temporizador.setFechaCreacion(new Date());
+					temporizador.setUsuarioRegistra(obj.getUsuarioRegistra());
+					temporizador.setEstado("A");
+
+					em.persist(temporizador);
+
+				}
+			}
+
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Campania edit(Campania obj) {
+		try {
+			return em.merge(obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<Campania> getListaCampania() {
+
+		Query q = em.createNamedQuery("Campania.getAllListaCampania");
+
+		q.setParameter("estado", Constantes.ACTIVO);
+		try {
+
+			List<Object[]> listaObjetos = new ArrayList<Object[]>();
+
+			listaObjetos = q.getResultList();
+
+			List<Campania> listaCampania = new ArrayList<Campania>();
+
+			for (Object[] row : listaObjetos) {
+
+				Campania campania = new Campania();
+				campania.setIdCampania((Long) row[0]);
+				campania.setDenominacion((String) row[1]);
+				campania.setAnio((String) row[2]);
+				campania.setPostAnio((String) row[3]);
+				campania.setFechaInicio((Date) row[4]);
+				campania.setFechaFin((Date) row[5]);
+				campania.setEstadoCampania((String) row[6]);
+				campania.setEstado((String) row[7]);
+
+				listaCampania.add(campania);
+			}
+
+			return listaCampania;
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<Campania> getListaEstadoCampania(String estado) {
+
+		Query q = em.createNamedQuery("Campania.getListaEstadoCampania");
+
+		q.setParameter("estado", estado);
+
+		try {
+
+			List<Object[]> listaObjetos = new ArrayList<Object[]>();
+
+			listaObjetos = q.getResultList();
+
+			List<Campania> listaCampania = new ArrayList<Campania>();
+
+			for (Object[] row : listaObjetos) {
+
+				Campania campania = new Campania();
+				campania.setIdCampania((Long) row[0]);
+				campania.setDenominacion((String) row[1]);
+				campania.setAnio((String) row[2]);
+				campania.setPostAnio((String) row[3]);
+
+				listaCampania.add(campania);
+			}
+
+			return listaCampania;
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<Campania> findCampaniaByPostAnio(String denominacion,
+			String anio, String postAnio) {
+
+		Query q = em.createNamedQuery("Campania.findCampaniaByPostAnio");
+
+		q.setParameter("anio", anio);
+
+		try {
+
+			List<Object[]> listaObjetos = new ArrayList<Object[]>();
+
+			listaObjetos = q.getResultList();
+
+			List<Campania> listaCampania = new ArrayList<Campania>();
+
+			for (Object[] row : listaObjetos) {
+
+				Campania campania = new Campania();
+				campania.setIdCampania((Long) row[0]);
+				campania.setDenominacion((String) row[1]);
+				campania.setAnio((String) row[2]);
+				campania.setPostAnio((String) row[3]);
+
+				listaCampania.add(campania);
+			}
+
+			return listaCampania;
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+
+	}
+
+	public Long getIdMax() {
+		try {
+			return (Long) em.createQuery(
+					"select max(c.idCampania) from Campania c")
+					.getSingleResult() + 1L;
+		} catch (Exception e) {
+			// e.printStackTrace();
+			return 1L;
+		}
+	}
+
+	public List<SelectItem> getComboCampania() {
+
+		List<SelectItem> listaCombo = new ArrayList<SelectItem>();
+		List<Campania> lista = new ArrayList<Campania>();
+		try {
+			lista = getListaEstadoCampania("Activo");
+		} catch (Exception as) {
+			as.printStackTrace();
+			SelectItem fila = new SelectItem(0L,
+					"Seleccione campaña de evaluación");
+			listaCombo.add(fila);
+			return listaCombo;
+		}
+		SelectItem fila = new SelectItem(0L, "Seleccione campaña de evaluación");
+		listaCombo.add(fila);
+
+		for (Campania row : lista) {
+			fila = new SelectItem(row.getIdCampania(), row.toString());
+			listaCombo.add(fila);
+		}
+		return listaCombo;
+	}
+
+	public List<SelectItem> getComboCampaniaCreada() {
+
+		List<SelectItem> listaCombo = new ArrayList<SelectItem>();
+		List<Campania> lista = new ArrayList<Campania>();
+		try {
+			lista = getListaCampania();
+		} catch (Exception as) {
+			as.printStackTrace();
+			SelectItem fila = new SelectItem(0L,
+					"Seleccione campaña de evaluación");
+			listaCombo.add(fila);
+			return listaCombo;
+		}
+		SelectItem fila = new SelectItem(0L, "Seleccione campaña de evaluación");
+		listaCombo.add(fila);
+
+		for (Campania row : lista) {
+			fila = new SelectItem(row.getIdCampania(), row.toString());
+			listaCombo.add(fila);
+		}
+		return listaCombo;
+	}
+
+}

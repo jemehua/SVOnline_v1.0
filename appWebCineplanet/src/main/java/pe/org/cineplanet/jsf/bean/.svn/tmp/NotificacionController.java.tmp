@@ -1,0 +1,332 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.model.DetalleFlujo;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.Mensaje;
+import gob.servir.desempenio.model.Notificacion;
+import gob.servir.desempenio.model.NotificacionPK;
+import gob.servir.desempenio.model.ParametroSistema;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.CampaniaService;
+import gob.servir.desempenio.service.DetalleFlujoService;
+import gob.servir.desempenio.service.InscripcionService;
+import gob.servir.desempenio.service.JavaMailService;
+import gob.servir.desempenio.service.MensajeService;
+import gob.servir.desempenio.service.NotificacionService;
+import gob.servir.desempenio.service.ParametroSistemaService;
+import gob.servir.desempenio.service.UsuarioService;
+import gob.servir.desempenio.util.Constantes;
+import gob.servir.desempenio.util.FormatTemplateMessage;
+import gob.servir.desempenio.util.Message;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+/**
+ * 
+ * @author Hever Pumallihua Garcia
+ */
+@Component("notificacionController")
+@Scope("session")
+public class NotificacionController {
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(NotificacionController.class);
+
+	@Autowired
+	private CampaniaService campaniaService;
+	@Autowired
+	private InscripcionService inscripcionService;
+	@Autowired
+	private NotificacionService notificacionService;
+	@Autowired
+	private DetalleFlujoService detalleFlujoService;
+	@Autowired
+	private MensajeService mensajeService;
+	@Autowired
+	private JavaMailService javaMailService;
+	@Autowired
+	private UsuarioService usuarioService;
+	@Autowired
+	private ParametroSistemaService parametroSistemaService;
+
+	private Message message = new Message();
+
+	private Usuario userSesion = null;
+	private List<SelectItem> comboCampania = new ArrayList<SelectItem>();
+	private Long campaniaSelec = 0L;
+
+	private List<DetalleFlujo> listaDetalleFlujo = new ArrayList<DetalleFlujo>();
+	private List<Notificacion> listaNotificacion = new ArrayList<Notificacion>();
+	// Buscar gp
+	private Inscripcion inscripcionSelec = null;
+	private String nombreGerente = null;
+	private List<Inscripcion> listaGerentePublico = new ArrayList<Inscripcion>();
+	private boolean swBtnBuscar = true;
+	private String valorBusqueda = "";
+	private static final String ACTIVIDAD_TEMPORIZADA = "T";
+
+	private DetalleFlujo detalleFlujo = null;
+	private List<Mensaje> listaMensaje = new ArrayList<Mensaje>();
+	private Mensaje mensajeSelec = null;
+	private boolean swEditar = false;
+
+	private String estado;
+
+	public String getEstado() {
+
+		return estado;
+	}
+
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
+
+	public NotificacionController() {
+		super();
+	}
+
+	public boolean isSwEditar() {
+		return swEditar;
+	}
+
+	public void setSwEditar(boolean swEditar) {
+		this.swEditar = swEditar;
+	}
+
+	public List<Mensaje> getListaMensaje() {
+		listaMensaje.clear();
+		if (detalleFlujo != null) {
+			listaMensaje = mensajeService.getListaMensajeTipo(detalleFlujo
+					.getId().getIdActividad(), detalleFlujo.getId()
+					.getIdProceso(), detalleFlujo.getId().getIdCampania(), "S");
+		}
+		return listaMensaje;
+	}
+
+	public void setListaMensaje(List<Mensaje> listaMensaje) {
+		this.listaMensaje = listaMensaje;
+	}
+
+	public Mensaje getMensajeSelec() {
+		return mensajeSelec;
+	}
+
+	public void setMensajeSelec(Mensaje mensajeSelec) {
+		this.mensajeSelec = mensajeSelec;
+	}
+
+	public DetalleFlujo getDetalleFlujo() {
+		return detalleFlujo;
+	}
+
+	public void setDetalleFlujo(DetalleFlujo detalleFlujo) {
+		this.detalleFlujo = detalleFlujo;
+	}
+
+	public List<SelectItem> getComboCampania() {
+		comboCampania = campaniaService.getComboCampania();
+		return comboCampania;
+	}
+
+	public void setComboCampania(List<SelectItem> comboCampania) {
+		this.comboCampania = comboCampania;
+	}
+
+	public Long getCampaniaSelec() {
+
+		if (campaniaSelec == 0L) {
+			inscripcionSelec = null;
+			nombreGerente = null;
+		}
+		return campaniaSelec;
+	}
+
+	public void setCampaniaSelec(Long campaniaSelec) {
+		this.campaniaSelec = campaniaSelec;
+	}
+
+	public Inscripcion getInscripcionSelec() {
+		return inscripcionSelec;
+	}
+
+	public void setInscripcionSelec(Inscripcion inscripcionSelec) {
+		this.inscripcionSelec = inscripcionSelec;
+	}
+
+	public String getNombreGerente() {
+		return nombreGerente;
+	}
+
+	public void setNombreGerente(String nombreGerente) {
+		this.nombreGerente = nombreGerente;
+	}
+
+	public List<Inscripcion> getListaGerentePublico() {
+
+		listaGerentePublico.clear();
+
+		if (campaniaSelec != 0L) {
+			// 0=todos
+			if (valorBusqueda.equalsIgnoreCase(""))
+				listaGerentePublico = inscripcionService.getListaInscripcion(
+						campaniaSelec, 0);
+			else
+				listaGerentePublico = inscripcionService.getListaInscripcion(
+						campaniaSelec, valorBusqueda);
+		}
+		return listaGerentePublico;
+	}
+
+	public void setListaGerentePublico(List<Inscripcion> listaGerentePublico) {
+		this.listaGerentePublico = listaGerentePublico;
+	}
+
+	public boolean isSwBtnBuscar() {
+		if (campaniaSelec != 0L)
+			swBtnBuscar = false;
+		else
+			swBtnBuscar = true;
+		return swBtnBuscar;
+	}
+
+	public void setSwBtnBuscar(boolean swBtnBuscar) {
+		this.swBtnBuscar = swBtnBuscar;
+	}
+
+	public String getValorBusqueda() {
+		return valorBusqueda;
+	}
+
+	public void setValorBusqueda(String valorBusqueda) {
+		this.valorBusqueda = valorBusqueda;
+	}
+
+	public List<DetalleFlujo> getListaDetalleFlujo() {
+		listaDetalleFlujo.clear();
+
+		if (campaniaSelec != 0L && inscripcionSelec != null)
+			listaDetalleFlujo = detalleFlujoService.getListaDetalleFlujo(
+					campaniaSelec, inscripcionSelec.getId()
+							.getIdGerentePublico(), ACTIVIDAD_TEMPORIZADA);
+
+		return listaDetalleFlujo;
+	}
+
+	public void setListaDetalleFlujo(List<DetalleFlujo> listaDetalleFlujo) {
+		this.listaDetalleFlujo = listaDetalleFlujo;
+	}
+
+	public List<Notificacion> getListaNotificacion() {
+		listaNotificacion.clear();
+		if (campaniaSelec != 0L && inscripcionSelec != null
+				&& detalleFlujo != null)
+			listaNotificacion = notificacionService
+					.getListaNotificacion(detalleFlujo.getId());
+
+		return listaNotificacion;
+	}
+
+	public void setListaNotificacion(List<Notificacion> listaNotificacion) {
+		this.listaNotificacion = listaNotificacion;
+	}
+
+	public void validarSesion() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		userSesion = (Usuario) context.getExternalContext().getSessionMap()
+				.get("userSesion");
+
+		if (userSesion == null) {
+			String ctxPath = context.getExternalContext()
+					.getRequestContextPath();
+			try {
+				context.getExternalContext().redirect(ctxPath + "/login.jsf");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void limpiar() {
+		inscripcionSelec = null;
+		nombreGerente = "";
+		swBtnBuscar = true;
+		campaniaSelec = 0L;
+	}
+
+	public void reenviarMensaje() {
+		validarSesion();
+		try {
+			String correos = "";
+			Usuario usuario = new Usuario();
+			usuario.setApPaterno(inscripcionSelec.getAsignacionGerenteV()
+					.getAp_paterno().toLowerCase());
+			usuario.setDni(inscripcionSelec.getAsignacionGerenteV().getDni());
+
+			ParametroSistema param = parametroSistemaService
+					.find(Constantes.ID_URL_CONFIRMACION);
+
+			mensajeSelec.setCuerpo(FormatTemplateMessage.textMessage(
+					mensajeSelec.getCuerpo(), detalleFlujo.getId(), usuario,
+					param.getValor()));
+			// Validando Correo
+			if (!inscripcionSelec.getAsignacionGerenteV().getMail_01().trim()
+					.isEmpty())
+				correos = inscripcionSelec.getAsignacionGerenteV().getMail_01();
+			if (!inscripcionSelec.getAsignacionGerenteV().getMail_02().trim()
+					.isEmpty())
+				correos += ","
+						+ inscripcionSelec.getAsignacionGerenteV().getMail_02();
+			if (!inscripcionSelec.getAsignacionGerenteV().getMail_03().trim()
+					.isEmpty())
+				correos += ","
+						+ inscripcionSelec.getAsignacionGerenteV().getMail_03();
+
+			javaMailService.enviar(mensajeSelec, correos);
+			detalleFlujo.setNroEnvios(detalleFlujo.getNroEnvios() + 1);
+            
+			Notificacion notificacion = new Notificacion();
+			NotificacionPK notificacionPK = new NotificacionPK();
+			notificacionPK.setIdActividad(detalleFlujo.getId().getIdActividad());
+			notificacionPK.setIdCampania(detalleFlujo.getId().getIdCampania());
+			notificacionPK.setIdGerentePublico(detalleFlujo.getId().getIdGerentePublico());
+			notificacionPK.setIdProceso(detalleFlujo.getId().getIdProceso());
+			notificacionPK.setIdMensaje(mensajeSelec.getId().getIdMensaje());
+			notificacionPK.setIdNotificacion(notificacionService
+					.getMaxId(detalleFlujo.getId()));
+			notificacion.setId(notificacionPK);
+			notificacion.setEstado(Constantes.ACTIVO);
+			notificacion.setUsuarioRegistra(userSesion.getUsuario());
+			notificacion.setFechaCreacion(new Date());
+
+			notificacionService.save(notificacion);
+			detalleFlujoService.edit(detalleFlujo);
+
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+							"Mensanje Reenviado "));
+
+		} catch (Exception e) {
+			logger.info("ERRROR AL REENVIAR MENSAJE");
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "ERROR",
+							"Mensaje no Reenviado"));
+		}
+	}
+
+}

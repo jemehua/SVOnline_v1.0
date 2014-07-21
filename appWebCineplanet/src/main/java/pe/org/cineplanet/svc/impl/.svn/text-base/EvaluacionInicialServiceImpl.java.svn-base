@@ -1,0 +1,55 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.EvaluacionInicialDao;
+import gob.servir.desempenio.model.EvaluacionInicial;
+import gob.servir.desempenio.model.EvaluacionInicialPK;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.service.EvaluacionInicialService;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Service
+public class EvaluacionInicialServiceImpl implements EvaluacionInicialService {
+
+	@Autowired
+	private EvaluacionInicialDao evaluacionInicialDao;
+
+	@Transactional
+	public EvaluacionInicial find(EvaluacionInicialPK id) {
+		return evaluacionInicialDao.find(id);
+	}
+
+	@Transactional
+	public EvaluacionInicial save(EvaluacionInicial obj) {
+		return evaluacionInicialDao.save(obj);
+	}
+
+	@Transactional
+	public EvaluacionInicial edit(EvaluacionInicial obj) {
+		return evaluacionInicialDao.edit(obj);
+
+	}
+
+	public List<EvaluacionInicial> getListaEvaluacionInicial() {
+		return evaluacionInicialDao.getListaEvaluacionInicial();
+	}
+
+	public List<EvaluacionInicial> getListaEvaluacionInicial(InscripcionPK id,
+			int opcion) {
+		return evaluacionInicialDao.getListaEvaluacionInicial(id, opcion);
+	}
+
+	public Integer getCountEvaluacionInicial(Inscripcion inscripcionSelec) {		
+		return evaluacionInicialDao.getCountEvaluacionInicial(inscripcionSelec);
+	}
+
+}

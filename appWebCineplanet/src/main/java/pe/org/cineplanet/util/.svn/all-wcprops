@@ -1,0 +1,83 @@
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/repservir/!svn/ver/1527/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/util
+END
+AccesoJdbc.java
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/repservir/!svn/ver/363/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/util/AccesoJdbc.java
+END
+Constantes.java
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/repservir/!svn/ver/1624/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/util/Constantes.java
+END
+Mail.java
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/repservir/!svn/ver/1527/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/util/Mail.java
+END
+Message.java
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/repservir/!svn/ver/906/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/util/Message.java
+END
+Fecha.java
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/repservir/!svn/ver/1131/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/util/Fecha.java
+END
+Evaluacion.java
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/repservir/!svn/ver/1337/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/util/Evaluacion.java
+END
+StringUtils.java
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/repservir/!svn/ver/1307/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/util/StringUtils.java
+END
+TemplateReporteServir.java
+K 25
+svn:wc:ra_dav:version-url
+V 123
+/repservir/!svn/ver/1325/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/util/TemplateReporteServir.java
+END
+Seguridad.java
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/repservir/!svn/ver/1665/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/util/Seguridad.java
+END
+EncriptacionAES.java
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/repservir/!svn/ver/1667/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/util/EncriptacionAES.java
+END
+FormatTemplateMessage.java
+K 25
+svn:wc:ra_dav:version-url
+V 123
+/repservir/!svn/ver/1663/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/util/FormatTemplateMessage.java
+END
+NumRomano.java
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/repservir/!svn/ver/620/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/util/NumRomano.java
+END
+Archivo.java
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/repservir/!svn/ver/906/desempenio/branches/desempenio/src/main/java/gob/servir/desempenio/util/Archivo.java
+END

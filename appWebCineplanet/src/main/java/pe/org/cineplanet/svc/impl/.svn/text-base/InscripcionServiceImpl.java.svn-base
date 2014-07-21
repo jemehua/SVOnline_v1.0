@@ -1,0 +1,88 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.InscripcionDao;
+import gob.servir.desempenio.dto.Monitoreo;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.InscripcionService;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Service
+public class InscripcionServiceImpl implements InscripcionService {
+
+	@Autowired
+	private InscripcionDao inscripcionDao;
+
+	public Inscripcion find(InscripcionPK id) {
+		return inscripcionDao.find(id);
+	}
+
+	@Transactional
+	public Inscripcion save(Inscripcion obj) {
+		return inscripcionDao.save(obj);
+	}
+
+	@Transactional
+	public Inscripcion edit(Inscripcion obj) {
+		return inscripcionDao.edit(obj);
+
+	}
+
+	public List<Inscripcion> getListaInscripcion() {
+		return inscripcionDao.getListaInscripcion();
+	}
+
+	public List<Inscripcion> getListaGerentePublico(Long idCampania) {
+		return inscripcionDao.getListaGerentePublico(idCampania);
+	}
+
+	public List<Inscripcion> getListaInscripcion(Long idCampania, int opcion) {
+		return inscripcionDao.getListaInscripcion(idCampania, opcion);
+	}
+
+	/*public List<Inscripcion> getListaInscripcion(Long idCampania,
+			String valorBusqueda) {
+		return inscripcionDao.getListaInscripcion(idCampania, valorBusqueda);
+	}
+
+	public List<Inscripcion> getListaInscripcion2(Long idCampania,
+			String valorBusqueda) {
+		return inscripcionDao.getListaInscripcion2(idCampania, valorBusqueda);
+	}*/
+
+	@Transactional
+	public boolean delete(InscripcionPK inscripcionPK) {
+		return inscripcionDao.delete(inscripcionPK);
+	}
+
+	public Inscripcion getInscripcionUsuario(Usuario usuario) {
+		return inscripcionDao.getInscripcionUsuario(usuario);
+	}
+	
+	public String  validarInscripcion(InscripcionPK id) {
+		return inscripcionDao.validarInscripcion(id);
+	}
+	
+	public List<Inscripcion> getListaInscripcionActivo(String codGerente) {
+		return inscripcionDao.getListaInscripcionActivo(codGerente);
+	}
+	
+	public List<Inscripcion> getListGpEvaCulminado(Long idCampania, Long idPuestoTipo, Long idEntidad) {
+		return inscripcionDao.getListGpEvaCulminado(idCampania, idPuestoTipo, idEntidad); 
+	}
+	
+	public List<Monitoreo> getListaMonitoreo(Long idCampania) {
+		return inscripcionDao.getListaMonitoreo(idCampania); 
+	}
+
+}

@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<h:outputStylesheet name="css/cssContent.css" />
+</h:head>
+<h:body>
+	<script type="text/javascript" src="./resources/js/calendario.js"></script>
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datos" header="Plan de Desarrollo de Competencias">
+		<p:spacer height="10" />
+		<p:panelGrid styleClass="panelGrid">
+			<p:row>
+				<p:column width="30">#{messages.lblCampania}
+				</p:column>
+				<p:column width="70">
+					<h:outputLabel
+						value="#{planCompetenciasController.inscripcionSelec.campania}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblGerentePublico}
+				</p:column>
+				<p:column>
+					<h:outputLabel
+						value="#{planCompetenciasController.inscripcionSelec.asignacionGerenteV} " />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblPuesto}
+				</p:column>
+				<p:column>
+					<h:outputText
+						value="#{planCompetenciasController.inscripcionSelec.puestoTipoV}" />
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+		<p:spacer height="10" />
+		<p:dataTable var="evaInicial"
+			value="#{planCompetenciasController.listaCompetencias}" id="dtComp"
+			rows="7" selection="#{planCompetenciasController.evaInicialSelec}"
+			emptyMessage="#{messages.msgEmptyMessage}" selectionMode="single"
+			rowKey="#{evaInicial.id.idCompetencia}">
+
+			<p:ajax event="rowSelect"
+				listener="#{planCompetenciasController.onRowSelect}"
+				update=":frm:pgPlan" />
+
+			<f:facet name="header">  
+            Lista de Competencias [Brecha > 0]
+            </f:facet>
+
+			<p:column headerText="#{messages.lblCodigo}" style="width:10%">
+				<h:outputText value="#{evaInicial.id.idCompetencia}" />
+			</p:column>
+			<p:column headerText="Competencia" style="width:60%">
+				<h:outputText
+					value="#{evaInicial.competencia.competencia.denominacion}" />
+			</p:column>
+			<p:column headerText="Nivel Deseado" style="width:10%">
+				<h:outputText value="#{evaInicial.competencia.nivelDeseado}" />
+			</p:column>
+			<p:column headerText="Eval.Inicial" style="width:10%">
+				<h:outputText value="#{evaInicial.nota}" />
+			</p:column>
+			<p:column headerText="Brecha" style="width:10%">
+				<h:outputText value="#{evaInicial.brecha}" />
+			</p:column>
+			<f:facet name="footer">
+				<div class="mensaje">Seleccione un registro e ingrese Plan de
+					Desarrollo (Max. para 2 competencias)</div>
+			</f:facet>
+
+		</p:dataTable>
+		<p:spacer height="10" />
+		<p:panelGrid id="pgPlan" styleClass="panelGrid">
+			<p:focus context="pgPlan" />
+			<p:row>
+				<p:column>Competencia<h:outputText value="*"
+						styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<h:outputLabel value="#{planCompetenciasController.competencia}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>Actividad de Capacitación<h:outputText
+						value="*" styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<p:inputText
+						value="#{planCompetenciasController.planDesarrollo.actCapacitacion}"
+						tabindex="1" maxlength="500" styleClass="txt" style="width:327px;" />
+					<p:spacer height="8" />
+						Fecha Culminación<h:outputText value="*" styleClass="obligatorio" />
+					<p:spacer height="5" />
+					<p:calendar id="hastaC" locale="es"
+						value="#{planCompetenciasController.planDesarrollo.fechaFinCapacitacion}"
+						showOn="button" navigator="true" tabindex="2" pattern="dd/MM/yyyy">
+						<f:convertDateTime type="date" dateStyle="short"
+							pattern="dd/MM/yyyy" />
+					</p:calendar>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>Actividad de Entrenamiento<h:outputText
+						value="*" styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<p:inputText
+						value="#{planCompetenciasController.planDesarrollo.actEntrenamiento}"
+						tabindex="3" maxlength="500" styleClass="txt" style="width:327px;" />
+					<p:spacer height="8" />
+						Fecha Culminación<h:outputText value="*" styleClass="obligatorio" />
+					<p:spacer height="5" />
+					<p:calendar id="hastaE" locale="es"
+						value="#{planCompetenciasController.planDesarrollo.fechaFinEntrenamiento}"
+						showOn="button" navigator="true" tabindex="4" pattern="dd/MM/yyyy">
+						<f:convertDateTime type="date" dateStyle="short"
+							pattern="dd/MM/yyyy" />
+					</p:calendar>
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+		<p:separator height="0" />
+		<table style="width: 100%">
+			<tr>
+				<td align="left"><p:commandButton value="Guardar"
+						id="btnGuardar" action="#{planCompetenciasController.guardar}"
+						update="dtComp,pgPlan,messages" icon="ui-icon-disk" tabindex="5"
+						disabled="#{planCompetenciasController.swFlujo}" /> <p:commandButton
+						value="#{messages.btnCancelar}" update="datos,messages"
+						action="#{planCompetenciasController.limpiar}"
+						icon="ui-icon-close" tabindex="6" /></td>
+				<td align="right"><p:commandButton value="Continuar"
+						update="datos,messages" id="btnFlujo"
+						onclick="confirmacion.show()" icon="ui-icon-circle-arrow-e"
+						tabindex="7" disabled="#{planCompetenciasController.swFlujo}" /></td>
+			</tr>
+		</table>
+	</p:panel>
+
+	<p:confirmDialog message="¿Estás seguro de continuar?"
+		showEffect="fade" hideEffect="fade"
+		header="Plan de Desarrollo de Competencias" widgetVar="confirmacion">
+		<table style="width: 100%">
+			<tr>
+				<td align="center"><p:commandButton value="Si"
+						style="width:50px" styleClass="ui-confirmdialog-yes"
+						icon="ui-icon-check" oncomplete="confirmacion.hide()"
+						update="datos,messages"
+						action="#{planCompetenciasController.atenderFlujo}">
+					</p:commandButton> <p:spacer width="10" /> <p:commandButton value="No"
+						style="width:50px" styleClass="ui-confirmdialog-no"
+						icon="ui-icon-close" onclick="confirmacion.hide()" /></td>
+			</tr>
+		</table>
+	</p:confirmDialog>
+</h:body>
+<p:ajaxStatus
+	style="width:64px;height:64px;position:fixed;right:5px;bottom:5px"
+	id="ajaxStatusPanel">
+	<f:facet name="start">
+		<p:graphicImage value="./images/loading.gif" />
+	</f:facet>
+
+	<f:facet name="complete">
+		<h:outputText value="" />
+	</f:facet>
+</p:ajaxStatus>
+</html>

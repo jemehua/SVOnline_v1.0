@@ -1,0 +1,21 @@
+package gob.servir.desempenio.serviceImpl;
+
+import java.util.List;
+
+import gob.servir.desempenio.dao.DetalleTipoCompetenciaDAO;
+import gob.servir.desempenio.model.DetalleTipoCompetencia;
+import gob.servir.desempenio.service.DetalleTipoCompetenciaService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class DetalleTipoCompetenciaServiceImpl implements DetalleTipoCompetenciaService{
+	@Autowired
+	private DetalleTipoCompetenciaDAO detalleTipoCompetenciaDAO;
+	
+	public List<DetalleTipoCompetencia> find(Long id) {
+		return detalleTipoCompetenciaDAO.find(id);
+	}
+
+}

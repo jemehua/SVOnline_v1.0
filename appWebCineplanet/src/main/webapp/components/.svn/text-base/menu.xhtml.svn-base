@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+<h:head>
+
+</h:head>
+<h:body>
+	<ui:composition>
+		<p:panelMenu>
+
+			<p:submenu id="adm" label="Administración">
+				<c:forEach items="#{contenidoController.listaPermisoAdm}"
+					var="adm">
+					<p:menuitem value="#{adm.itemMenu.nombre}" update="content"
+						icon="ui-icon-carat-1-e" immediate="true">
+						<f:setPropertyActionListener
+							target="#{contenidoController.includedPage}"
+							value="#{adm.itemMenu.urlXhtml}" />
+					</p:menuitem>
+				</c:forEach>
+			</p:submenu>
+
+			<p:separator />
+			<p:submenu label="Operaciones">
+				<c:forEach items="#{contenidoController.listaPermisoOpe}"
+					var="ope">
+					<p:menuitem value="#{ope.itemMenu.nombre}" update="content"
+						icon="ui-icon-carat-1-e" immediate="true">
+						<f:setPropertyActionListener
+							target="#{contenidoController.includedPage}"
+							value="#{ope.itemMenu.urlXhtml}" />
+					</p:menuitem>
+				</c:forEach>
+			</p:submenu>
+			<p:separator />
+			<p:submenu label="Evaluación">
+				<c:forEach items="#{contenidoController.listaPermisoMon}"
+					var="mon">
+					<p:menuitem value="#{mon.itemMenu.nombre}" update="content"
+						icon="ui-icon-carat-1-e" immediate="true">
+						<f:setPropertyActionListener
+							target="#{contenidoController.includedPage}"
+							value="#{mon.itemMenu.urlXhtml}" />
+					</p:menuitem>
+				</c:forEach>
+			</p:submenu>
+			<p:submenu label="Notificación">
+				<c:forEach items="#{contenidoController.listaPermisoNoti}"
+					var="noti">
+					<p:menuitem value="#{noti.itemMenu.nombre}" update="content"
+						icon="ui-icon-carat-1-e" immediate="true">
+						<f:setPropertyActionListener
+							target="#{contenidoController.includedPage}"
+							value="#{noti.itemMenu.urlXhtml}" />
+					</p:menuitem>
+				</c:forEach>
+			</p:submenu>
+			<p:submenu label="Reportes">
+				<c:forEach items="#{contenidoController.listaPermisoRep}"
+					var="rep">
+					<p:menuitem value="#{rep.itemMenu.nombre}" update="content"
+						icon="ui-icon-carat-1-e" immediate="true">
+						<f:setPropertyActionListener
+							target="#{contenidoController.includedPage}"
+							value="#{rep.itemMenu.urlXhtml}" />
+					</p:menuitem>
+				</c:forEach>
+			</p:submenu>
+		</p:panelMenu>
+	</ui:composition>
+</h:body>
+</html>

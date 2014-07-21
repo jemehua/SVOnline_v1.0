@@ -1,0 +1,19 @@
+package gob.servir.desempenio.service;
+
+import gob.servir.desempenio.model.PuestoTipoV;
+
+import java.util.List;
+
+import javax.faces.model.SelectItem;
+
+/**
+ * 
+ * @author Hever Pumallihua García
+ */
+public interface PuestoTipoVService {
+
+	public abstract PuestoTipoV find(Long id);
+
+	public abstract List<SelectItem> getComboPuestoTipo();
+
+}

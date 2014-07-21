@@ -1,0 +1,60 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.JefeInmediatoDao;
+import gob.servir.desempenio.model.JefeInmediato;
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Repository
+public class JefeInmediatoDaoImpl implements JefeInmediatoDao {
+	@PersistenceContext
+	private EntityManager em;
+
+	@Transactional
+	public JefeInmediato save(JefeInmediato obj) {
+		try {
+			em.persist(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public JefeInmediato edit(JefeInmediato obj) {
+		try {
+			return em.merge(obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public JefeInmediato find(String id) {
+
+		try {
+			return em.find(JefeInmediato.class, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+
+	}
+
+	public List<JefeInmediato> getListaJefeInmediato() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}

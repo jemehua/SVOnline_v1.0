@@ -1,0 +1,277 @@
+package gob.servir.desempenio.model;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+
+/**
+ * 
+ * @author Hever Pumallihua García
+ */
+@Entity
+@NamedQueries({ @NamedQuery(name = "EntidadDestinoV.getListaEntidadDestino", query = "SELECT e FROM EntidadDestinoV e ORDER BY e.desc_ed ASC ") })
+public class EntidadDestinoV implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	private Long id_ed;
+	@Column
+	private String desc_ed;
+	@Column
+	private String te_numero_documento;
+	@Column
+	private String te_nombres;
+	@Column
+	private String te_apellido_paterno;
+	@Column
+	private String te_apellido_materno;
+	@Column
+	private String te_correo_electronico_trabajo;
+	@Column
+	private String te_correo_electronico_personal;
+	@Column
+	private String te_telefono_oficina;
+	@Column
+	private String te_telefono_celular;
+	@Column
+	private String te_cargo;
+
+	public EntidadDestinoV() {
+		super();
+	}
+
+	public Long getId_ed() {
+		return id_ed;
+	}
+
+	public void setId_ed(Long id_ed) {
+		this.id_ed = id_ed;
+	}
+
+	public String getDesc_ed() {
+		return desc_ed;
+	}
+
+	public void setDesc_ed(String desc_ed) {
+		this.desc_ed = desc_ed;
+	}
+
+	public String getTe_numero_documento() {
+		return te_numero_documento;
+	}
+
+	public void setTe_numero_documento(String te_numero_documento) {
+		this.te_numero_documento = te_numero_documento;
+	}
+
+	public String getTe_nombres() {
+		return te_nombres;
+	}
+
+	public void setTe_nombres(String te_nombres) {
+		this.te_nombres = te_nombres;
+	}
+
+	public String getTe_apellido_paterno() {
+		return te_apellido_paterno;
+	}
+
+	public void setTe_apellido_paterno(String te_apellido_paterno) {
+		this.te_apellido_paterno = te_apellido_paterno;
+	}
+
+	public String getTe_apellido_materno() {
+		return te_apellido_materno;
+	}
+
+	public void setTe_apellido_materno(String te_apellido_materno) {
+		this.te_apellido_materno = te_apellido_materno;
+	}
+
+	public String getTe_correo_electronico_trabajo() {
+		return te_correo_electronico_trabajo;
+	}
+
+	public void setTe_correo_electronico_trabajo(
+			String te_correo_electronico_trabajo) {
+		this.te_correo_electronico_trabajo = te_correo_electronico_trabajo;
+	}
+
+	public String getTe_correo_electronico_personal() {
+		return te_correo_electronico_personal;
+	}
+
+	public void setTe_correo_electronico_personal(
+			String te_correo_electronico_personal) {
+		this.te_correo_electronico_personal = te_correo_electronico_personal;
+	}
+
+	public String getTe_telefono_oficina() {
+		return te_telefono_oficina;
+	}
+
+	public void setTe_telefono_oficina(String te_telefono_oficina) {
+		this.te_telefono_oficina = te_telefono_oficina;
+	}
+
+	public String getTe_telefono_celular() {
+		return te_telefono_celular;
+	}
+
+	public void setTe_telefono_celular(String te_telefono_celular) {
+		this.te_telefono_celular = te_telefono_celular;
+	}
+
+	public String getTe_cargo() {
+		return te_cargo;
+	}
+
+	public void setTe_cargo(String te_cargo) {
+		this.te_cargo = te_cargo;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((desc_ed == null) ? 0 : desc_ed.hashCode());
+		result = prime * result + ((id_ed == null) ? 0 : id_ed.hashCode());
+		result = prime
+				* result
+				+ ((te_apellido_materno == null) ? 0 : te_apellido_materno
+						.hashCode());
+		result = prime
+				* result
+				+ ((te_apellido_paterno == null) ? 0 : te_apellido_paterno
+						.hashCode());
+		result = prime * result
+				+ ((te_cargo == null) ? 0 : te_cargo.hashCode());
+		result = prime
+				* result
+				+ ((te_correo_electronico_personal == null) ? 0
+						: te_correo_electronico_personal.hashCode());
+		result = prime
+				* result
+				+ ((te_correo_electronico_trabajo == null) ? 0
+						: te_correo_electronico_trabajo.hashCode());
+		result = prime * result
+				+ ((te_nombres == null) ? 0 : te_nombres.hashCode());
+		result = prime
+				* result
+				+ ((te_numero_documento == null) ? 0 : te_numero_documento
+						.hashCode());
+		result = prime
+				* result
+				+ ((te_telefono_celular == null) ? 0 : te_telefono_celular
+						.hashCode());
+		result = prime
+				* result
+				+ ((te_telefono_oficina == null) ? 0 : te_telefono_oficina
+						.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		EntidadDestinoV other = (EntidadDestinoV) obj;
+		if (desc_ed == null) {
+			if (other.desc_ed != null)
+				return false;
+		} else if (!desc_ed.equals(other.desc_ed))
+			return false;
+		if (id_ed == null) {
+			if (other.id_ed != null)
+				return false;
+		} else if (!id_ed.equals(other.id_ed))
+			return false;
+		if (te_apellido_materno == null) {
+			if (other.te_apellido_materno != null)
+				return false;
+		} else if (!te_apellido_materno.equals(other.te_apellido_materno))
+			return false;
+		if (te_apellido_paterno == null) {
+			if (other.te_apellido_paterno != null)
+				return false;
+		} else if (!te_apellido_paterno.equals(other.te_apellido_paterno))
+			return false;
+		if (te_cargo == null) {
+			if (other.te_cargo != null)
+				return false;
+		} else if (!te_cargo.equals(other.te_cargo))
+			return false;
+		if (te_correo_electronico_personal == null) {
+			if (other.te_correo_electronico_personal != null)
+				return false;
+		} else if (!te_correo_electronico_personal
+				.equals(other.te_correo_electronico_personal))
+			return false;
+		if (te_correo_electronico_trabajo == null) {
+			if (other.te_correo_electronico_trabajo != null)
+				return false;
+		} else if (!te_correo_electronico_trabajo
+				.equals(other.te_correo_electronico_trabajo))
+			return false;
+		if (te_nombres == null) {
+			if (other.te_nombres != null)
+				return false;
+		} else if (!te_nombres.equals(other.te_nombres))
+			return false;
+		if (te_numero_documento == null) {
+			if (other.te_numero_documento != null)
+				return false;
+		} else if (!te_numero_documento.equals(other.te_numero_documento))
+			return false;
+		if (te_telefono_celular == null) {
+			if (other.te_telefono_celular != null)
+				return false;
+		} else if (!te_telefono_celular.equals(other.te_telefono_celular))
+			return false;
+		if (te_telefono_oficina == null) {
+			if (other.te_telefono_oficina != null)
+				return false;
+		} else if (!te_telefono_oficina.equals(other.te_telefono_oficina))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("EntidadDestinoV [id_ed=");
+		builder.append(id_ed);
+		builder.append(", desc_ed=");
+		builder.append(desc_ed);
+		builder.append(", te_numero_documento=");
+		builder.append(te_numero_documento);
+		builder.append(", te_nombres=");
+		builder.append(te_nombres);
+		builder.append(", te_apellido_paterno=");
+		builder.append(te_apellido_paterno);
+		builder.append(", te_apellido_materno=");
+		builder.append(te_apellido_materno);
+		builder.append(", te_correo_electronico_trabajo=");
+		builder.append(te_correo_electronico_trabajo);
+		builder.append(", te_correo_electronico_personal=");
+		builder.append(te_correo_electronico_personal);
+		builder.append(", te_telefono_oficina=");
+		builder.append(te_telefono_oficina);
+		builder.append(", te_telefono_celular=");
+		builder.append(te_telefono_celular);
+		builder.append(", te_cargo=");
+		builder.append(te_cargo);
+		builder.append("]");
+		return builder.toString();
+	}
+
+}

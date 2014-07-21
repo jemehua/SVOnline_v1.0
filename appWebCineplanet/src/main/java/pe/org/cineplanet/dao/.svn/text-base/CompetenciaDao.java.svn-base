@@ -1,0 +1,29 @@
+package gob.servir.desempenio.dao;
+
+import gob.servir.desempenio.model.Competencia;
+import gob.servir.desempenio.model.CompetenciaPK;
+
+import java.util.List;
+
+/**
+ * 
+ * @author Cristhian Munguia Martinez
+ */
+public interface CompetenciaDao {
+	public abstract Competencia save(Competencia obj);
+
+	public abstract Competencia edit(Competencia obj);
+
+	public abstract Competencia find(CompetenciaPK id);
+
+	public abstract List<Competencia> getListaCompetencia(Long idPuestoTipo);
+
+	public abstract List<Competencia> getListaPerfil(Long idPuestoTipo);
+
+	public abstract List<Competencia> getListaPerfil();
+
+	public abstract Integer getCountNivelDeseado(Long puestoSelec);
+	
+	public abstract Integer getCountNivelDeseadoConfirmado(Long puestoSelec);
+
+}

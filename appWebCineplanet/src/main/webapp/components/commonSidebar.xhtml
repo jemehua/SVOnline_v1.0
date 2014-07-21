@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+<style>
+     ul.ui-menu-child {
+     width: 200px !important;
+        }
+ </style>
+	<p:menubar> 
+		<p:submenu label="Administración">
+			<c:forEach items="#{contenidoController.listaPermisoAdm}" var="adm">
+				<p:menuitem value="#{adm.itemMenu.nombre}" update="content"
+					icon="ui-icon-carat-1-e" immediate="true" >
+					<f:setPropertyActionListener
+						target="#{contenidoController.includedPage}"
+						value="#{adm.itemMenu.urlXhtml}" />
+				</p:menuitem> 
+			</c:forEach>
+		</p:submenu>
+
+		<p:submenu label="Operaciones">
+			<c:forEach items="#{contenidoController.listaPermisoOpe}" var="ope">
+				<p:menuitem value="#{ope.itemMenu.nombre}" update="content"
+					icon="ui-icon-carat-1-e" immediate="true">
+					<f:setPropertyActionListener
+						target="#{contenidoController.includedPage}"
+						value="#{ope.itemMenu.urlXhtml}" />
+				</p:menuitem>
+			</c:forEach>
+		</p:submenu>
+	
+	</p:menubar>
+</ui:composition>

@@ -1,0 +1,22 @@
+package gob.servir.desempenio.service;
+
+import java.util.List;
+
+import javax.faces.model.SelectItem;
+
+import gob.servir.desempenio.model.EntidadDestinoV;
+
+import org.springframework.stereotype.Service;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Service
+public interface EntidadDestinoVService {
+
+	public abstract EntidadDestinoV find(Long id);
+	
+	public abstract List<SelectItem> getComboEntidadDestino();
+
+}

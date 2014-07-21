@@ -1,0 +1,107 @@
+package gob.servir.desempenio.model;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Entity
+@NamedQueries({
+		@NamedQuery(name = "Rol.getAllListaRol", query = "SELECT r FROM Rol r order by r.idRol"),
+		@NamedQuery(name = "Rol.getListaRolByNombre", query = "SELECT r FROM Rol r WHERE r.nombre = :nombre") })
+public class Rol implements Serializable {
+
+	private static final long serialVersionUID = -1308795024262635690L;
+
+	@Id
+	private Long idRol;
+	@Column
+	private String nombre;
+	@Column
+	private String estado;
+
+	public Rol() {
+	}
+
+	public Long getIdRol() {
+		return idRol;
+	}
+
+	public void setIdRol(Long idRol) {
+		this.idRol = idRol;
+	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	public String getEstado() {
+		return estado;
+	}
+
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((estado == null) ? 0 : estado.hashCode());
+		result = prime * result + ((idRol == null) ? 0 : idRol.hashCode());
+		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Rol other = (Rol) obj;
+		if (estado == null) {
+			if (other.estado != null)
+				return false;
+		} else if (!estado.equals(other.estado))
+			return false;
+		if (idRol == null) {
+			if (other.idRol != null)
+				return false;
+		} else if (!idRol.equals(other.idRol))
+			return false;
+		if (nombre == null) {
+			if (other.nombre != null)
+				return false;
+		} else if (!nombre.equals(other.nombre))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Rol [idRol=");
+		builder.append(idRol);
+		builder.append(", nombre=");
+		builder.append(nombre);
+		builder.append(", estado=");
+		builder.append(estado);
+		builder.append("]");
+		return builder.toString();
+	}
+
+}

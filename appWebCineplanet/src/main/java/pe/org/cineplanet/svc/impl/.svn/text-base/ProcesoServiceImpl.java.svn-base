@@ -1,0 +1,49 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.ProcesoDao;
+import gob.servir.desempenio.model.Proceso;
+import gob.servir.desempenio.service.ProcesoService;
+
+import java.util.List;
+
+import javax.faces.model.SelectItem;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Service
+public class ProcesoServiceImpl implements ProcesoService {
+
+	@Autowired
+	private ProcesoDao procesoDao;
+
+	@Transactional
+	public Proceso find(Long id) {
+		return procesoDao.find(id);
+	}
+
+	@Transactional
+	public Proceso save(Proceso obj) {
+		return procesoDao.save(obj);
+	}
+	
+	@Transactional
+	public Proceso edit(Proceso obj) {
+		return procesoDao.edit(obj);
+		
+	}
+
+	public List<Proceso> getListaProceso() {
+		return procesoDao.getListaProceso();
+	}
+	
+	public List<SelectItem> getComboProceso() {
+		return procesoDao.getComboProceso();
+	}
+
+}

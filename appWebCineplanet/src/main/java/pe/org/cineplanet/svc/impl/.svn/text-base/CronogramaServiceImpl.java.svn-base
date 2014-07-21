@@ -1,0 +1,62 @@
+package gob.servir.desempenio.serviceImpl;
+
+import gob.servir.desempenio.dao.CronogramaDao;
+import gob.servir.desempenio.model.Cronograma;
+import gob.servir.desempenio.model.CronogramaPK;
+import gob.servir.desempenio.model.Temporizador;
+import gob.servir.desempenio.service.CronogramaService;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Service
+public class CronogramaServiceImpl implements CronogramaService {
+
+	@Autowired
+	private CronogramaDao cronogramaDao;
+
+	@Transactional
+	public Cronograma find(CronogramaPK id) {
+		return cronogramaDao.find(id);
+	}
+
+	@Transactional
+	public Cronograma save(Cronograma obj) {
+		return cronogramaDao.save(obj);
+	}
+
+	@Transactional
+	public Cronograma save(Cronograma obj, int cantidadTemp) {
+		return cronogramaDao.save(obj, cantidadTemp);
+	}
+
+	@Transactional
+	public Cronograma save(Cronograma obj, List<Temporizador> listaTemporizador) {
+		return cronogramaDao.save(obj, listaTemporizador);
+	}
+
+	@Transactional
+	public Cronograma edit(Cronograma obj) {
+		return cronogramaDao.edit(obj);
+	}
+
+	public List<Cronograma> getListaCronograma() {
+		return cronogramaDao.getListaCronograma();
+	}
+
+	public List<Cronograma> getListaCronograma(Long idCampania) {
+		return cronogramaDao.getListaCronograma(idCampania);
+	}
+
+	public Long getMaxId(Long idCampania) {
+		return cronogramaDao.getMaxId(idCampania);
+	}
+
+}

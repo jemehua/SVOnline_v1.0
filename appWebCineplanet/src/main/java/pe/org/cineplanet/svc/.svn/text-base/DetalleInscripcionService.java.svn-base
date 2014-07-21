@@ -1,0 +1,50 @@
+package gob.servir.desempenio.service;
+
+import gob.servir.desempenio.dto.InscripcionGerente;
+import gob.servir.desempenio.model.DetalleInscripcion;
+import gob.servir.desempenio.model.DetalleInscripcionPK;
+import gob.servir.desempenio.model.EntidadDestinoV;
+import gob.servir.desempenio.model.JefeInmediatoV;
+import gob.servir.desempenio.model.Usuario;
+
+import java.util.List;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+public interface DetalleInscripcionService {
+
+	public abstract DetalleInscripcion find(DetalleInscripcionPK id);
+
+	public abstract DetalleInscripcion save(DetalleInscripcion obj);
+	
+	public abstract void saveTotal(DetalleInscripcion obj) throws Exception;
+
+	public abstract DetalleInscripcion edit(DetalleInscripcion obj);
+
+	public abstract List<DetalleInscripcion> getListaInscripcionDetalle();
+	
+	public abstract Long getMaxId();
+
+	public abstract List<DetalleInscripcion> getListaInscripcionDetalle(Long campaniaSelec);
+	
+	public abstract List<InscripcionGerente> getListaInscripcion(Long idCampania);
+	
+	public abstract List<DetalleInscripcion> getInscripcionCampaña(Long idCampania, Usuario usuario);
+	
+	public abstract List<DetalleInscripcion> getListaDetalleInscripcion(Long idCampania, String codGerente);
+	
+	public abstract DetalleInscripcion getDetalleInscripcion(Long idCampania, String codGerente);
+	
+	public abstract DetalleInscripcion getDetalleflujoJiAndTe(Long idCampania, String codGerente);
+	
+	public abstract void crearUsuarioJI(JefeInmediatoV ji, Long idCampania,
+			String anioCampania, String usrRegistra) throws Exception;
+	
+	public abstract void crearUsuarioTE(EntidadDestinoV ed, Long idCampania,
+			String anioCampania, String usrRegistra) throws Exception;
+	
+	public abstract List<String> getDetalleInscripcionUsuario(Usuario usuario);
+
+}

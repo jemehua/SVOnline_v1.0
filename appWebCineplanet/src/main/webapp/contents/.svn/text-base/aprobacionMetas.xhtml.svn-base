@@ -1,0 +1,150 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+	<h:outputStylesheet name="css/cssContent.css" />
+</h:head>
+<h:body>
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datos" header="Verificación de Indicadores y Metas">
+		<p:spacer height="10" />
+		<p:panelGrid styleClass="panelGrid">
+			<p:row>
+				<p:column width="30">#{messages.lblCampania}
+				</p:column>
+				<p:column width="70">
+					<h:outputLabel
+						value="#{aprobacionMetasController.inscripcionSelec.campania}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblGerentePublico}
+				</p:column>
+				<p:column>
+					<h:outputLabel
+						value="#{aprobacionMetasController.inscripcionSelec.asignacionGerenteV}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblPuesto}
+				</p:column>
+				<p:column>
+					<h:outputText
+						value="#{aprobacionMetasController.inscripcionSelec.puestoTipoV}" />
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+		<p:spacer height="10" />
+		<p:dataTable var="meta"
+			value="#{aprobacionMetasController.listaMetas}" id="dtMetas" rows="7"
+			emptyMessage="#{messages.msgEmptyMessage}">
+
+			<f:facet name="header">  
+            Lista de Metas
+            </f:facet>
+
+			<p:column headerText="#{messages.lblCodigo}" style="width:8%">
+				<h:outputText value="#{meta.id.idMeta}" />
+			</p:column>
+			<p:column headerText="Tipo Meta" style="width:8%">
+				<h:outputText value="#{meta.tipo}" />
+			</p:column>
+			<p:column headerText="Meta" style="width:35%; white-space: normal;text-align: justify;">
+				<h:outputText value="#{meta.denominacion}" />
+			</p:column>
+			<p:column headerText="Relación POI" style="width:33%; white-space: normal;text-align: justify;">
+				<h:outputText value="#{meta.relacionPOI}" />
+			</p:column>
+			<p:column headerText="Estado" style="width:8%">
+				<p:selectBooleanButton value="#{meta.aprobacion}" onLabel="Aprobado"
+					offLabel="Desaprobado" onIcon="ui-icon-check"
+					offIcon="ui-icon-close" style="height:18px"
+					disabled="#{aprobacionMetasController.swFlujo}">
+					<p:ajax listener="#{aprobacionMetasController.activarObservacion(meta)}"  immediate="true"/>
+				</p:selectBooleanButton>
+			</p:column>
+			<p:column headerText="Opciones" style="width:8%">
+				<p:commandButton value="" icon="ui-icon-pencil" id="btnObservacion"
+					title="Ingrese su Observación"
+					disabled="#{meta.aprobacion eq true ? true : false}"
+					oncomplete="dlgObserva.show()" update=":frm:pnlObservacion">
+					<f:setPropertyActionListener value="#{meta}"
+						target="#{aprobacionMetasController.nuevoMeta}" />
+				</p:commandButton>
+			</p:column>
+			<f:facet name="footer">
+				<div class="mensaje">Ud. puede Aprobar / Desaprobar las Metas
+					propuestas.</div>
+			</f:facet>
+		</p:dataTable>
+		<p:spacer height="10" />
+		<p:separator id="s1" />
+		<table style="width: 100%">
+			<tr>
+				<td align="left"><p:commandButton value="Guardar"
+						id="btnGuardar" action="#{aprobacionMetasController.guardar}"
+						update="datos,messages" icon="ui-icon-disk" tabindex="1"
+						disabled="#{aprobacionMetasController.swFlujo}" /></td>
+				<td align="right"><p:commandButton value="Continuar"
+						id="btnFlujo"						
+						icon="ui-icon-circle-arrow-e" tabindex="2"
+						disabled="#{aprobacionMetasController.swFlujo}" 
+						onclick="confirmacion.show()"/></td>
+			</tr>
+		</table>
+		<p:separator id="s2" />
+	</p:panel>
+
+	<p:dialog id="dlgObservacion"
+		header="Escriba su observación para la Meta seleccionada"
+		widgetVar="dlgObserva" modal="true" resizable="false"
+		showEffect="clip" closable="true" hideEffect="fold">
+		<p:panelGrid id="pnlObservacion" styleClass="panelGrid">
+			<p:focus context="pnlObservacion" />
+			<p:row>
+				<p:column>
+					<p:inputTextarea
+						value="#{aprobacionMetasController.nuevoMeta.observacion}"
+						rows="10" cols="100" autoResize="false" maxlength="3000" tabindex="1" />
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+		<f:facet name="footer">
+			<p:commandButton value="Guardar" update="pnlObservacion,dtMetas,messages" id="btnObs"
+				actionListener="#{aprobacionMetasController.grabarObservacion}"
+				icon="ui-icon-disk" oncomplete="dlgObserva.hide()" disabled="#{aprobacionMetasController.swFlujo}"/>
+		</f:facet>
+	</p:dialog>
+	
+		<p:confirmDialog message="¿Estás seguro de continuar?"
+		showEffect="fade" hideEffect="fade" header="Verificación de Indicadores y Metas"
+		widgetVar="confirmacion">
+		<table style="width: 100%">
+			<tr>
+				<td align="center"><p:commandButton value="Si"
+						style="width:50px" styleClass="ui-confirmdialog-yes"
+						icon="ui-icon-check" oncomplete="confirmacion.hide()"
+						update="btnFlujo,btnGuardar,dtMetas,btnObs,messages" action="#{aprobacionMetasController.atenderFlujo}">
+					</p:commandButton> <p:spacer width="10" /> <p:commandButton value="No"
+						style="width:50px" styleClass="ui-confirmdialog-no"
+						icon="ui-icon-close" onclick="confirmacion.hide()" /></td>
+			</tr>
+		</table>
+	</p:confirmDialog>
+
+</h:body>
+<p:ajaxStatus style="width:64px;height:64px;position:fixed;right:5px;bottom:5px" id="ajaxStatusPanel">  
+    <f:facet name="start">  
+        <p:graphicImage value="./images/loading.gif" /> 
+    </f:facet>  
+      
+    <f:facet name="complete">  
+        <h:outputText value="" />  
+    </f:facet>  
+</p:ajaxStatus> 
+</html>

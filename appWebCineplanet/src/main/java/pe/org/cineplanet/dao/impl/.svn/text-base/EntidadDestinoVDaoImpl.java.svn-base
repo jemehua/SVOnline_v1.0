@@ -1,0 +1,63 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.EntidadDestinoVDao;
+import gob.servir.desempenio.model.EntidadDestinoV;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.faces.model.SelectItem;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+@Repository
+public class EntidadDestinoVDaoImpl implements EntidadDestinoVDao {
+
+	@PersistenceContext
+	private EntityManager em;
+
+	@Transactional
+	public EntidadDestinoV find(Long id) {
+		return em.find(EntidadDestinoV.class, id);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<EntidadDestinoV> getListaEntidadDestino() {
+		Query q = null;
+		try {
+			q = em.createNamedQuery("EntidadDestinoV.getListaEntidadDestino");
+
+			return q.getResultList();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<SelectItem> getComboEntidadDestino() {
+
+		List<SelectItem> listaCombo = new ArrayList<SelectItem>();
+		List<EntidadDestinoV> lista = new ArrayList<EntidadDestinoV>();
+		try {
+			lista = getListaEntidadDestino();
+		} catch (Exception e) {
+			// e.printStackTrace();
+			SelectItem fila = new SelectItem(0L, "Seleccione Entidad Destino");
+			listaCombo.add(fila);
+			return listaCombo;
+		}
+		SelectItem fila = new SelectItem(0L, "Seleccione Entidad Destino");
+		listaCombo.add(fila);
+
+		for (EntidadDestinoV tipo : lista) {
+			fila = new SelectItem(tipo.getId_ed(), tipo.getDesc_ed());
+			listaCombo.add(fila);
+		}
+		return listaCombo;
+	}
+
+}

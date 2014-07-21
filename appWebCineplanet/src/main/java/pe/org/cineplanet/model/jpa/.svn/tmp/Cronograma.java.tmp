@@ -1,0 +1,193 @@
+package gob.servir.desempenio.model;
+
+import java.io.Serializable;
+import java.util.Calendar;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Entity
+@NamedQueries({
+		@NamedQuery(name = "Cronograma.getAllListaCronograma", query = "SELECT c FROM Cronograma c ORDER BY c.id.idCronograma "),
+		@NamedQuery(name = "Cronograma.getListaCronogramaCampania", query = "SELECT c.proceso.idProceso, c.proceso.denominacion, c.id, c.fechaInicio, c.fechaFin, c.estado "
+				+ "FROM Cronograma c "
+<<<<<<< .mine
+				+ "WHERE c.id.idCampania =:idCampania AND c.estado =:estado ORDER BY c.id.idProceso ASC "),
+		@NamedQuery(name = "Cronograma.getListaCronogramaCampaniaAndProceso", query = "select c "
+				+ "from Cronograma c "
+				+ "where c.id.idCampania =:idCampania and c.id.idProceso =:idProceso order by c.id.idProceso asc ") })
+=======
+				+ "WHERE c.id.idCampania =:idCampania AND c.estado =:estado AND c.tipo =:tipo ORDER BY c.id.idProceso ASC ") })
+>>>>>>> .r1648
+public class Cronograma implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@EmbeddedId
+	private CronogramaPK id;
+	@Column
+	private String estado;
+	@Column
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date fechaInicio;
+	@Column
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date fechaFin;
+	@Column
+	private String usuarioRegistra;
+	@Column
+	private String usuarioModifica;
+	@Column
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date fechaCreacion;
+	@Column
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date fechaModificacion;
+	@JoinColumn(name = "idCampania", referencedColumnName = "idCampania", insertable = false, updatable = false)
+	@ManyToOne(optional = false)
+	private Campania campania;
+	@JoinColumn(name = "idProceso", referencedColumnName = "idProceso", insertable = false, updatable = false)
+	@ManyToOne(optional = false)
+	private Proceso proceso;
+
+	public Cronograma() {
+		super();
+	}
+
+	public CronogramaPK getId() {
+		return id;
+	}
+
+	public void setId(CronogramaPK id) {
+		this.id = id;
+	}
+
+	public String getEstado() {
+		return estado;
+	}
+
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
+
+	public Date getFechaInicio() {
+		return fechaInicio;
+	}
+
+	public void setFechaInicio(Date fechaInicio) {
+		this.fechaInicio = fechaInicio;
+	}
+
+	public Date getFechaFin() {
+		return fechaFin;
+	}
+
+	public void setFechaFin(Date fechaFin) {
+		this.fechaFin = fechaFin;
+	}
+
+	public String getUsuarioRegistra() {
+		return usuarioRegistra;
+	}
+
+	public void setUsuarioRegistra(String usuarioRegistra) {
+		this.usuarioRegistra = usuarioRegistra;
+	}
+
+	public String getUsuarioModifica() {
+		return usuarioModifica;
+	}
+
+	public void setUsuarioModifica(String usuarioModifica) {
+		this.usuarioModifica = usuarioModifica;
+	}
+
+	public Date getFechaCreacion() {
+		return fechaCreacion;
+	}
+
+	public void setFechaCreacion(Date fechaCreacion) {
+		this.fechaCreacion = fechaCreacion;
+	}
+
+	public Date getFechaModificacion() {
+		return fechaModificacion;
+	}
+
+	public void setFechaModificacion(Date fechaModificacion) {
+		this.fechaModificacion = fechaModificacion;
+	}
+
+	public Campania getCampania() {
+		return campania;
+	}
+
+	public void setCampania(Campania campania) {
+		this.campania = campania;
+	}
+
+	public Proceso getProceso() {
+		return proceso;
+	}
+
+	public void setProceso(Proceso proceso) {
+		this.proceso = proceso;
+	}
+
+	@PrePersist
+	private void putFechaCreacion() {
+		setFechaCreacion(new Date(Calendar.getInstance().getTime().getTime()));
+	}
+
+	@PreUpdate
+	private void putFechaModificacion() {
+		setFechaModificacion(new Date(Calendar.getInstance().getTime()
+				.getTime()));
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Cronograma other = (Cronograma) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(id);
+		return builder.toString();
+	}
+
+}

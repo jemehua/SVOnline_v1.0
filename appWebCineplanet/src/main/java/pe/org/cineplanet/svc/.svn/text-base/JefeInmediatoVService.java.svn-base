@@ -1,0 +1,19 @@
+package gob.servir.desempenio.service;
+
+import gob.servir.desempenio.model.JefeInmediatoV;
+
+import java.util.List;
+
+/**
+ * 
+ * @author Hever Pumallihua García
+ */
+public interface JefeInmediatoVService {
+
+	public abstract JefeInmediatoV find(Long id);
+
+	public abstract JefeInmediatoV getNombreCompletoAndDni(Long id);
+	
+	public abstract List<JefeInmediatoV> getListaJefeInmediato();
+
+}

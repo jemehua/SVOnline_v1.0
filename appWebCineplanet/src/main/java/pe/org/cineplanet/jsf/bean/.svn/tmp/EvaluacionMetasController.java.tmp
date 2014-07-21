@@ -1,0 +1,768 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.model.Campania;
+import gob.servir.desempenio.model.DetalleFlujo;
+import gob.servir.desempenio.model.DetalleFlujoPK;
+import gob.servir.desempenio.model.EvaluacionMetas;
+import gob.servir.desempenio.model.EvaluacionMetasPK;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.Meta;
+import gob.servir.desempenio.model.PlanMetas;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.CampaniaService;
+import gob.servir.desempenio.service.DetalleFlujoService;
+import gob.servir.desempenio.service.EvaluacionMetasService;
+import gob.servir.desempenio.service.FlujoService;
+import gob.servir.desempenio.service.InscripcionService;
+import gob.servir.desempenio.service.MetaService;
+import gob.servir.desempenio.service.PlanMetasService;
+import gob.servir.desempenio.util.Message;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
+
+import org.primefaces.event.SelectEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+
+@Component("evaluacionMetasController")
+@Scope("session")
+public class EvaluacionMetasController implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private static final Logger logger = LoggerFactory
+			.getLogger(MetasController.class);
+
+	@Autowired
+	private CampaniaService campaniaService;
+	@Autowired
+	private MetaService metaService;
+	@Autowired
+	private InscripcionService inscripcionService;
+	@Autowired
+	private PlanMetasService planMetasService;
+	@Autowired
+	private EvaluacionMetasService evaluacionMetasService;
+	@Autowired
+	private FlujoService flujoService;
+	@Autowired
+	private DetalleFlujoService detalleFlujoService;
+
+	private Usuario userSesion = null;
+	private Message message = new Message();
+
+	private List<SelectItem> comboCampania = new ArrayList<SelectItem>();
+	private Long campaniaSelec = 0L;
+
+	private String nombreGerente = "";
+	private List<Inscripcion> listaGerentePublico = new ArrayList<Inscripcion>();
+	private boolean swBtnBuscar = true;
+	private boolean swBtnObservacion = false;
+
+	// Agregar
+	private Meta nuevoMeta = new Meta();
+	private List<SelectItem> comboTipoMeta = new ArrayList<SelectItem>();
+	private List<Meta> listaMetas = new ArrayList<Meta>();
+	private Integer totalPeso = 0;
+
+	// lista
+	private List<Inscripcion> listaInscripcion = new ArrayList<Inscripcion>();
+	private Inscripcion inscripcionSelec = null;
+
+	private List<Campania> listaCampania = new ArrayList<Campania>();
+
+	private PlanMetas planMetas = new PlanMetas();
+	private List<PlanMetas> listaPlanMetas = new ArrayList<PlanMetas>();
+	private List<PlanMetas> listaPlanMetas2 = new ArrayList<PlanMetas>();
+	private boolean swBtnUpdate = false;
+
+	private EvaluacionMetas evaluacionMetas = new EvaluacionMetas();
+	private List<EvaluacionMetas> listaEvaluacionMetas = new ArrayList<EvaluacionMetas>();
+
+	private String nota;
+	private SelectEvent event2;
+
+	private boolean swFlujo = true;
+	private static final Long P2_CUALITATIVA_METAS = 4L;
+
+	public EvaluacionMetasController() {
+
+	}
+
+	public boolean isSwFlujo() {
+
+		if (inscripcionSelec == null) {
+			swFlujo = false;
+		} else {
+			DetalleFlujo detalle = detalleFlujoService.find(new DetalleFlujoPK(
+					inscripcionSelec.getId().getIdCampania(), inscripcionSelec
+							.getId().getIdGerentePublico(), 2L,
+					P2_CUALITATIVA_METAS));
+
+			if (detalle != null) {
+				if (detalle.getEstado().equalsIgnoreCase("AT"))
+					swFlujo = true;
+				else
+					swFlujo = false;
+			} else
+				swFlujo = true;
+		}
+		return swFlujo;
+	}
+
+	public void setSwFlujo(boolean swFlujo) {
+		this.swFlujo = swFlujo;
+	}
+
+	public SelectEvent getEvent2() {
+		return event2;
+	}
+
+	public void setEvent2(SelectEvent event2) {
+		this.event2 = event2;
+	}
+
+	public String getNota() {
+		return nota;
+	}
+
+	public void setNota(String nota) {
+		this.nota = nota;
+	}
+
+	public List<EvaluacionMetas> getListaEvaluacionMetas() {
+		listaEvaluacionMetas.clear();
+
+		if (planMetas.getMeta() != null) {
+			EvaluacionMetas evaluacionMetas2 = new EvaluacionMetas();
+			evaluacionMetas2 = evaluacionMetasService
+					.find(new EvaluacionMetasPK(planMetas.getId()
+							.getIdPlanMeta(), planMetas.getId().getIdMeta(),
+							planMetas.getId().getIdCampania(), planMetas
+									.getId().getIdGerentePublico()));
+			if (evaluacionMetas2 != null)
+				listaEvaluacionMetas.add(evaluacionMetas2);
+
+			return listaEvaluacionMetas;
+		}
+
+		return listaEvaluacionMetas;
+	}
+
+	public void setListaEvaluacionMetas(
+			List<EvaluacionMetas> listaEvaluacionMetas) {
+		this.listaEvaluacionMetas = listaEvaluacionMetas;
+	}
+
+	public EvaluacionMetas getEvaluacionMetas() {
+		return evaluacionMetas;
+	}
+
+	public void setEvaluacionMetas(EvaluacionMetas evaluacionMetas) {
+		this.evaluacionMetas = evaluacionMetas;
+	}
+
+	public PlanMetas getPlanMetas() {
+		return planMetas;
+	}
+
+	public void setPlanMetas(PlanMetas planMetas) {
+		this.planMetas = planMetas;
+	}
+
+	public boolean isSwBtnUpdate() {
+		return swBtnUpdate;
+	}
+
+	public void setSwBtnUpdate(boolean swBtnUpdate) {
+		this.swBtnUpdate = swBtnUpdate;
+	}
+
+	public List<PlanMetas> getListaPlanMetas() {
+		System.out.println("aqui  lista Plan");
+		if (nuevoMeta != null) {
+			return listaPlanMetas = planMetasService
+					.getListaPlanMetas(nuevoMeta);
+
+		} else
+			return null;
+
+	}
+
+	public void setListaPlanMetas(List<PlanMetas> listaPlanMetas) {
+		this.listaPlanMetas = listaPlanMetas;
+	}
+
+	public List<PlanMetas> getListaPlanMetas2() {
+		return planMetasService.getListaPlanMetas();
+	}
+
+	public void setListaPlanMetas2(List<PlanMetas> listaPlanMetas2) {
+		this.listaPlanMetas2 = listaPlanMetas2;
+	}
+
+	public List<Campania> getListaCampania() {
+		listaCampania = campaniaService.getListaEstadoCampania("Activo");
+		return listaCampania;
+	}
+
+	public void setListaCampania(List<Campania> listaCampania) {
+		this.listaCampania = listaCampania;
+	}
+
+	public Inscripcion getInscripcion() {
+		validarSesion();
+		getListaCampania();
+		for (Campania campania : listaCampania) {
+
+			if (inscripcionService.getInscripcionCampaña(
+					campania.getIdCampania(), userSesion) != null)
+				inscripcionSelec = inscripcionService.getInscripcionCampaña(
+						campania.getIdCampania(), userSesion);
+		}
+
+		return inscripcionSelec;
+	}
+
+	public void setInscripcion(Inscripcion inscripcion) {
+		this.inscripcionSelec = inscripcion;
+	}
+
+	public boolean isSwBtnObservacion() {
+		return swBtnObservacion;
+	}
+
+	public void setSwBtnObservacion(boolean swBtnObservacion) {
+		this.swBtnObservacion = swBtnObservacion;
+	}
+
+	public Integer getTotalPeso() {
+		return totalPeso;
+	}
+
+	public void setTotalPeso(Integer totalPeso) {
+		this.totalPeso = totalPeso;
+	}
+
+	public boolean isSwBtnBuscar() {
+
+		if (campaniaSelec != 0L)
+			swBtnBuscar = false;
+		else
+			swBtnBuscar = true;
+
+		return swBtnBuscar;
+	}
+
+	public void setSwBtnBuscar(boolean swBtnBuscar) {
+		this.swBtnBuscar = swBtnBuscar;
+	}
+
+	public void setListaInscripcion(List<Inscripcion> listaInscripcion) {
+		this.listaInscripcion = listaInscripcion;
+	}
+
+	public Meta getNuevoMeta() {
+		return nuevoMeta;
+	}
+
+	public void setNuevoMeta(Meta nuevoMeta) {
+		this.nuevoMeta = nuevoMeta;
+	}
+
+	public void setComboTipoMeta(List<SelectItem> comboTipoMeta) {
+		this.comboTipoMeta = comboTipoMeta;
+	}
+
+	public Inscripcion getInscripcionSelec() {
+		return inscripcionSelec;
+	}
+
+	public void setInscripcionSelec(Inscripcion inscripcionSelec) {
+		this.inscripcionSelec = inscripcionSelec;
+	}
+
+	public String getNombreGerente() {
+		return nombreGerente;
+	}
+
+	public void setNombreGerente(String nombreGerente) {
+		this.nombreGerente = nombreGerente;
+	}
+
+	public void setListaGerentePublico(List<Inscripcion> listaGerentePublico) {
+		this.listaGerentePublico = listaGerentePublico;
+	}
+
+	public List<Meta> getListaMetas() {
+		listaMetas.clear();
+		if (inscripcionSelec != null) {
+			listaMetas = metaService.getListaMeta(inscripcionSelec.getId()
+					.getIdCampania(), inscripcionSelec.getId()
+					.getIdGerentePublico());
+
+			totalPeso = 0;
+			for (Meta row : listaMetas) {
+				totalPeso += row.getPeso();
+			}
+		}
+
+		return listaMetas;
+	}
+
+	public void setListaMetas(List<Meta> listaMetas) {
+		this.listaMetas = listaMetas;
+	}
+
+	public List<SelectItem> getComboCampania() {
+		comboCampania = campaniaService.getComboCampania();
+		return comboCampania;
+	}
+
+	public void setComboCampania(List<SelectItem> comboCampania) {
+		this.comboCampania = comboCampania;
+	}
+
+	public Long getCampaniaSelec() {
+		return campaniaSelec;
+	}
+
+	public void setCampaniaSelec(Long campaniaSelec) {
+		this.campaniaSelec = campaniaSelec;
+	}
+
+	public void validarSesion() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		userSesion = (Usuario) context.getExternalContext().getSessionMap()
+				.get("userSesion");
+
+		if (userSesion == null) {
+			String ctxPath = context.getExternalContext()
+					.getRequestContextPath();
+			try {
+				context.getExternalContext().redirect(ctxPath + "/login.jsf");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void guardarCualitativo() {
+		validarSesion();
+
+		if (!validarGuardar())
+			return;
+
+		try {
+
+			if (swBtnUpdate) {
+				if (evaluacionMetas.getId() != null) {
+
+					evaluacionMetas.setUsuarioModifica(userSesion.getUsuario());
+					evaluacionMetas.setFechaModificacion(new Date());
+					evaluacionMetasService.edit(evaluacionMetas);
+					FacesContext
+							.getCurrentInstance()
+							.addMessage(
+									null,
+									new FacesMessage(
+											FacesMessage.SEVERITY_INFO,
+											"EXITO", message
+													.getMessage("msgModificar")));
+				}
+
+			} else {
+
+				if (evaluacionMetasService.find(evaluacionMetas.getId()) != null) {
+
+					evaluacionMetas.setUsuarioModifica(userSesion.getUsuario());
+					evaluacionMetas.setFechaModificacion(new Date());
+					evaluacionMetasService.edit(evaluacionMetas);
+					FacesContext
+							.getCurrentInstance()
+							.addMessage(
+									null,
+									new FacesMessage(
+											FacesMessage.SEVERITY_INFO,
+											"EXITO", message
+													.getMessage("msgModificar")));
+
+				} else {
+
+					System.out.println("GRAN" + evaluacionMetas);
+					EvaluacionMetasPK evaluacionMetasPK = new EvaluacionMetasPK();
+					evaluacionMetasPK.setIdCampania(planMetas.getId()
+							.getIdCampania());
+					evaluacionMetasPK.setIdGerentePublico(planMetas.getId()
+							.getIdGerentePublico());
+					evaluacionMetasPK.setIdMeta(planMetas.getId().getIdMeta());
+					evaluacionMetasPK.setIdPlanMeta(planMetas.getId()
+							.getIdPlanMeta());
+					evaluacionMetas.setId(evaluacionMetasPK);
+					evaluacionMetas.setPlanMetas(planMetas);
+					evaluacionMetas.setUsuarioRegistra(userSesion.getUsuario());
+					evaluacionMetas.setFechaCreacion(new Date());
+					evaluacionMetas.setEstado("A");
+
+					evaluacionMetasService.save(evaluacionMetas);
+
+					DetalleFlujoPK detalleFlujoPK = new DetalleFlujoPK(
+							planMetas.getId().getIdCampania(), planMetas
+									.getId().getIdGerentePublico(), 2L, 4L);
+
+					flujoService.atenderFlujo(detalleFlujoPK,
+							userSesion.getUsuario());
+
+					FacesContext
+							.getCurrentInstance()
+							.addMessage(
+									null,
+									new FacesMessage(
+											FacesMessage.SEVERITY_INFO,
+											"EXITO", message
+													.getMessage("msgRegistrar")));
+
+				}
+			}
+
+			// PlanMetasPK planMetasPK;
+			//
+			// if (planMetasService.getListaPlanMetas(nuevoMeta).size() > 0) {
+			// System.out.println("altiguo");
+			// PlanMetas planMetas2 = new PlanMetas();
+			// planMetas2 = planMetasService.getListaPlanMetas(nuevoMeta).get(
+			// 0);
+			// planMetas2.setDescripcionPlan(planMetas.getDescripcionPlan());
+			// planMetasService.edit(planMetas2);
+			//
+			// FacesContext.getCurrentInstance().addMessage(
+			// null,
+			// new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+			// message.getMessage("msgModificar")));
+			//
+			// } else {
+			// System.out.println("nuevo");
+			// planMetasPK = new PlanMetasPK();
+			//
+			// planMetasPK.setIdCampania(nuevoMeta.getId().getIdCampania());
+			// planMetasPK.setIdMeta(nuevoMeta.getId().getIdMeta());
+			// planMetasPK.setIdGerentePublico(nuevoMeta.getId()
+			// .getIdGerentePublico());
+			// planMetasPK.setIdPlanMeta(planMetasService.getMaxId());
+			// planMetas.setId(planMetasPK);
+			// // planMetasPK.setIdPlanMeta(planMetasService.getMaxId());
+			// planMetasService.save(planMetas);
+			//
+			// FacesContext.getCurrentInstance().addMessage(
+			// null,
+			// new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+			// message.getMessage("msgRegistrar")));
+			//
+			// }
+
+			// limpiar();
+		} catch (Exception e) {
+			logger.info("ERRROR AL REGISTRAR META");
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "ERROR",
+							message.getMessage("msgRegistrarError")));
+		}
+	}
+
+	public void guardarCuantitativa() {
+		validarSesion();
+
+		if (!validarGuardarCuantitativa())
+			return;
+
+		try {
+
+			if (swBtnUpdate) {
+				if (evaluacionMetas.getId() != null) {
+					evaluacionMetas.setUsuarioModifica(userSesion.getUsuario());
+					evaluacionMetas.setFechaModificacion(new Date());
+
+					int tipo = Integer.parseInt(""
+							+ userSesion.getRol().getIdRol());
+					switch (tipo) {
+					case 3:
+						evaluacionMetas.setNotaGP(Integer.parseInt(nota));
+						break;
+					case 4:
+						evaluacionMetas.setNotaJI(Integer.parseInt(nota));
+						break;
+					case 5:
+						evaluacionMetas.setNotaTE(Integer.parseInt(nota));
+						break;
+
+					default:
+						break;
+					}
+
+					evaluacionMetasService.edit(evaluacionMetas);
+
+					FacesContext
+							.getCurrentInstance()
+							.addMessage(
+									null,
+									new FacesMessage(
+											FacesMessage.SEVERITY_INFO,
+											"EXITO", message
+													.getMessage("msgModificar")));
+				}
+
+			} else {
+				System.out.println("GRAN" + evaluacionMetas);
+				EvaluacionMetasPK evaluacionMetasPK = new EvaluacionMetasPK();
+				evaluacionMetasPK.setIdCampania(planMetas.getId()
+						.getIdCampania());
+				evaluacionMetasPK.setIdGerentePublico(planMetas.getId()
+						.getIdGerentePublico());
+				evaluacionMetasPK.setIdMeta(planMetas.getId().getIdMeta());
+				evaluacionMetasPK.setIdPlanMeta(planMetas.getId()
+						.getIdPlanMeta());
+				evaluacionMetas.setId(evaluacionMetasPK);
+				evaluacionMetas.setPlanMetas(planMetas);
+				evaluacionMetas.setUsuarioRegistra(userSesion.getUsuario());
+				evaluacionMetas.setFechaCreacion(new Date());
+
+				evaluacionMetasService.save(evaluacionMetas);
+
+				FacesContext.getCurrentInstance().addMessage(
+						null,
+						new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+								message.getMessage("msgModificar")));
+
+				DetalleFlujoPK detalleFlujoPK = new DetalleFlujoPK(planMetas
+						.getId().getIdCampania(), planMetas.getId()
+						.getIdGerentePublico(), 3L, 4L);
+
+				flujoService.atenderFlujo(detalleFlujoPK,
+						userSesion.getUsuario());
+
+			}
+
+		} catch (Exception e) {
+			logger.info("ERRROR AL REGISTRAR META");
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "ERROR",
+							message.getMessage("msgRegistrarError")));
+		}
+	}
+
+	public boolean validarGuardar() {
+		String txtObligatorio = message.getMessage("msgTxtObligatorio");
+
+		if (!evaluacionMetas.getPorcentajeAvance().isEmpty()) {
+			if (Integer.parseInt(evaluacionMetas.getPorcentajeAvance()) < 0
+					|| Integer.parseInt(evaluacionMetas.getPorcentajeAvance()) > 100) {
+				FacesContext.getCurrentInstance().addMessage(
+						null,
+						new FacesMessage(FacesMessage.SEVERITY_WARN,
+								"ADVERTENCIA",
+								"Ingrese Porcentaje de Avance max. 100%"));
+				return false;
+			}
+		} else {
+
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+
+		if (evaluacionMetas.getDescripcion().trim().equalsIgnoreCase("")) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+		}
+
+		return true;
+	}
+
+	public boolean validarGuardarCuantitativa() {
+		String txtObligatorio = message.getMessage("msgTxtObligatorio");
+		if (!nota.isEmpty()) {
+			if (Integer.parseInt(nota) < 0 || Integer.parseInt(nota) > 100) {
+				FacesContext.getCurrentInstance().addMessage(
+						null,
+						new FacesMessage(FacesMessage.SEVERITY_WARN,
+								"ADVERTENCIA",
+								"Ingrese Evaluación inicial max. 100%"));
+				return false;
+			}
+		} else {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							txtObligatorio));
+			return false;
+
+		}
+
+		return true;
+	}
+
+	public void limpiar() {
+		nuevoMeta = new Meta();
+		inscripcionSelec = null;
+		nombreGerente = "";
+		totalPeso = 0;
+		evaluacionMetas = new EvaluacionMetas();
+		planMetas = new PlanMetas();
+		event2 = null;
+		// campaniaSelec = 0L;
+	}
+
+	public void limpiarAgregar() {
+		nuevoMeta = new Meta();
+	}
+
+	public void onRowSelect(SelectEvent event) {
+		// evaluacionMetas = new EvaluacionMetas();
+		event2 = event;
+		swBtnUpdate = false;
+		nuevoMeta = ((Meta) event.getObject());
+		System.out.println("META :)" + nuevoMeta);
+		validarSesion();
+
+		if (getListaPlanMetas().size() > 0) {
+			planMetas = listaPlanMetas.get(0);
+
+			if (planMetas.getDescripcionPlan() != null) {
+				// evaluacionMetas = new EvaluacionMetas();
+
+				if (getListaEvaluacionMetas().size() > 0) {
+					evaluacionMetas = listaEvaluacionMetas.get(0);
+
+					if (evaluacionMetas.getId() != null) {
+						int tipo = Integer.parseInt(""
+								+ userSesion.getRol().getIdRol());
+						switch (tipo) {
+						case 3:
+							if (evaluacionMetas.getNotaGP() != null)
+								nota = evaluacionMetas.getNotaGP().toString();
+							else nota=null;
+							break;
+						case 4:
+							if (evaluacionMetas.getNotaJI() != null)
+								nota = evaluacionMetas.getNotaJI().toString();
+							else nota=null;
+							break;
+						case 5:
+							if (evaluacionMetas.getNotaTE() != null)
+								nota = evaluacionMetas.getNotaTE().toString();
+							else nota=null;
+							break;
+
+						default:
+							break;
+						}
+						swBtnUpdate = true;
+
+					}
+
+				} else {
+					evaluacionMetas = new EvaluacionMetas();
+					swBtnUpdate = false;
+
+				}
+			}
+		} else {
+
+			planMetas = new PlanMetas();
+			swBtnUpdate = false;
+			listaEvaluacionMetas.clear();
+			evaluacionMetas = new EvaluacionMetas();
+
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Primero, ingrese el Plan de meta"));
+		}
+
+	}
+
+	public int cantidadPlan() {
+		int conta = 0;
+
+		for (PlanMetas planeMetas : getListaPlanMetas2()) {
+			if (planeMetas.getDescripcionPlan() != null)
+				conta++;
+
+		}
+		System.out.println("Cantidad.. " + conta);
+		return conta;
+	}
+	
+	public void atenderFlujo() {
+
+		validarSesion();
+
+		if (!validarAtenderFlujo())
+			return;
+
+		try {
+			DetalleFlujoPK idDetalle = new DetalleFlujoPK(inscripcionSelec
+					.getId().getIdCampania(), inscripcionSelec.getId()
+					.getIdGerentePublico(), 2L, P2_CUALITATIVA_METAS);
+
+			flujoService.atenderFlujo(idDetalle, userSesion.getUsuario());
+			FacesContext
+					.getCurrentInstance()
+					.addMessage(
+							null,
+							new FacesMessage(FacesMessage.SEVERITY_INFO,
+									"EXITO",
+									"Se ha procesado la Evaluación Cualitativa de Metas para el Gerente Público"));
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "ERROR",
+							"Ha ocurrido un error"));
+		}
+		limpiar();
+	}
+
+	public boolean validarAtenderFlujo() {
+
+		if (inscripcionSelec.getId() == null) {
+			return false;
+		}
+
+		/*if (inscripcion.getEstadoEvaInicial() != "R") {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Primero haga clic en el boton Guardar"));
+			return false;
+		}*/
+
+		return true;
+	}
+
+}

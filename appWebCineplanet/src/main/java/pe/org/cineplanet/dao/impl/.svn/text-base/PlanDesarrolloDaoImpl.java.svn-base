@@ -1,0 +1,260 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.PlanDesarrolloDao;
+import gob.servir.desempenio.model.Competencia;
+import gob.servir.desempenio.model.EvaluacionInicial;
+import gob.servir.desempenio.model.EvaluacionInicialPK;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.PlanDesarrollo;
+import gob.servir.desempenio.model.PlanDesarrolloPK;
+import gob.servir.desempenio.model.TipoCompetencia;
+import gob.servir.desempenio.util.Constantes;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua García
+ */
+@Repository
+public class PlanDesarrolloDaoImpl implements PlanDesarrolloDao {
+	@PersistenceContext
+	private EntityManager em;
+
+	public PlanDesarrollo find(PlanDesarrolloPK id) {
+		try {
+			return em.find(PlanDesarrollo.class, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public PlanDesarrollo save(PlanDesarrollo obj) {
+		try {
+			em.persist(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public PlanDesarrollo edit(PlanDesarrollo obj) {
+		try {
+			return em.merge(obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<PlanDesarrollo> getListaPlanDesarrollo() {
+
+		TypedQuery<PlanDesarrollo> tq = em.createNamedQuery(
+				"PlanDesarrollo.getAllListaPlanDesarrollo",
+				PlanDesarrollo.class);
+
+		tq.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+			return tq.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public Long getMaxId(Long idCompetencia, Long idCampania,
+			String codGerente, Long idPuesto) {
+
+		Query q = null;
+		q = (Query) em
+				.createQuery("SELECT MAX(p.id.idPlan) FROM PlanDesarrollo p WHERE p.id.idCompetencia =:idCompetencia AND p.id.idCampania =:idCampania AND p.id.idGerentePublico =:codGerente AND p.id.idPuesto =:idPuesto");
+		q.setParameter("idCompetencia", idCompetencia);
+		q.setParameter("idCampania", idCampania);
+		q.setParameter("codGerente", codGerente);
+		q.setParameter("idPuesto", idPuesto);
+
+		try {
+			return (Long) q.getSingleResult() + 1L;
+		} catch (Exception as) {
+			as.printStackTrace();
+			return 1L;
+		}
+
+	}
+
+	public List<PlanDesarrollo> getListaPlanDesarrollo(Long idCompetencia,
+			Long idCampania, String codGerente, Long idPuesto) {
+
+		TypedQuery<PlanDesarrollo> tq = em.createNamedQuery(
+				"PlanDesarrollo.getListaPlanDesarrolloCompetencia",
+				PlanDesarrollo.class);
+
+		tq.setParameter("idCompetencia", idCompetencia);
+		tq.setParameter("idCampania", idCampania);
+		tq.setParameter("codGerente", codGerente);
+		tq.setParameter("idPuesto", idPuesto);
+
+		try {
+			return tq.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<PlanDesarrollo> getListaPlanDesarrollo(InscripcionPK id) {
+
+		Query q = em
+				.createNamedQuery("PlanDesarrollo.getListByCampaniaAndGerente");
+
+		q.setParameter("idCampania", id.getIdCampania());
+		q.setParameter("idGerente", id.getIdGerentePublico());
+		q.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+
+			List<Object[]> listaObjetos = new ArrayList<Object[]>();
+
+			listaObjetos = q.getResultList();
+
+			List<PlanDesarrollo> listaPlanDesarrollo = new ArrayList<PlanDesarrollo>();
+
+			for (Object[] row : listaObjetos) {
+				PlanDesarrollo planDesarrollo = new PlanDesarrollo();
+				EvaluacionInicial evaluacionInicial = new EvaluacionInicial();
+				Competencia competencia = new Competencia();
+				TipoCompetencia tipoCompetencia = new TipoCompetencia();
+
+				evaluacionInicial.setId((EvaluacionInicialPK) row[0]);
+				tipoCompetencia.setDenominacion((String) row[1]);
+				competencia.setNivelDeseado((Integer) row[2]);
+				evaluacionInicial.setNota((Integer) row[3]);
+				evaluacionInicial.setBrecha((Integer) row[4]);
+				competencia.setCompetencia(tipoCompetencia);
+				evaluacionInicial.setCompetencia(competencia);
+				planDesarrollo.setId((PlanDesarrolloPK) row[5]);
+				planDesarrollo.setActCapacitacion((String) row[6]);
+				planDesarrollo.setActEntrenamiento((String) row[7]);
+				planDesarrollo.setAprobacion((Boolean) row[8]);
+				planDesarrollo.setObservacion((String) row[9]);
+				planDesarrollo.setFechaFinCapacitacion((Date) row[10]);
+				planDesarrollo.setFechaFinEntrenamiento((Date) row[11]);
+				planDesarrollo.setEvaluacionInicial(evaluacionInicial);
+
+				listaPlanDesarrollo.add(planDesarrollo);
+			}
+
+			return listaPlanDesarrollo;
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<PlanDesarrollo> getListaPlanDesarrollo(InscripcionPK id,
+			boolean aprobacion) {
+
+		Query q = em
+				.createNamedQuery("PlanDesarrollo.getListByCampaniaAndGerenteAndAprobacion");
+
+		q.setParameter("idCampania", id.getIdCampania());
+		q.setParameter("idGerente", id.getIdGerentePublico());
+		q.setParameter("aprobacion", aprobacion);
+		q.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+
+			List<Object[]> listaObjetos = new ArrayList<Object[]>();
+
+			listaObjetos = q.getResultList();
+
+			List<PlanDesarrollo> listaPlanDesarrollo = new ArrayList<PlanDesarrollo>();
+
+			for (Object[] row : listaObjetos) {
+				PlanDesarrollo planDesarrollo = new PlanDesarrollo();
+				EvaluacionInicial evaluacionInicial = new EvaluacionInicial();
+				Competencia competencia = new Competencia();
+				TipoCompetencia tipoCompetencia = new TipoCompetencia();
+
+				evaluacionInicial.setId((EvaluacionInicialPK) row[0]);
+				tipoCompetencia.setDenominacion((String) row[1]);
+				competencia.setNivelDeseado((Integer) row[2]);
+				evaluacionInicial.setNota((Integer) row[3]);
+				evaluacionInicial.setBrecha((Integer) row[4]);
+				competencia.setCompetencia(tipoCompetencia);
+				evaluacionInicial.setCompetencia(competencia);
+				planDesarrollo.setId((PlanDesarrolloPK) row[5]);
+				planDesarrollo.setActCapacitacion((String) row[6]);
+				planDesarrollo.setActEntrenamiento((String) row[7]);
+				planDesarrollo.setAprobacion((Boolean) row[8]);
+				planDesarrollo.setObservacion((String) row[9]);
+				planDesarrollo.setFechaFinCapacitacion((Date) row[10]);
+				planDesarrollo.setFechaFinEntrenamiento((Date) row[11]);
+				planDesarrollo.setEvaluacionInicial(evaluacionInicial);
+
+				listaPlanDesarrollo.add(planDesarrollo);
+			}
+
+			return listaPlanDesarrollo;
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<PlanDesarrollo> getListaPlanDesarrollo(Long idCampania,
+			String codGerente, Long idPuesto) {
+		
+		TypedQuery<PlanDesarrollo> tq = em.createNamedQuery(
+				"PlanDesarrollo.getListaPlanDesarrolloPuesto",
+				PlanDesarrollo.class);
+		
+		tq.setParameter("idCampania", idCampania);
+		tq.setParameter("codGerente", codGerente);
+		tq.setParameter("idPuesto", idPuesto);
+
+		try {
+			return tq.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public Integer getCantidadPlanesDesaprobados(Long idCampania,
+			String codGerente, Long idPuesto) {
+		Query q = null;
+		q = (Query) em
+				.createQuery("SELECT COUNT(p.id.idCompetencia) FROM PlanDesarrollo p WHERE p.id.idCampania =:idCampania AND p.id.idGerentePublico =:codGerente AND p.id.idPuesto =:idPuesto AND p.aprobacion =:desaprobado");
+		q.setParameter("idCampania", idCampania);
+		q.setParameter("codGerente", codGerente);
+		q.setParameter("idPuesto", idPuesto);
+		q.setParameter("desaprobado", false);
+		// q.setParameter("estado", "A");
+
+		try {
+			return ((Long) q.getSingleResult()).intValue();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+}

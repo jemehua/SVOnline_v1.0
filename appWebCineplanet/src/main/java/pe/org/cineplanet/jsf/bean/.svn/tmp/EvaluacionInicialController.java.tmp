@@ -1,0 +1,542 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.model.Competencia;
+import gob.servir.desempenio.model.DetalleFlujoPK;
+import gob.servir.desempenio.model.EvaluacionInicial;
+import gob.servir.desempenio.model.EvaluacionInicialPK;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.service.CampaniaService;
+import gob.servir.desempenio.service.CompetenciaService;
+import gob.servir.desempenio.service.DetalleFlujoService;
+import gob.servir.desempenio.service.EvaluacionInicialService;
+import gob.servir.desempenio.service.FlujoService;
+import gob.servir.desempenio.service.InscripcionService;
+import gob.servir.desempenio.util.Constantes;
+import gob.servir.desempenio.util.Message;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.event.ValueChangeEvent;
+import javax.faces.model.SelectItem;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+
+@Controller("evaluacionInicialController")
+@Scope("session")
+public class EvaluacionInicialController implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private static final Logger logger = LoggerFactory
+			.getLogger(EvaluacionInicialController.class);
+
+	@Autowired
+	private LoginController loginController;
+	@Autowired
+	private CampaniaService campaniaService;
+	@Autowired
+	private EvaluacionInicialService evaluacionInicialService;
+	@Autowired
+	private CompetenciaService competenciaService;
+	@Autowired
+	private InscripcionService inscripcionService;
+	@Autowired
+	private FlujoService flujoService;
+	@Autowired
+	private DetalleFlujoService detalleFlujoService;
+
+	private Usuario userSesion = null;
+	private Message message = new Message();
+
+	private List<SelectItem> comboCampania = new ArrayList<SelectItem>();
+	private Long campaniaSelec = 0L;
+
+	// Buscar gp
+	private Inscripcion inscripcionSelec = null;
+	private List<Inscripcion> listaGerentePublico = new ArrayList<Inscripcion>();
+	private List<Inscripcion> listaGerentePublicoFiltered = new ArrayList<Inscripcion>();
+	private boolean swBtnBuscar = true;
+
+	// lista
+	private List<Inscripcion> listaInscripcion = new ArrayList<Inscripcion>();
+	private List<EvaluacionInicial> listaEvaluacionInicial = new ArrayList<EvaluacionInicial>();
+
+	private Integer nota = 0;
+	private boolean swFlujo = true;
+
+	public EvaluacionInicialController() {
+
+	}
+
+	@PostConstruct
+	public void cargar() {
+		validarSesion();
+		verificarEstadoFlujo();
+		buscarListaEvaluacionInicial();
+		buscarListaGerentesConEvaInicial();
+	}
+
+	public void verificarEstadoFlujo() {
+		if (inscripcionSelec == null) {
+			swFlujo = true;
+		} else {
+			String detalle = detalleFlujoService
+					.getEstadoDetalleFlujo(new DetalleFlujoPK(inscripcionSelec
+							.getId().getIdCampania(), inscripcionSelec.getId()
+							.getIdGerentePublico(), Constantes.PROCESO1,
+							Constantes.P1_EVALUACION_INICIAL));
+
+			if (detalle != null) {
+				if (detalle.equalsIgnoreCase(Constantes.ATENDIDO))
+					swFlujo = true;
+				else
+					swFlujo = false;
+			} else
+				swFlujo = true;
+		}
+	}
+
+	public boolean isSwFlujo() {
+		return swFlujo;
+	}
+
+	public void setSwFlujo(boolean swFlujo) {
+		this.swFlujo = swFlujo;
+	}
+
+	public void buscarListaEvaluacionInicial() {
+		listaEvaluacionInicial.clear();
+		// todos
+		if (inscripcionSelec != null)
+			if (inscripcionSelec.getPuestoTipoV() != null)
+				listaEvaluacionInicial = evaluacionInicialService
+						.getListaEvaluacionInicial(inscripcionSelec.getId(), 0);
+	}
+
+	public void buscarListaGerentesConEvaInicial() {
+		listaInscripcion.clear();
+		if (campaniaSelec != 0L)
+			listaInscripcion = inscripcionService.getListaInscripcion(
+					campaniaSelec, 2);// 2:Evaluacion incial
+
+	}
+
+	public List<EvaluacionInicial> getListaEvaluacionInicial() {
+		return listaEvaluacionInicial;
+	}
+
+	public void setListaEvaluacionInicial(
+			List<EvaluacionInicial> listaEvaluacionInicial) {
+		this.listaEvaluacionInicial = listaEvaluacionInicial;
+	}
+
+	public boolean isSwBtnBuscar() {
+		if (campaniaSelec != 0L)
+			swBtnBuscar = false;
+		else
+			swBtnBuscar = true;
+		return swBtnBuscar;
+	}
+
+	public void setSwBtnBuscar(boolean swBtnBuscar) {
+		this.swBtnBuscar = swBtnBuscar;
+	}
+
+	public List<Inscripcion> getListaInscripcion() {
+		return listaInscripcion;
+	}
+
+	public void setListaInscripcion(List<Inscripcion> listaInscripcion) {
+		this.listaInscripcion = listaInscripcion;
+	}
+
+	public Inscripcion getInscripcionSelec() {
+		return inscripcionSelec;
+	}
+
+	public void setInscripcionSelec(Inscripcion inscripcionSelec) {
+		this.inscripcionSelec = inscripcionSelec;
+	}
+
+	public void buscarGerenteInscrito() {
+		listaGerentePublico.clear();
+		if (campaniaSelec != 0L)
+			listaGerentePublico = inscripcionService
+					.getListaGerentePublico(campaniaSelec);
+		listaGerentePublicoFiltered = listaGerentePublico;
+	}
+
+	public List<Inscripcion> getListaGerentePublico() {
+		return listaGerentePublico;
+	}
+
+	public void setListaGerentePublico(List<Inscripcion> listaGerentePublico) {
+		this.listaGerentePublico = listaGerentePublico;
+	}
+
+	public List<Inscripcion> getListaGerentePublicoFiltered() {
+		return listaGerentePublicoFiltered;
+	}
+
+	public void setListaGerentePublicoFiltered(
+			List<Inscripcion> listaGerentePublicoFiltered) {
+		this.listaGerentePublicoFiltered = listaGerentePublicoFiltered;
+	}
+
+	public List<SelectItem> getComboCampania() {
+		comboCampania = campaniaService.getComboCampania();
+		return comboCampania;
+	}
+
+	public void setComboCampania(List<SelectItem> comboCampania) {
+		this.comboCampania = comboCampania;
+	}
+
+	public Long getCampaniaSelec() {
+		return campaniaSelec;
+	}
+
+	public void setCampaniaSelec(Long campaniaSelec) {
+		this.campaniaSelec = campaniaSelec;
+	}
+
+	public void validarSesion() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		
+		userSesion = (Usuario) context.getExternalContext().getSessionMap()
+				.get(loginController.getUsername());
+
+		if (userSesion == null) {
+			String ctxPath = context.getExternalContext()
+					.getRequestContextPath();
+			try {
+				context.getExternalContext().redirect(ctxPath + "/login.jsf");
+			} catch (Exception e) {
+				//e.printStackTrace();
+			}
+		}
+	}
+
+	public void guardar() {
+
+		validarSesion();
+
+		if (!validarGuardar())
+			return;
+
+		try {
+
+			InscripcionPK id = new InscripcionPK(inscripcionSelec.getId()
+					.getIdCampania(), inscripcionSelec.getId()
+					.getIdGerentePublico());
+
+			Inscripcion inscripcionResp = inscripcionService.find(id);
+
+			inscripcionResp.setUsuarioModifica(userSesion.getUsuario());
+			inscripcionResp.setEstadoEvaInicial(Constantes.REGISTRADO);
+
+			inscripcionService.edit(inscripcionResp);
+
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+							message.getMessage("msgRegistrar")));
+			cargar();
+		} catch (Exception e) {
+			logger.info("ERRROR AL REGISTRAR META");
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+							message.getMessage("msgRegistrarError")));
+		}
+
+	}
+
+	public boolean validarGuardar() {
+
+		if (campaniaSelec == 0L) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Seleccione campaña de evaluación"));
+			return false;
+		}
+
+		if (inscripcionSelec == null) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Seleccione Gerente Público"));
+			return false;
+		}
+
+		if (validarRegistroEvInicial()) {
+			FacesContext
+					.getCurrentInstance()
+					.addMessage(
+							null,
+							new FacesMessage(FacesMessage.SEVERITY_WARN,
+									"ADVERTENCIA",
+									"Ingrese Evaluacion Inicial para cada competencia"));
+			return false;
+		}
+
+		return true;
+	}
+
+	public void registroPrevio() {
+
+		EvaluacionInicial evaluacionInicial = null;
+		EvaluacionInicialPK id = null;
+
+		try {
+
+			if (inscripcionSelec != null) {
+
+				if (inscripcionSelec.getPuestoTipoV() == null) {
+					FacesContext
+							.getCurrentInstance()
+							.addMessage(
+									null,
+									new FacesMessage(
+											FacesMessage.SEVERITY_WARN,
+											"ADVERTENCIA",
+											"El Gerente Público no tiene asignado un Puesto Tipo"));
+					return;
+
+				}
+
+				List<Competencia> listCompetencia = competenciaService
+						.getListaCompetencia(inscripcionSelec.getPuestoTipoV()
+								.getId_puesto_tipo());
+
+				if (listCompetencia.size() > 0) {
+					for (Competencia row : listCompetencia) {
+
+						id = new EvaluacionInicialPK(row.getId()
+								.getIdCompetencia(), campaniaSelec,
+								inscripcionSelec.getId().getIdGerentePublico(),
+								row.getId().getIdPuesto());
+
+						EvaluacionInicial evaInicialResp = evaluacionInicialService
+								.find(id);
+
+						if (evaInicialResp == null) {
+							evaluacionInicial = new EvaluacionInicial();
+							evaluacionInicial.setId(id);
+							evaluacionInicial.setUsuarioRegistra(userSesion
+									.getUsuario());
+							evaluacionInicialService.save(evaluacionInicial);
+						}
+					}
+				} else {
+					FacesContext
+							.getCurrentInstance()
+							.addMessage(
+									null,
+									new FacesMessage(
+											FacesMessage.SEVERITY_WARN,
+											"ADVERTENCIA",
+											message.getMessage("msgRegistrarNivelDeseado")));
+				}
+			}
+			seleccionarGerente();
+		} catch (Exception e) {
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+							message.getMessage("msgRegistrarError")));
+		}
+
+	}
+
+<<<<<<< .mine
+	private boolean validarRegistroEvInicial() {
+=======
+//	private boolean validarEvaluacionInicial() {
+//
+//		boolean respuesta = true;
+//		int count;
+//
+//		count = evaluacionInicialService
+//				.getCountBrechaEvaluacionInicial(inscripcionSelec);
+//
+//		if (count > 0)
+//			respuesta = true;
+//		else
+//			respuesta = false;
+//
+//		return respuesta;
+//	}
+	
+	private boolean validarRegistroEvInicial() {
+>>>>>>> .r1651
+
+<<<<<<< .mine
+		Integer count = evaluacionInicialService.getCountEvaluacionInicial(inscripcionSelec);
+=======
+        Integer count = evaluacionInicialService.getCountEvaluacionInicial(inscripcionSelec);
+>>>>>>> .r1651
+
+<<<<<<< .mine
+		if (count == 7)
+			return false;
+		else
+			return true;
+	}
+
+=======
+        if (count == 7)
+                return false;
+        else
+                return true;
+}
+
+>>>>>>> .r1651
+	public void asignarCantidadDias(ValueChangeEvent evet) {
+		try {
+			nota = (Integer) evet.getNewValue();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void asignarDias(EvaluacionInicial paramEvalInicial) {
+		try {
+			if (paramEvalInicial != null) {
+
+				EvaluacionInicial ei = evaluacionInicialService
+						.find(paramEvalInicial.getId());
+
+				ei.setNota(nota);
+				ei.setUsuarioModifica(userSesion.getUsuario());
+				if (nota != null) {
+					if (paramEvalInicial.getCompetencia().getNivelDeseado() > nota)
+						ei.setBrecha(paramEvalInicial.getCompetencia()
+								.getNivelDeseado() - nota);
+					else
+						ei.setBrecha(0);
+
+				} else {
+					ei.setBrecha(null);
+				}
+				ei.setEstado(Constantes.ACTIVO);
+				evaluacionInicialService.edit(ei);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void seleccionarGerente() {
+		verificarEstadoFlujo();
+		buscarListaEvaluacionInicial();
+		buscarListaGerentesConEvaInicial();
+	}
+	
+	public void seleccionarEditar() {
+		verificarEstadoFlujo();
+		buscarListaEvaluacionInicial();
+	}
+
+	public void limpiar() {
+		inscripcionSelec = null;
+		seleccionarGerente();
+	}
+
+	public void atenderFlujo() {
+
+		validarSesion();
+
+		if (!validarAtenderFlujo())
+			return;
+
+		try {
+			DetalleFlujoPK idDetalle = new DetalleFlujoPK(inscripcionSelec
+					.getId().getIdCampania(), inscripcionSelec.getId()
+					.getIdGerentePublico(), Constantes.PROCESO1,
+					Constantes.P1_EVALUACION_INICIAL);
+
+			flujoService.atenderFlujo(idDetalle, userSesion.getUsuario());
+			FacesContext
+					.getCurrentInstance()
+					.addMessage(
+							null,
+							new FacesMessage(FacesMessage.SEVERITY_INFO,
+									"EXITO",
+									"Se ha procesado la Evaluación Inicial para el Gerente Público"));
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+							"Ha ocurrido un error"));
+		}
+		limpiar();
+	}
+
+	public boolean validarAtenderFlujo() {
+
+		if (inscripcionSelec == null) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Seleccione Gerente Público"));
+			return false;
+		}
+
+		if (verificarRegistroEvaInicial()) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+							"Primero debe guardar los cambios realizados"));
+			return false;
+		}
+
+		if (validarRegistroEvInicial()) {
+			FacesContext
+					.getCurrentInstance()
+					.addMessage(
+							null,
+							new FacesMessage(FacesMessage.SEVERITY_WARN,
+									"ADVERTENCIA",
+									"Ingrese Evaluacion Inicial para cada competencia"));
+			return false;
+		}
+
+		return true;
+	}
+
+	private boolean verificarRegistroEvaInicial() {
+
+		Inscripcion inscripcion = inscripcionService.find(inscripcionSelec
+				.getId());
+
+		if (inscripcion.getEstadoEvaInicial().equalsIgnoreCase(
+				Constantes.REGISTRADO))
+			return false;
+		else
+			return true;
+	}
+
+}

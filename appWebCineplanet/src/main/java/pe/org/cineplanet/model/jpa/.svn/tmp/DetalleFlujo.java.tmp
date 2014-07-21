@@ -1,0 +1,240 @@
+package gob.servir.desempenio.model;
+
+import java.io.Serializable;
+import java.util.Calendar;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Entity
+@NamedQueries({
+		@NamedQuery(name = "DetalleFlujo.getListAll", query = "SELECT d FROM DetalleFlujo d"),
+		@NamedQuery(name = "DetalleFlujo.getListByCampaniaAndGerenteAndTipoAct", query = "SELECT d FROM DetalleFlujo d "
+				+ "WHERE d.id.idCampania =:idCampania AND d.id.idGerentePublico =:codGerente AND d.actividad.tipo =:tipo "
+				+ "ORDER BY d.id.idProceso, d.id.idActividad"),
+		@NamedQuery(name = "DetalleFlujo.getListByCampaniaAndGerenteAndProceso", query = "SELECT d FROM DetalleFlujo d WHERE d.id.idCampania =:idCampania AND d.id.idGerentePublico =:codGerente AND d.id.idProceso =:idProceso ORDER BY d.id.idActividad"),
+		@NamedQuery(name = "DetalleFlujo.getEstadoByPK", query = "SELECT d.estado FROM DetalleFlujo d WHERE d.id.idCampania =:idCampania AND d.id.idGerentePublico =:codGerente AND d.id.idProceso =:idProceso AND d.id.idActividad =:idActividad ORDER BY d.id.idActividad") })
+public class DetalleFlujo implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	@EmbeddedId
+	private DetalleFlujoPK id;
+	@Column
+	private Integer nroEnvios;
+	@Column
+	private String usuarioRegistra;
+	@Column
+	private String usuarioModifica;
+	@Column
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date fechaCreacion;
+	@Column
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date fechaModificacion;
+	@Column
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date fechaSgteEnvio;
+	@Column
+	private String estado;
+	@Transient
+	private String estadoNotificacion;
+	@Transient
+	private String estadoEvaFinalGP;
+	@Transient
+	private String estadoEvaFinalJI;
+	@Transient
+	private String estadoEvaFinalTE;
+	@ManyToOne(optional = false)
+	@JoinColumns({
+			@JoinColumn(name = "idCampania", referencedColumnName = "idCampania", insertable = false, updatable = false),
+			@JoinColumn(name = "idGerentePublico", referencedColumnName = "idGerentePublico", insertable = false, updatable = false),
+			@JoinColumn(name = "idProceso", referencedColumnName = "idProceso", insertable = false, updatable = false) })
+	private Flujo flujo;
+	@ManyToOne(optional = false)
+	@JoinColumns({
+			@JoinColumn(name = "idActividad", referencedColumnName = "idActividad", insertable = false, updatable = false),
+			@JoinColumn(name = "idProceso", referencedColumnName = "idProceso", insertable = false, updatable = false) })
+	private Actividad actividad;
+
+	public DetalleFlujo() {
+		super();
+	}
+
+	public DetalleFlujoPK getId() {
+		return id;
+	}
+
+	public void setId(DetalleFlujoPK id) {
+		this.id = id;
+	}
+
+	public String getUsuarioRegistra() {
+		return usuarioRegistra;
+	}
+
+	public void setUsuarioRegistra(String usuarioRegistra) {
+		this.usuarioRegistra = usuarioRegistra;
+	}
+
+	public String getUsuarioModifica() {
+		return usuarioModifica;
+	}
+
+	public void setUsuarioModifica(String usuarioModifica) {
+		this.usuarioModifica = usuarioModifica;
+	}
+
+	public Date getFechaCreacion() {
+		return fechaCreacion;
+	}
+
+	public void setFechaCreacion(Date fechaCreacion) {
+		this.fechaCreacion = fechaCreacion;
+	}
+
+	public Date getFechaModificacion() {
+		return fechaModificacion;
+	}
+
+	public void setFechaModificacion(Date fechaModificacion) {
+		this.fechaModificacion = fechaModificacion;
+	}
+
+	public String getEstado() {
+		return estado;
+	}
+
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
+
+	public Integer getNroEnvios() {
+		return nroEnvios;
+	}
+
+	public void setNroEnvios(Integer nroEnvios) {
+		this.nroEnvios = nroEnvios;
+	}
+
+	public Flujo getFlujo() {
+		return flujo;
+	}
+
+	public void setFlujo(Flujo flujo) {
+		this.flujo = flujo;
+	}
+
+	public Actividad getActividad() {
+		return actividad;
+	}
+
+	public void setActividad(Actividad actividad) {
+		this.actividad = actividad;
+	}
+
+	public Date getFechaSgteEnvio() {
+		return fechaSgteEnvio;
+	}
+
+	public void setFechaSgteEnvio(Date fechaSgteEnvio) {
+		this.fechaSgteEnvio = fechaSgteEnvio;
+	}
+
+	public String getEstadoNotificacion() {
+		return estadoNotificacion;
+	}
+
+	public void setEstadoNotificacion(String estadoNotificacion) {
+		this.estadoNotificacion = estadoNotificacion;
+	}
+
+	public String getEstadoEvaFinalGP() {
+		return estadoEvaFinalGP;
+	}
+
+	public void setEstadoEvaFinalGP(String estadoEvaFinalGP) {
+		this.estadoEvaFinalGP = estadoEvaFinalGP;
+	}
+	
+	@PrePersist
+	private void putFechaCreacion() {
+		setFechaCreacion(new Date(Calendar.getInstance().getTime().getTime()));
+	}
+
+<<<<<<< .mine
+	@PreUpdate
+	private void putFechaModificacion() {
+		setFechaModificacion(new Date(Calendar.getInstance().getTime()
+				.getTime()));
+	}
+
+=======
+	public String getEstadoEvaFinalJI() {
+		return estadoEvaFinalJI;
+	}
+
+	public void setEstadoEvaFinalJI(String estadoEvaFinalJI) {
+		this.estadoEvaFinalJI = estadoEvaFinalJI;
+	}
+
+	public String getEstadoEvaFinalTE() {
+		return estadoEvaFinalTE;
+	}
+
+	public void setEstadoEvaFinalTE(String estadoEvaFinalTE) {
+		this.estadoEvaFinalTE = estadoEvaFinalTE;
+	}
+
+>>>>>>> .r1146
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DetalleFlujo other = (DetalleFlujo) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(estado);
+		return builder.toString();
+	}
+
+}

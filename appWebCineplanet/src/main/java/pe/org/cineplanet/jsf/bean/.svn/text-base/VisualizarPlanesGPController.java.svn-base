@@ -1,0 +1,236 @@
+package gob.servir.desempenio.controller;
+
+import gob.servir.desempenio.model.Campania;
+import gob.servir.desempenio.model.Inscripcion;
+import gob.servir.desempenio.model.PlanDesarrollo;
+import gob.servir.desempenio.model.PlanMetas;
+import gob.servir.desempenio.model.Usuario;
+import gob.servir.desempenio.report.PlanesReport;
+import gob.servir.desempenio.service.CampaniaService;
+import gob.servir.desempenio.service.DetalleFlujoService;
+import gob.servir.desempenio.service.FlujoService;
+import gob.servir.desempenio.service.InscripcionService;
+import gob.servir.desempenio.service.PlanDesarrolloService;
+import gob.servir.desempenio.service.PlanMetasService;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.faces.context.FacesContext;
+
+import org.primefaces.model.StreamedContent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+@Component("visualizarPlanesGPController")
+@Scope("session")
+public class VisualizarPlanesGPController implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private static final Logger logger = LoggerFactory
+			.getLogger(InscripcionController.class);
+
+	@Autowired
+	private LoginController loginController;
+	@Autowired
+	private CampaniaService campaniaService;
+	@Autowired
+	private InscripcionService inscripcionService;
+	@Autowired
+	private PlanMetasService planMetasService;
+	@Autowired
+	private PlanDesarrolloService planDesarrolloService;
+	@Autowired
+	private FlujoService flujoService;
+	@Autowired
+	private DetalleFlujoService detalleFlujoService;
+
+	private Inscripcion inscripcionSelec = null;
+
+	private PlanMetas planMetas = new PlanMetas();
+	private PlanMetas planMetasSelec = null;
+	private PlanMetas planMetasSelec2 = null;
+	private List<PlanMetas> listaPlanMetasVerificacion = new ArrayList<PlanMetas>();
+	private PlanDesarrollo planDesarrollo = new PlanDesarrollo();
+	private PlanDesarrollo planDesarrolloSelec = null;
+	private PlanDesarrollo planDesarrolloSelec2 = null;
+	private List<PlanDesarrollo> listaPlanDesarrolloVerificacion = new ArrayList<PlanDesarrollo>();
+
+	private Campania campania = new Campania();
+
+	private Usuario userSesion = null;
+
+	public VisualizarPlanesGPController() {
+		super();
+	}
+
+	@PostConstruct
+	public void cargar() {
+		validarSesion();
+		getInscripcion();
+		mostrarCampania();
+		buscarListaPlanMetas();
+		buscarListaPlanCompetencias();
+	}
+
+	public void getInscripcion() {
+		Inscripcion ins = inscripcionService.getInscripcionUsuario(userSesion);
+		if (ins != null)
+			inscripcionSelec = ins;
+	}
+
+	public Inscripcion getInscripcionSelec() {
+		return inscripcionSelec;
+	}
+
+	public void setInscripcionSelec(Inscripcion inscripcionSelec) {
+		this.inscripcionSelec = inscripcionSelec;
+	}
+
+	public Campania getCampania() {
+		return campania;
+	}
+
+	public void setCampania(Campania campania) {
+		this.campania = campania;
+	}
+
+	public PlanMetas getPlanMetasSelec2() {
+		return planMetasSelec2;
+	}
+
+	public void setPlanMetasSelec2(PlanMetas planMetasSelec2) {
+		this.planMetasSelec2 = planMetasSelec2;
+	}
+
+	public PlanMetas getPlanMetasSelec() {
+		return planMetasSelec;
+	}
+
+	public void setPlanMetasSelec(PlanMetas planMetasSelec) {
+		this.planMetasSelec = planMetasSelec;
+	}
+
+	public PlanDesarrollo getPlanDesarrolloSelec() {
+		return planDesarrolloSelec;
+	}
+
+	public void setPlanDesarrolloSelec(PlanDesarrollo planDesarrolloSelec) {
+		this.planDesarrolloSelec = planDesarrolloSelec;
+	}
+
+	public PlanDesarrollo getPlanDesarrolloSelec2() {
+		return planDesarrolloSelec2;
+	}
+
+	public void setPlanDesarrolloSelec2(PlanDesarrollo planDesarrolloSelec2) {
+		this.planDesarrolloSelec2 = planDesarrolloSelec2;
+	}
+
+	public void buscarListaPlanMetas() {
+		listaPlanMetasVerificacion.clear();
+		if (campania.getIdCampania() != 0L && inscripcionSelec != null) {
+			listaPlanMetasVerificacion = planMetasService
+					.getListaPlanMetas(inscripcionSelec.getId());
+
+		}
+	}
+
+	public void buscarListaPlanCompetencias() {
+		listaPlanDesarrolloVerificacion.clear();
+		if (campania.getIdCampania() != 0L && inscripcionSelec != null) {
+
+			listaPlanDesarrolloVerificacion = planDesarrolloService
+					.getListaPlanDesarrollo(inscripcionSelec.getId());
+		}
+	}
+
+	public List<PlanMetas> getListaPlanMetasVerificacion() {
+		return listaPlanMetasVerificacion;
+	}
+
+	public void setListaPlanMetasVerificacion(
+			List<PlanMetas> listaPlanMetasVerificacion) {
+		this.listaPlanMetasVerificacion = listaPlanMetasVerificacion;
+	}
+
+	public List<PlanDesarrollo> getListaPlanDesarrolloVerificacion() {
+		return listaPlanDesarrolloVerificacion;
+	}
+
+	public void setListaPlanDesarrolloVerificacion(
+			List<PlanDesarrollo> listaPlanDesarrolloVerificacion) {
+		this.listaPlanDesarrolloVerificacion = listaPlanDesarrolloVerificacion;
+	}
+
+	public void validarSesion() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		
+		userSesion = (Usuario) context.getExternalContext().getSessionMap()
+				.get(loginController.getUsername());
+
+		if (userSesion == null) {
+			String ctxPath = context.getExternalContext()
+					.getRequestContextPath();
+			try {
+				context.getExternalContext().redirect(ctxPath + "/login.jsf");
+			} catch (Exception e) {
+				//e.printStackTrace();
+			}
+		}
+	}
+
+	public PlanMetas getPlanMetas() {
+		return planMetas;
+	}
+
+	public void setPlanMetas(PlanMetas planMetas) {
+		this.planMetas = planMetas;
+	}
+
+	public PlanDesarrollo getPlanDesarrollo() {
+		return planDesarrollo;
+	}
+
+	public void setPlanDesarrollo(PlanDesarrollo planDesarrollo) {
+		this.planDesarrollo = planDesarrollo;
+	}
+
+	private StreamedContent docPlan;
+
+	public StreamedContent getDocPlan() {
+		validarSesion();
+		PlanesReport planesReport = new PlanesReport();
+		return planesReport.generarReporteAdm(campania.getIdCampania(),
+				campania, inscripcionSelec, listaPlanMetasVerificacion,
+				listaPlanDesarrolloVerificacion, userSesion);
+	}
+
+	public void setDocPlan(StreamedContent docPlan) {
+		this.docPlan = docPlan;
+	}
+
+	public void mostrarCampania() {
+		campania = campaniaService.find(userSesion.getIdCampania());
+
+	}
+
+	public void verPlan() {
+
+		planMetasSelec = planMetasService.find(planMetasSelec.getId());
+
+	}
+
+	public void verCompetencia() {
+
+		planDesarrolloSelec = planDesarrolloService.find(planDesarrolloSelec2
+				.getId());
+
+	}
+
+}

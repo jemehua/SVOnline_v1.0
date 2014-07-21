@@ -1,0 +1,334 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+	<h:outputStylesheet name="css/cssContent.css" />
+	<script type="text/javascript">
+		PrimeFaces.locales['es'] = {
+			closeText : 'Cerrar',
+			prevText : 'Anterior',
+			nextText : 'Siguiente',
+			monthNames : [ 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo',
+					'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre',
+					'Noviembre', 'Diciembre' ],
+			monthNamesShort : [ 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+					'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic' ],
+			dayNames : [ 'Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves',
+					'Viernes', 'Sábado' ],
+			dayNamesShort : [ 'Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab' ],
+			dayNamesMin : [ 'D', 'L', 'M', 'M', 'J', 'V', 'S' ],
+			weekHeader : 'Semana',
+			firstDay : 1,
+			isRTL : false,
+			showMonthAfterYear : false,
+			yearSuffix : '',
+			timeOnlyTitle : 'Sólo hora',
+			timeText : 'Tiempo',
+			hourText : 'Hora',
+			minuteText : 'Minuto',
+			secondText : 'Segundo',
+			currentText : 'Fecha actual',
+			ampm : false,
+			month : 'Mes',
+			week : 'Semana',
+			day : 'Día',
+			allDayText : 'Todo el día'
+		};
+	</script>
+	<script type="text/javascript">
+		function showPlanAdm() {
+			statusDialog.show();
+		}
+		function hidePlanAdm() {
+			statusDialog.hide();
+		}
+	</script>
+</h:head>
+<h:body>
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datos" header="Resultado de Planes">
+		<p:spacer height="10" />
+		<p:focus context="datos" />
+
+		<p:panelGrid styleClass="panelGrid" id="panelVerificador">
+			<p:row>
+				<p:column width="30">#{messages.lblCampania}
+				</p:column>
+				<p:column width="70">
+					<h:outputText value="#{visualizarPlanesGPController.campania}" />
+				</p:column>
+				<p:column></p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblGerentePublico}
+				</p:column>
+
+				<p:column>
+
+					<h:outputText
+						value="#{visualizarPlanesGPController.inscripcionSelec.asignacionGerenteV}" />
+
+				</p:column>
+
+				<p:column>
+					<p:commandLink ajax="false"
+						onclick="PrimeFaces.monitorDownload(showPlanAdm,hidePlanAdm)">
+						<p:graphicImage value="./images/pdf.png" />
+						<p:fileDownload value="#{visualizarPlanesGPController.docPlan}" />
+					</p:commandLink>
+				</p:column>
+			</p:row>
+
+		</p:panelGrid>
+
+		<p:dialog modal="true" widgetVar="statusDialog" header="Status"
+			draggable="false" closable="true">
+			<p:graphicImage value="./images/ajax-loader.gif" />
+		</p:dialog>
+
+		<p:spacer height="10" />
+
+		<!-- 	METAS -->
+		<p:dataTable id="dtMetas" var="planmeta"
+			value="#{visualizarPlanesGPController.listaPlanMetasVerificacion}"
+			rows="7" emptyMessage="#{messages.msgEmptyMessage}">
+
+			<f:facet name="header">  
+            Lista de Metas
+            </f:facet>
+
+			<p:column headerText="#{messages.lblCodigo}" style="width:10%">
+				<h:outputText value="#{planmeta.meta.id.idMeta}" />
+			</p:column>
+			<p:column headerText="Tipo Meta" style="width:15%">
+				<h:outputText value="#{planmeta.meta.tipo}" />
+			</p:column>
+			<p:column headerText="Meta"
+				style="width:30%; white-space: normal;text-align: justify;">
+				<h:outputText value="#{planmeta.meta.denominacion}" />
+			</p:column>
+			<p:column headerText="Relación POI"
+				style="width:27%; white-space: normal;text-align: justify;">
+				<h:outputText value="#{planmeta.meta.relacionPOI}" />
+			</p:column>
+			<p:column headerText="Peso (%)" style="width:8%">
+				<h:outputText value="#{planmeta.meta.peso}" />
+			</p:column>
+			<p:column headerText="#{messages.lblOpciones}" style="width:10%">
+				<p:commandButton value="" id="editAcJIT" icon="ui-icon-newwin"
+					update=":frm:dlgEditPlanMeda2,:frm:pnlEditPlanMeta22,:frm:pgComp12"
+					oncomplete="editDialogMeta2.show()"
+					action="#{visualizarPlanesGPController.verPlan}">
+					<f:setPropertyActionListener value="#{planmeta}"
+						target="#{visualizarPlanesGPController.planMetasSelec}" />
+					<f:setPropertyActionListener value="#{planmeta}"
+						target="#{visualizarPlanesGPController.planMetasSelec2}" />
+				</p:commandButton>
+				<pe:tooltip for="editAcJIT" value="Ver Plan de Acción"
+					showEffect="fadeIn" hideEffect="fadeIn" atPosition="top center"
+					myPosition="bottom center" />
+			</p:column>
+			<f:facet name="footer">
+				<div class="mensaje">Seleccione un registro para aprobar /
+					desaprobar Plan de Acción de Metas</div>
+			</f:facet>
+		</p:dataTable>
+
+		<p:spacer height="20" />
+
+		<!-- 	PLAN DE DESARROLLO -->
+		<p:dataTable id="dtCompetencias" var="planDesarrollo"
+			value="#{visualizarPlanesGPController.listaPlanDesarrolloVerificacion}"
+			rows="7" emptyMessage="#{messages.msgEmptyMessage}">
+
+			<f:facet name="header">  
+            Lista de Competencias [Brecha > 0]
+            </f:facet>
+
+			<p:column headerText="#{messages.lblCodigo}" style="width:10%">
+				<h:outputText
+					value="#{planDesarrollo.evaluacionInicial.id.idCompetencia}" />
+			</p:column>
+			<p:column headerText="Competencia" style="width:60%">
+				<h:outputText
+					value="#{planDesarrollo.evaluacionInicial.competencia.competencia.denominacion}" />
+			</p:column>
+			<p:column headerText="Nivel Deseado" style="width:10%">
+				<h:outputText
+					value="#{planDesarrollo.evaluacionInicial.competencia.nivelDeseado}" />
+			</p:column>
+			<p:column headerText="Eval.Inicial" style="width:10%">
+				<h:outputText value="#{planDesarrollo.evaluacionInicial.nota}" />
+			</p:column>
+			<p:column headerText="Brecha" style="width:10%">
+				<h:outputText value="#{planDesarrollo.evaluacionInicial.brecha}" />
+			</p:column>
+			<p:column headerText="#{messages.lblOpciones}" style="width:10%">
+				<p:commandButton value="" id="editAcJI2" icon="ui-icon-newwin"
+					update=":frm:dlgEditPlanDesarrollo2,:frm:pnlEditPlanDesarrollo2,:frm:pgComp23"
+					action="#{visualizarPlanesGPController.verCompetencia}"
+					oncomplete="editDialogCompetencia2.show()">
+					<!-- 					<f:setPropertyActionListener value="#{planDesarrollo}" -->
+					<!-- 						target="#visualizarPlanesGPController.planDesarrolloSelec}" /> -->
+					<f:setPropertyActionListener value="#{planDesarrollo}"
+						target="#{visualizarPlanesGPController.planDesarrolloSelec2}" />
+				</p:commandButton>
+				<pe:tooltip for="editAcJI2" value="Ver Plan de Competencia"
+					showEffect="fadeIn" hideEffect="fadeIn" atPosition="top center"
+					myPosition="bottom center" />
+			</p:column>
+			<f:facet name="footer">
+				<div class="mensaje">Seleccione un registro para aprobar /
+					desaprobar Plan de Desarrollo de Competencias</div>
+			</f:facet>
+		</p:dataTable>
+		<p:spacer height="10" />
+
+	</p:panel>
+
+
+
+	<!-- 	Dialog PLan Metas -->
+	<p:dialog id="dlgEditPlanMeda2" header="Plan de Acción de Metas"
+		widgetVar="editDialogMeta2" modal="true" resizable="false" width="680"
+		showEffect="clip" closable="true" hideEffect="fold">
+		<p:panel id="pnlEditPlanMeta22">
+			<p:panelGrid id="pgComp12" styleClass="panelGrid">
+				<p:row>
+					<p:column>Tipo Meta:
+				    </p:column>
+					<p:column>
+						<h:outputText
+							value="#{visualizarPlanesGPController.planMetasSelec2.meta.tipo}" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>Meta:
+				    </p:column>
+					<p:column>
+						<h:outputText
+							value="#{visualizarPlanesGPController.planMetasSelec2.meta.denominacion}" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>Relación POI:
+				</p:column>
+					<p:column>
+						<h:outputLabel
+							value="#{visualizarPlanesGPController.planMetasSelec2.meta.relacionPOI}" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>Peso (%):
+				    </p:column>
+					<p:column>
+						<h:outputText
+							value="#{visualizarPlanesGPController.planMetasSelec2.meta.peso}" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>Fecha Culminación:
+				    </p:column>
+					<p:column>
+						<h:outputText
+							value="#{visualizarPlanesGPController.planMetasSelec2.meta.fechaFinMeta}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+				</p:row>
+
+
+				<p:row>
+					<p:column>Plan de acción:
+				</p:column>
+					<p:column>
+						<h:outputLabel
+							value="#{visualizarPlanesGPController.planMetasSelec.descripcionPlan}" />
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+
+		</p:panel>
+	</p:dialog>
+
+	<!-- 	Dialog Plan de Desarrollo -->
+	<p:dialog id="dlgEditPlanDesarrollo2"
+		header="Plan de Desarrollo de Competencias"
+		widgetVar="editDialogCompetencia2" modal="true" resizable="false"
+		width="680" showEffect="clip" closable="true" hideEffect="fold">
+		<p:panel id="pnlEditPlanDesarrollo2">
+			<p:panelGrid id="pgComp23" styleClass="panelGrid">
+				<p:row>
+					<p:column width="30">Competencia
+				</p:column>
+					<p:column width="70">
+						<h:outputLabel
+							value="#{visualizarPlanesGPController.planDesarrolloSelec2.evaluacionInicial.competencia.competencia.denominacion}" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column width="30">Actividad de Capacitación
+				</p:column>
+					<p:column width="70">
+						<h:outputLabel
+							value="#{visualizarPlanesGPController.planDesarrolloSelec.actCapacitacion}"
+							styleClass="txt" style="width:580px;" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column width="30">Fecha de culminación de Capacitación
+				</p:column>
+					<p:column width="70">
+						<h:outputLabel
+							value="#{visualizarPlanesGPController.planDesarrolloSelec.fechaFinCapacitacion}"
+							styleClass="txt" style="width:580px;">
+							<f:convertDateTime type="date" dateStyle="short"
+								pattern="dd/MM/yyyy" />
+						</h:outputLabel>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>Actividad de Entrenamiento
+				</p:column>
+					<p:column>
+						<h:outputLabel
+							value="#{visualizarPlanesGPController.planDesarrolloSelec.actEntrenamiento}"
+							styleClass="txt" style="width:580px;" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column width="30">Fecha de culminación de Entrenamiento
+				</p:column>
+					<p:column width="70">
+						<h:outputLabel
+							value="#{visualizarPlanesGPController.planDesarrolloSelec.fechaFinEntrenamiento}"
+							styleClass="txt" style="width:580px;">
+							<f:convertDateTime type="date" dateStyle="short"
+								pattern="dd/MM/yyyy" />
+						</h:outputLabel>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+
+		</p:panel>
+	</p:dialog>
+
+
+</h:body>
+<p:ajaxStatus
+	style="width:64px;height:64px;position:fixed;right:5px;bottom:5px"
+	id="ajaxStatusPanel">
+	<f:facet name="start">
+		<p:graphicImage value="./images/loading.gif" />
+	</f:facet>
+
+	<f:facet name="complete">
+		<h:outputText value="" />
+	</f:facet>
+</p:ajaxStatus>
+</html>

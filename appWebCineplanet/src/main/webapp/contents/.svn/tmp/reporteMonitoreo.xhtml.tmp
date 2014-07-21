@@ -1,0 +1,319 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<<<<<<< .mine
+=======
+<h:head>
+		<script type="text/javascript">
+		function showStatusRepMo() {
+			statusDialog.show();
+		}
+		function hideStatusRepMo() {
+			statusDialog.hide();
+		}
+	</script>	
+	
+</h:head>
+>>>>>>> .r1408
+<h:body>
+	<h:outputStylesheet name="css/cssContent.css" />
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datos" header="Monitoreo">
+		<p:focus context="datos" />
+		<table cellpadding="2" cellspacing="4">
+			<tr>
+				<td>#{messages.lblCampania}</td>
+				<td><p:selectOneMenu id="comboCampania"
+						value="#{reporteMonitoreoController.campaniaSelec}"
+						style="width:250px;" tabindex="1">
+						<f:selectItems value="#{reporteMonitoreoController.comboCampania}" />
+						<p:ajax update="feInicio, feFin, dtList" event="change"
+							listener="#{reporteMonitoreoController.cargarData}" />
+					</p:selectOneMenu></td>
+			</tr>
+			<tr>
+				<td>Fecha Inicio</td>
+				<td><h:outputText id="feInicio"
+						value="#{reporteMonitoreoController.campania.fechaInicio}">
+						<f:convertDateTime type="date" dateStyle="short"
+							pattern="dd/MM/yyyy" />
+					</h:outputText> <p:spacer width="10" /> Fecha Fin<p:spacer width="5" /> <h:outputText
+						id="feFin" value="#{reporteMonitoreoController.campania.fechaFin}">
+						<f:convertDateTime type="date" dateStyle="short"
+							pattern="dd/MM/yyyy" />
+					</h:outputText></td>
+				<td>
+						<h:commandLink
+							onclick="PrimeFaces.monitorDownload(showStatusRepMo,hideStatusRepMo)">
+							<p:graphicImage value="./images/export1.png" width="25" height="25"/>
+							<p:dataExporter type="xls" target="dtList" fileName="reporteMonitoreo"
+								postProcessor="#{reporteMonitoreoController.postProcessXLS}" />
+						</h:commandLink>
+				
+						<p:dialog modal="true" widgetVar="statusDialog" header="Status"
+							draggable="false" closable="true">
+							<p:graphicImage value="./images/ajax-loader.gif" />
+						</p:dialog>
+								
+				</td>	
+			</tr>
+		</table>
+	</p:panel>
+
+	<p:dataTable var="ins"
+		value="#{reporteMonitoreoController.listMonitoreo}" id="dtList"
+		paginator="true" rows="15"
+		paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+		emptyMessage="#{messages.msgEmptyMessage}">
+
+		<f:facet name="header">    
+            	Lista de Gerentes Públicos Inscritos
+            	</f:facet>
+		<!--  filterBy="#{ins.codGerente}" filterStyle="width:30px;" -->
+		<p:columnGroup type="header">
+			<p:row>
+				<p:column rowspan="2" headerText="GP" filterBy="#{ins.codGerente}"
+					filterStyle="width:30px;" />
+				<p:column colspan="9" headerText="Planeamiento del Desempeño" />
+				<p:column colspan="3" headerText="Medio Año" />
+				<p:column colspan="8" headerText="Fin Año" />
+				<p:column rowspan="2" headerText="EFD" />
+			</p:row>
+
+			<p:row>
+				<p:column headerText="A1"/>
+				<p:column headerText="A2" />
+				<p:column headerText="A3" />
+				<p:column headerText="A4" />
+				<p:column headerText="A5" />
+				<p:column headerText="A6" />
+				<p:column headerText="A7" />
+				<p:column headerText="A8" />
+				<p:column headerText="A9" />
+				<p:column headerText="A1" />
+				<p:column headerText="A2" />
+				<p:column headerText="A3" />
+				<p:column headerText="A1" />
+				<p:column headerText="A2" />
+				<p:column headerText="A3" />
+				<p:column headerText="A4" />
+				<p:column headerText="A5" />
+				<p:column headerText="A6" />
+				<p:column headerText="A7" />
+				<p:column headerText="A8" />
+			</p:row>
+		</p:columnGroup>
+
+		<p:column>
+			<h:outputLink id="fade" value="#">
+				<h:outputText value="#{ins.codGerente}" />
+			</h:outputLink>
+			<p:tooltip for="fade" value="#{ins}" showEffect="fade"
+				hideEffect="fade" />
+		</p:column>
+		<p:column styleClass="#{ins.color1}">
+			<h:outputText value="#{ins.act1}" />
+		</p:column>
+		<p:column styleClass="#{ins.color2}">
+			<h:outputText value="#{ins.act2}" />
+		</p:column>
+		<p:column styleClass="#{ins.color3}">
+			<h:outputText value="#{ins.act3}" />
+		</p:column>
+		<p:column styleClass="#{ins.color4}">
+			<h:outputText value="#{ins.act4}" />
+		</p:column>
+		<p:column styleClass="#{ins.color5}">
+			<h:outputText value="#{ins.act5}" />
+		</p:column>
+		<p:column styleClass="#{ins.color6}">
+			<h:outputText value="#{ins.act6}" />
+		</p:column>
+		<p:column styleClass="#{ins.color7}">
+			<h:outputText value="#{ins.act7}" />
+		</p:column>
+		<p:column styleClass="#{ins.color8}">
+			<h:outputText value="#{ins.act8}" />
+		</p:column>
+		<p:column styleClass="#{ins.color9}">
+			<h:outputText value="#{ins.act9}" />
+		</p:column>
+		<p:column styleClass="#{ins.color10}">
+			<h:outputText value="#{ins.act10}" />
+		</p:column>
+		<p:column styleClass="#{ins.color11}">
+			<h:outputText value="#{ins.act11}" />
+		</p:column>
+		<p:column styleClass="#{ins.color12}">
+			<h:outputText value="#{ins.act12}" />
+		</p:column>
+		<p:column styleClass="#{ins.color13}">
+			<h:outputText value="#{ins.act13}" />
+		</p:column>
+		<p:column styleClass="#{ins.color14}">
+			<h:outputText value="#{ins.act14}" />
+		</p:column>
+		<p:column styleClass="#{ins.color15}">
+			<h:outputText value="#{ins.act15}" />
+		</p:column>
+		<p:column styleClass="#{ins.color16}">
+			<h:outputText value="#{ins.act16}" />
+		</p:column>
+		<p:column styleClass="#{ins.color17}">
+			<h:outputText value="#{ins.act17}" />
+		</p:column>
+		<p:column styleClass="#{ins.color18}">
+			<h:outputText value="#{ins.act18}" />
+		</p:column>
+		<p:column styleClass="#{ins.color19}">
+			<h:outputText value="#{ins.act19}" />
+		</p:column>
+		<p:column styleClass="#{ins.color20}">
+			<h:outputText value="#{ins.act20}" />
+		</p:column>
+		<p:column styleClass="#{ins.promedioFinal gt 0.0 ? 'old' : null}">
+			<h:outputText value="#{ins.promedioFinal}" />
+		</p:column>
+
+		<f:facet name="footer">
+					Total de registros #{reporteMonitoreoController.cantidad}
+			</f:facet>
+	</p:dataTable>
+
+	<!-- 	<p:commandLink id="sd" update="modalDialog" onclick="dlg2.show();" -->
+	<!-- 		style="margin-right:20px;"> -->
+	<!-- 		<h:outputText value="Leyenda" /> -->
+	<!-- 	</p:commandLink> -->
+	<br></br>
+	<p:commandButton id="modalDialogButton" value="Leyenda"
+		onclick="dlg2.show();" type="button" />
+
+	<p:dialog id="modalDialog" header="Leyenda" widgetVar="dlg2"
+		modal="true" width="450">
+
+		<table cellspacing="2" cellpadding="2">
+			<thead>
+				<th></th>
+				<th style="text-align: left;">Planeamiento del Desempeño</th>
+			</thead>
+			<tbody>
+				<tr>
+					<td>A1</td>
+					<td>Recibir Notificación (1)</td>
+				</tr>
+				<tr>
+					<td>A2</td>
+					<td>Revisar y Proponer modificación de Indicadores y Metas</td>
+				</tr>
+				<tr>
+					<td>A3</td>
+					<td>Notificar Monitoreo y Evaluación de las modificaciones
+						propuestas</td>
+				</tr>
+				<tr>
+					<td>A4</td>
+					<td>V°B°</td>
+				</tr>
+				<tr>
+					<td>A5</td>
+					<td>Recibir Notificación (2)</td>
+				</tr>
+				<tr>
+					<td>A6</td>
+					<td>Registrar Plan de Desarrollo de Competencias</td>
+				</tr>
+				<tr>
+					<td>A7</td>
+					<td>Registrar Plan de Acción de Metas</td>
+				</tr>
+				<tr>
+					<td>A8</td>
+					<td>Notificar Monitoreo y Evaluación de los planes registrados</td>
+				</tr>
+				<tr>
+					<td>A9</td>
+					<td>Recibir y Analizar las observaciones correspondientes a
+						los planes registrados</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<table cellspacing="2" cellpadding="2">
+			<thead>
+				<th></th>
+				<th style="text-align: left;">Evaluación Medio Año</th>
+			</thead>
+			<tbody>
+				<tr>
+					<td>A1</td>
+					<td>Recibir Notificación</td>
+				</tr>
+				<tr>
+					<td>A2</td>
+					<td>Registra Evaluación Cualitativa de Competencias</td>
+				</tr>
+				<tr>
+					<td>A3</td>
+					<td>Registra Evaluación Cualitativa de Metas</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<table cellspacing="2" cellpadding="2">
+			<thead>
+				<th></th>
+				<th style="text-align: left;">Evaluación Fin de Año</th>
+			</thead>
+			<tbody>
+				<tr>
+					<td>A1</td>
+					<td>Recibir Notificación (1)</td>
+				</tr>
+				<tr>
+					<td>A2</td>
+					<td>Evaluar Cuantitativamente Competencias Nro.1</td>
+				</tr>
+				<tr>
+					<td>A3</td>
+					<td>Evaluar Cuantitativamente las Metas Nro.1</td>
+				</tr>
+				<tr>
+					<td>A4</td>
+					<td>Recibir Notificación (2)</td>
+				</tr>
+				<tr>
+					<td>A5</td>
+					<td>Evaluar Cuantitativamente Competencias Nro.2</td>
+				</tr>
+				<tr>
+					<td>A6</td>
+					<td>Evaluar Cuantitativamente Metas Nro.2</td>
+				</tr>
+				<tr>
+					<td>A7</td>
+					<td>Recibir Notificación (3)</td>
+				</tr>
+				<tr>
+					<td>A8</td>
+					<td>Evaluar Cuantitativamente Competencias Nro.3</td>
+				</tr>
+			</tbody>
+		</table>
+	</p:dialog>
+</h:body>
+<p:ajaxStatus
+	style="width:64px;height:64px;position:fixed;right:5px;bottom:5px"
+	id="ajaxStatusPanel">
+	<f:facet name="start">
+		<p:graphicImage value="./images/loading.gif" />
+	</f:facet>
+	<f:facet name="complete">
+		<h:outputText value="" />
+	</f:facet>
+</p:ajaxStatus>
+</html>

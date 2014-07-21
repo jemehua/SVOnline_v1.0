@@ -1,0 +1,10 @@
+package gob.servir.desempenio.service;
+
+import java.util.List;
+
+import gob.servir.desempenio.model.DetalleTipoCompetencia;
+
+public interface DetalleTipoCompetenciaService {
+	public abstract List<DetalleTipoCompetencia> find(Long id);
+
+}

@@ -1,0 +1,182 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.PlanMetasDao;
+import gob.servir.desempenio.model.InscripcionPK;
+import gob.servir.desempenio.model.Meta;
+import gob.servir.desempenio.model.MetaPK;
+import gob.servir.desempenio.model.PlanMetas;
+import gob.servir.desempenio.model.PlanMetasPK;
+import gob.servir.desempenio.util.Constantes;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Repository
+public class PlanMetasDaoImpl implements PlanMetasDao {
+	@PersistenceContext
+	private EntityManager em;
+
+	public PlanMetas find(PlanMetasPK id) {
+		try {
+			return em.find(PlanMetas.class, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public PlanMetas save(PlanMetas obj) {
+		try {
+			em.persist(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public PlanMetas edit(PlanMetas obj) {
+		try {
+			return em.merge(obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<PlanMetas> getListaPlanMetas() {
+		TypedQuery<PlanMetas> tq = em.createNamedQuery(
+				"PlanMetas.getListPlanMetas", PlanMetas.class);
+
+		try {
+			return tq.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<PlanMetas> getListaPlanMetas(InscripcionPK inspk) {
+		Query q = em
+				.createNamedQuery("PlanMetas.getListByCampaniaAndGerente");
+		q.setParameter("idCampania", inspk.getIdCampania());
+		q.setParameter("idGerente", inspk.getIdGerentePublico());
+		q.setParameter("estado", Constantes.ACTIVO);
+		try {
+
+			List<Object[]> listaObjetos = new ArrayList<Object[]>();
+
+			listaObjetos = q.getResultList();
+
+			List<PlanMetas> listaPlanMetas = new ArrayList<PlanMetas>();
+
+			for (Object[] row : listaObjetos) {
+				PlanMetas planMetas = new PlanMetas();
+				Meta meta = new Meta();
+				meta.setId((MetaPK) row[0]);
+				meta.setTipo((String) row[1]);
+				meta.setDenominacion((String) row[2]);
+				meta.setRelacionPOI((String) row[3]);
+				meta.setPeso((Integer) row[4]);
+				meta.setAprobacion((Boolean) row[5]);
+				meta.setObservacion((String) row[6]);
+				meta.setEstado((String) row[7]);
+				planMetas.setId((PlanMetasPK) row[8]);
+				planMetas.setMeta(meta);
+				planMetas.setDescripcionPlan((String) row[9]);
+				planMetas.setAprobacion((Boolean) row[10]);
+				planMetas.setObservacion((String) row[11]);
+				planMetas.setEstado((String) row[12]);
+				meta.setFechaFinMeta((Date) row[13]);
+
+				listaPlanMetas.add(planMetas);
+			}
+
+			return listaPlanMetas;
+
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<PlanMetas> getListaPlanMetas(InscripcionPK inspk,
+			boolean aprobacion) {
+		Query q = em
+				.createNamedQuery("PlanMetas.getListByCampaniaAndGerenteAndAprobacion");
+		q.setParameter("idCampania", inspk.getIdCampania());
+		q.setParameter("idGerente", inspk.getIdGerentePublico());
+		q.setParameter("aprobacion", aprobacion);
+		q.setParameter("estado", Constantes.ACTIVO);
+		try {
+
+			List<Object[]> listaObjetos = new ArrayList<Object[]>();
+
+			listaObjetos = q.getResultList();
+
+			List<PlanMetas> listaPlanMetas = new ArrayList<PlanMetas>();
+
+			for (Object[] row : listaObjetos) {
+				PlanMetas planMetas = new PlanMetas();
+				Meta meta = new Meta();
+				meta.setId((MetaPK) row[0]);
+				meta.setTipo((String) row[1]);
+				meta.setDenominacion((String) row[2]);
+				meta.setRelacionPOI((String) row[3]);
+				meta.setPeso((Integer) row[4]);
+				meta.setFechaFinMeta((Date) row[5]);
+				meta.setAprobacion((Boolean) row[6]);
+				meta.setObservacion((String) row[7]);
+				meta.setEstado((String) row[8]);
+				planMetas.setId((PlanMetasPK) row[9]);
+				planMetas.setMeta(meta);
+				planMetas.setDescripcionPlan((String) row[10]);
+				planMetas.setAprobacion((Boolean) row[11]);
+				planMetas.setObservacion((String) row[12]);
+				planMetas.setEstado((String) row[13]);
+
+				listaPlanMetas.add(planMetas);
+			}
+
+			return listaPlanMetas;
+
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public Integer getCantidadPlanesDesaprobados(InscripcionPK inspk,
+			boolean aprobacion) {
+
+		TypedQuery<Long> tq = em.createNamedQuery(
+				"PlanMetas.getCantidadPlanesDesaprobados", Long.class);
+		tq.setParameter("idCampania", inspk.getIdCampania());
+		tq.setParameter("idGerente", inspk.getIdGerentePublico());
+		tq.setParameter("aprobacion", aprobacion);
+		tq.setParameter("estado", Constantes.ACTIVO);
+		try {
+			return tq.getSingleResult().intValue();
+		} catch (Exception as) {
+			return 0;
+		}
+	}
+
+}

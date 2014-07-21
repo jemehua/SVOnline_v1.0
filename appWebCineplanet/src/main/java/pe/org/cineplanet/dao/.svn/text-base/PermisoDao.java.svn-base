@@ -1,0 +1,23 @@
+package gob.servir.desempenio.dao;
+
+import gob.servir.desempenio.model.Permiso;
+
+import java.util.List;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+public interface PermisoDao {
+	
+	public abstract Permiso find(Long id);
+	
+	public abstract Permiso save(Permiso obj);
+	
+	public abstract List<Permiso> getListaPermiso();
+	
+	public abstract List<Permiso> getListaPermiso(Long idRol);
+	
+	public abstract List<Permiso> getListaPermiso(Long idMenu, Long idRol);
+
+}

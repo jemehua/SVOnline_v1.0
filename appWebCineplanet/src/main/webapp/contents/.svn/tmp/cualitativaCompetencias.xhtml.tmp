@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<h:outputStylesheet name="css/cssContent.css" />
+</h:head>
+<h:body>
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="datos"
+		header="Evaluación Cualitativa del Plan de Desarrollo de Competencias">
+		<p:focus context="datos" />
+		<p:spacer height="10" />
+		<p:panelGrid styleClass="panelGrid">
+			<p:row>
+				<p:column width="30">#{messages.lblCampania}<h:outputText
+						value="*" styleClass="obligatorio" />
+				</p:column>
+				<p:column width="70">
+					<h:outputLabel
+						value="#{cualitativaCompetenciasController.inscripcion.campania.denominacion}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblGerentePublico}<h:outputText
+						value="*" styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+<<<<<<< .mine
+					<h:outputLabel
+						value="#{cualitativaCompetenciasController.inscripcion.asignacionGerenteV}" />
+=======
+					<h:outputLabel value="#{cualitativaCompetenciasController.inscripcion.asignacionGerenteV.nombres} #{cualitativaCompetenciasController.inscripcion.asignacionGerenteV.ap_paterno} #{cualitativaCompetenciasController.inscripcion.asignacionGerenteV.ap_materno}" />
+>>>>>>> .r742
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>#{messages.lblPuesto}<h:outputText value="*"
+						styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<h:outputText
+						value="#{cualitativaCompetenciasController.inscripcion.puestoTipoV}" />
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+		<p:spacer height="10" />
+		<p:dataTable var="evaInicial"
+			value="#{cualitativaCompetenciasController.dataModelPlan}"
+			id="dtMetas"
+			selection="#{cualitativaCompetenciasController.evaInicialSelec}"
+			selectionMode="single" rows="7"
+			emptyMessage="#{messages.msgEmptyMessage}">
+
+
+			<p:ajax event="rowSelect"
+				listener="#{cualitativaCompetenciasController.onRowSelect}"
+				update=":frm:pgPlan,:frm:messages" />
+			<p:ajax event="rowUnselect"
+				listener="#{cualitativaCompetenciasController.onRowUnselect}"
+				update=":frm:messages" />
+
+			<f:facet name="header">  
+            Lista de Competencias [Brecha > 0]
+            </f:facet>
+
+			<p:column headerText="#{messages.lblCodigo}" style="width:10%">
+				<h:outputText value="#{evaInicial.id.idCompetencia}" />
+			</p:column>
+			<p:column headerText="Competencia" style="width:60%">
+				<h:outputText
+					value="#{evaInicial.competencia.competencia.denominacion}" />
+			</p:column>
+			<p:column headerText="Nivel Deseado" style="width:10%">
+				<h:outputText value="#{evaInicial.competencia.nivelDeseado}" />
+			</p:column>
+			<p:column headerText="Eval.Inicial" style="width:10%">
+				<h:outputText value="#{evaInicial.nota}" />
+			</p:column>
+			<p:column headerText="Brecha" style="width:10%">
+				<h:outputText value="#{evaInicial.brecha}" />
+			</p:column>
+<<<<<<< .mine
+=======
+			
+			<f:facet name="footer" >  
+			<div style="text-align: left; color: blue;">
+            Por favor, seleccione un registro e ingrese Evaluación anual</div>
+            </f:facet>
+>>>>>>> .r742
+
+			<f:facet name="footer">
+				<div style="text-align: left; color: blue;">Por favor,
+					seleccione un registro e ingrese Plan de Desarrollo de Comptencias</div>
+			</f:facet>
+
+		</p:dataTable>
+		<p:spacer height="10" />
+		<p:panelGrid id="pgPlan" styleClass="panelGrid">
+			<p:focus context="pgPlan" />
+			<p:row>
+				<p:column width="30">Competencia<h:outputText value="*"
+						styleClass="obligatorio" />
+				</p:column>
+				<p:column width="70">
+					<h:outputLabel
+						value="#{cualitativaCompetenciasController.competencia}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column width="30">Actividad de Capacitación<h:outputText
+						value="*" styleClass="obligatorio" />
+				</p:column>
+				<p:column width="70">
+					<p:inputText
+						value="#{cualitativaCompetenciasController.planDesarrollo.actCapacitacion}"
+						tabindex="1" maxlength="300" styleClass="txt" style="width:580px;"
+						readonly="true" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>Actividad de Entrenamiento<h:outputText
+						value="*" styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<p:inputText id="apPaterno"
+						value="#{cualitativaCompetenciasController.planDesarrollo.actEntrenamiento}"
+						tabindex="2" maxlength="300" styleClass="txt" style="width:580px;"
+						readonly="true" />
+				</p:column>
+			</p:row>
+
+
+			<p:row>
+				<p:column>Evaluación Cualitativa<h:outputText value="*"
+						styleClass="obligatorio" />
+				</p:column>
+				<p:column>
+					<p:inputText
+						value="#{cualitativaCompetenciasController.cualitativa.descripcion}"
+						tabindex="2" maxlength="300" styleClass="txt" style="width:580px;" />
+				</p:column>
+			</p:row>
+
+		</p:panelGrid>
+		<p:separator height="0" />
+		<table style="width: 100%">
+			<tr>
+				<td align="left"><p:commandButton value="Guardar"
+						action="#{cualitativaCompetenciasController.guardar}"
+						disabled="#{cualitativaCompetenciasController.swFlujo}"
+						update="dtMetas,pgPlan,messages" icon="ui-icon-document"
+						tabindex="3" /> <p:commandButton value="#{messages.btnCancelar}"
+						update="datos,messages"
+						action="#{cualitativaCompetenciasController.limpiar}"
+						icon="ui-icon-close" tabindex="4" /></td>
+				<td align="right"><p:commandButton value="Continuar"
+						id="btFlujo" update="datos,messages"
+						action="#{cualitativaCompetenciasController.atenderFlujo}"
+						icon="ui-icon-circle-arrow-e" tabindex="5"
+						disabled="#{cualitativaCompetenciasController.swFlujo}" /></td>
+			</tr>
+		</table>
+		<p:separator id="s2" />
+	</p:panel>
+</h:body>
+</html>

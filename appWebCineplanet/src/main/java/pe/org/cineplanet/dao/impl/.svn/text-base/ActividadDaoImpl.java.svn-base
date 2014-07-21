@@ -1,0 +1,163 @@
+package gob.servir.desempenio.daoImpl;
+
+import gob.servir.desempenio.dao.ActividadDao;
+import gob.servir.desempenio.model.Actividad;
+import gob.servir.desempenio.util.Constantes;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.faces.model.SelectItem;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 
+ * @author Hever Pumallihua
+ */
+@Repository
+public class ActividadDaoImpl implements ActividadDao {
+	@PersistenceContext
+	private EntityManager em;
+
+	public Actividad find(Long id) {
+		try {
+			return em.find(Actividad.class, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Actividad save(Actividad obj) {
+		try {
+			em.persist(obj);
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Transactional
+	public Actividad edit(Actividad obj) {
+		try {
+			return em.merge(obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<Actividad> getListaActividad() {
+		TypedQuery<Actividad> tq = em.createNamedQuery(
+				"Actividad.getListaActividadAll", Actividad.class);
+
+		try {
+			return tq.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<Actividad> getListaActTemporizado(Long idProceso) {
+
+		TypedQuery<Actividad> tq = em.createNamedQuery(
+				"Actividad.getListaActTemporizado", Actividad.class);
+
+		tq.setParameter("idProceso", idProceso);
+		tq.setParameter("tipo", Constantes.TEMPORIZADOR);
+		tq.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+			return tq.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<Actividad> getListaActividad(Long idProceso) {
+		TypedQuery<Actividad> tq = em.createNamedQuery(
+				"Actividad.getListaActividad", Actividad.class);
+
+		tq.setParameter("idProceso", idProceso);
+		tq.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+			return tq.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<SelectItem> getComboActividad(Long idProceso) {
+
+		List<SelectItem> listaCombo = new ArrayList<SelectItem>();
+		List<Actividad> lista = new ArrayList<Actividad>();
+		try {
+			lista = getListaActividad(idProceso);
+		} catch (Exception as) {
+			as.printStackTrace();
+			SelectItem fila = new SelectItem(0L, "Seleccione actividad");
+			listaCombo.add(fila);
+			return listaCombo;
+		}
+		SelectItem fila = new SelectItem(0L, "Seleccione actividad");
+		listaCombo.add(fila);
+
+		for (Actividad row : lista) {
+			fila = new SelectItem(row.getId().getIdActividad(), row.getNombre());
+			listaCombo.add(fila);
+		}
+		return listaCombo;
+	}
+
+	public List<Actividad> getListaActTempTodos(Long idProceso) {
+
+		TypedQuery<Actividad> tq = em.createNamedQuery(
+				"Actividad.getListaActTempTodos", Actividad.class);
+
+		tq.setParameter("idProceso", idProceso);
+		tq.setParameter("tipo1", Constantes.TEMPORIZADOR);
+		tq.setParameter("tipo2", Constantes.NOTIFICACION);
+		tq.setParameter("estado", Constantes.ACTIVO);
+
+		try {
+			return tq.getResultList();
+		} catch (Exception as) {
+			as.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<SelectItem> getComboActTemp(Long idProceso) {
+
+		List<SelectItem> listaCombo = new ArrayList<SelectItem>();
+		List<Actividad> lista = new ArrayList<Actividad>();
+		try {
+			lista = getListaActTempTodos(idProceso);
+		} catch (Exception as) {
+			as.printStackTrace();
+			SelectItem fila = new SelectItem(0L, "Seleccione actividad");
+			listaCombo.add(fila);
+			return listaCombo;
+		}
+		SelectItem fila = new SelectItem(0L, "Seleccione actividad");
+		listaCombo.add(fila);
+
+		for (Actividad row : lista) {
+			fila = new SelectItem(row.getId().getIdActividad(), row.getNombre());
+			listaCombo.add(fila);
+		}
+		return listaCombo;
+	}
+
+}
