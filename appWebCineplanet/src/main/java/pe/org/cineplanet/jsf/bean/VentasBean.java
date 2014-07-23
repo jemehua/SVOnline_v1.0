@@ -10,6 +10,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,11 +86,15 @@ public class VentasBean implements Serializable {
 	private List<SelectItem> comboTipoEntrada = new ArrayList<SelectItem>();
 	private Long tipoEntradaSelec;
 	private List<SelectItem> comboCliente = new ArrayList<SelectItem>();
-	private String clienteSelec;
+	private Long clienteSelec;
 	private List<SelectItem> comboTipoDocumento = new ArrayList<SelectItem>();
 	private Long tipoDocumentoSelec;
 
 	private Long idVentaSelec;
+	private StreamedContent file;
+
+	// autocomplete
+	private Cliente cliente;
 
 	public VentasBean() {
 		super();
@@ -101,7 +106,7 @@ public class VentasBean implements Serializable {
 		venta = new Venta();
 		// detalleVenta = new DetalleVenta();
 		tipoEntradaSelec = 0L;
-		clienteSelec = "";
+		clienteSelec = 0L;
 		tipoDocumentoSelec = 0L;
 		cantidad = "";
 		descTipoEntrada = "";
@@ -135,7 +140,7 @@ public class VentasBean implements Serializable {
 		venta = new Venta();
 		// detalleVenta = new DetalleVenta();
 		tipoEntradaSelec = 0L;
-		clienteSelec = "";
+		clienteSelec = 0L;
 		tipoDocumentoSelec = 0L;
 		cantidad = "";
 		descTipoEntrada = "";
@@ -147,6 +152,8 @@ public class VentasBean implements Serializable {
 		cargarComboCliente();
 		cargarComboTipoDocumento();
 		cargarListaVentas();
+		
+		cliente = new Cliente();
 	}
 
 	public void limpiarPedido() {
@@ -284,7 +291,7 @@ public class VentasBean implements Serializable {
 			return false;
 		}
 
-		if (clienteSelec.equalsIgnoreCase("")) {
+		if (clienteSelec != 0L) {
 			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
 					"ADVERTENCIA", "Seleccione Cliente"));
 			return false;
@@ -352,6 +359,8 @@ public class VentasBean implements Serializable {
 		cargarCantidadDisponibleByTipoEntrada();
 
 	}
+	
+	
 
 	public void cargarDescTipoEntrada() {
 		descTipoEntrada = "";
@@ -390,7 +399,7 @@ public class VentasBean implements Serializable {
 
 	public void cargarDescAgenciaByCliente() {
 		descAgencia = "";
-		if (!clienteSelec.equalsIgnoreCase("")) {
+		if (clienteSelec != 0L) {
 
 			Cliente cliente = null;
 			try {
@@ -406,23 +415,13 @@ public class VentasBean implements Serializable {
 		}
 	}
 
-	private StreamedContent file;
-
-	/*
-	 * public FileDownloadView() { InputStream stream =
-	 * ((ServletContext)FacesContext
-	 * .getCurrentInstance().getExternalContext().getContext
-	 * ()).getResourceAsStream("/resources/demo/images/optimus.jpg"); file = new
-	 * DefaultStreamedContent(stream, "image/jpg", "downloaded_optimus.jpg"); }
-	 */
-
 	public StreamedContent getFile() {
 
 		System.out.println("StreamedContent.getFile()");
 
 		List<VentaDTO> listaVentas = new ArrayList<VentaDTO>();
-		System.out.println("idVentaSelec"+idVentaSelec);
-		
+		System.out.println("idVentaSelec" + idVentaSelec);
+
 		if (idVentaSelec != 0L) {
 
 			try {
@@ -441,11 +440,37 @@ public class VentasBean implements Serializable {
 		return ventaReport.entradas(listaVentas);
 
 	}
-	
-	public void downloadAction(Long idVenta){
-		System.out.println("downloadAction "+idVentaSelec);
+
+	public void downloadAction(Long idVenta) {
+		System.out.println("downloadAction " + idVentaSelec);
 		idVentaSelec = idVenta;
 	}
+	
+	 public List<Cliente> complete(String query) throws Exception {
+	        List<Cliente> allThemes = clienteService.getListaCliente();
+	        List<Cliente> filteredThemes = new ArrayList<Cliente>();
+	         
+	        for (int i = 0; i < allThemes.size(); i++) {
+	        	Cliente skin = allThemes.get(i);
+	            if(skin.getRazonSocial().toLowerCase().startsWith(query)) {
+	                filteredThemes.add(skin);
+	            }
+	        }
+	         
+	        return filteredThemes;
+	    }
+	 
+	 public void onItemSelect(SelectEvent event) {
+	        Cliente cliente =  (Cliente)event.getObject();
+	        
+	        System.out.println("cliente"+cliente.getRazonSocial());
+	        
+	        if(cliente != null) {
+	        	clienteSelec = cliente.getIdCliente();
+		        cargarDescAgenciaByCliente();
+	        }
+	        
+	    }
 
 	// GET - SET
 
@@ -505,11 +530,11 @@ public class VentasBean implements Serializable {
 		this.comboCliente = comboCliente;
 	}
 
-	public String getClienteSelec() {
+	public Long getClienteSelec() {
 		return clienteSelec;
 	}
 
-	public void setClienteSelec(String clienteSelec) {
+	public void setClienteSelec(Long clienteSelec) {
 		this.clienteSelec = clienteSelec;
 	}
 
@@ -559,6 +584,14 @@ public class VentasBean implements Serializable {
 
 	public void setIdVentaSelec(Long idVentaSelec) {
 		this.idVentaSelec = idVentaSelec;
+	}
+
+	public Cliente getCliente() {
+		return cliente;
+	}
+
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
 	}
 
 }
