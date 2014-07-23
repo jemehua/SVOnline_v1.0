@@ -22,7 +22,7 @@ public class ClienteDaoImpl implements ClienteDao {
 	@PersistenceContext
 	private EntityManager em;
 
-	public Cliente find(String id) throws Exception {
+	public Cliente find(Long id) throws Exception {
 		return em.find(Cliente.class, id);
 	}
 
@@ -43,6 +43,11 @@ public class ClienteDaoImpl implements ClienteDao {
 		tq.setParameter("estado", Constantes.ACTIVO);
 		return tq.getResultList();
 
+	}
+	
+	public Long getMaxId() throws Exception {
+		return (Long) em.createQuery("select max(c.idCliente) from Cliente c")
+				.getSingleResult();
 	}
 
 }

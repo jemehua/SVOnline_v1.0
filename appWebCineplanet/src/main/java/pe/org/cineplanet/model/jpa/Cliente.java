@@ -23,9 +23,10 @@ import javax.validation.constraints.Size;
 public class Cliente implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	// @Id
-	// private Long idCliente;
 	@Id
+	private Long idCliente;
+
+	// @Id
 	@Column(length = 15)
 	@Size(max = 15)
 	private String nroDocumento;
@@ -33,6 +34,10 @@ public class Cliente implements Serializable {
 	@Column(length = 200)
 	@Size(max = 200)
 	private String razonSocial;
+	
+	@Column(length = 200)
+	@Size(max = 200)
+	private String apellidos;
 
 	@Column(length = 60)
 	@Size(max = 60)
@@ -71,6 +76,14 @@ public class Cliente implements Serializable {
 	private Agencia agencia;
 
 	public Cliente() {
+	}
+
+	public Long getIdCliente() {
+		return idCliente;
+	}
+
+	public void setIdCliente(Long idCliente) {
+		this.idCliente = idCliente;
 	}
 
 	public String getNroDocumento() {
@@ -161,12 +174,20 @@ public class Cliente implements Serializable {
 		this.fecModificacion = fecModificacion;
 	}
 
+	public String getApellidos() {
+		return apellidos;
+	}
+
+	public void setApellidos(String apellidos) {
+		this.apellidos = apellidos;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
-				+ ((nroDocumento == null) ? 0 : nroDocumento.hashCode());
+				+ ((idCliente == null) ? 0 : idCliente.hashCode());
 		return result;
 	}
 
@@ -179,10 +200,10 @@ public class Cliente implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Cliente other = (Cliente) obj;
-		if (nroDocumento == null) {
-			if (other.nroDocumento != null)
+		if (idCliente == null) {
+			if (other.idCliente != null)
 				return false;
-		} else if (!nroDocumento.equals(other.nroDocumento))
+		} else if (!idCliente.equals(other.idCliente))
 			return false;
 		return true;
 	}

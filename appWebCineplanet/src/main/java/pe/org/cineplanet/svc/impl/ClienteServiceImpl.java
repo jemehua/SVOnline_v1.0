@@ -25,7 +25,7 @@ public class ClienteServiceImpl implements ClienteService {
 	private ClienteDao clienteDao;
 
 	@Transactional
-	public Cliente find(String id) throws Exception{
+	public Cliente find(Long id) throws Exception{
 		return clienteDao.find(id);
 	}
 
@@ -47,7 +47,7 @@ public class ClienteServiceImpl implements ClienteService {
 	public List<SelectItem> getComboCliente(){
 		//return agenciaDao.getComboAgencia();
 		List<SelectItem> listaCombo = new ArrayList<SelectItem>();
-		SelectItem fila = new SelectItem("", "Seleccione Cliente");
+		SelectItem fila = new SelectItem(0L, "Seleccione Cliente");
 		listaCombo.add(fila);
 		
 		List<Cliente> lista = new ArrayList<Cliente>();
@@ -58,10 +58,19 @@ public class ClienteServiceImpl implements ClienteService {
 		}
 
 		for (Cliente tipo : lista) {
-			fila = new SelectItem(tipo.getNroDocumento(), tipo.getRazonSocial());
+			fila = new SelectItem(tipo.getIdCliente(), tipo.getRazonSocial());
 			listaCombo.add(fila);
 		}
 		return listaCombo;
+	}
+	
+	public Long getMaxId() {
+		try {
+			return clienteDao.getMaxId() + 1L;
+		} catch (Exception e) {
+			// TODO: handle exception
+			return 1L;
+		}
 	}
 
 }

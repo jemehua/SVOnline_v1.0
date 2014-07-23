@@ -13,7 +13,7 @@ import pe.org.cineplanet.model.jpa.Cliente;
  */
 public interface ClienteService {
 
-	public abstract Cliente find(String id) throws Exception;
+	public abstract Cliente find(Long id) throws Exception;
 
 	public abstract Cliente save(Cliente obj) throws Exception;
 
@@ -22,5 +22,7 @@ public interface ClienteService {
 	public abstract List<Cliente> getListaCliente() throws Exception;
 
 	public abstract List<SelectItem> getComboCliente() throws Exception;
+	
+	public abstract Long getMaxId();
 
 }
