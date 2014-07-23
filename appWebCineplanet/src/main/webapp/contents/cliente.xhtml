@@ -16,41 +16,51 @@
 		<p:focus context="pnlCliente" />
 		<table cellpadding="2" cellspacing="2" style="width: 100%;">
 			<tr>
-				<td>DNI/RUC<h:outputText value="*" styleClass="obligatorio" /></td>
+				<td>Nombres/Razon Social<h:outputText value="*"
+						styleClass="obligatorio" /></td>
+				<td><p:inputText id="nombre"
+						value="#{clienteBean.cliente.razonSocial}" tabindex="1"
+						maxlength="200" styleClass="txt" /></td>
+				<td>Apellidos</td>
+				<td><p:inputText id="apellidos"
+						value="#{clienteBean.cliente.apellidos}" tabindex="2"
+						maxlength="200" styleClass="txt">
+					</p:inputText></td>
+			</tr>
+			<tr>
+				<td>DNI/RUC</td>
 				<td><p:inputText id="codigo"
-						value="#{clienteBean.cliente.nroDocumento}" tabindex="1"
+						value="#{clienteBean.cliente.nroDocumento}" tabindex="3"
 						maxlength="11" styleClass="txt">
 						<pe:keyFilter for="codigo" regEx="/[0-9]/i" />
 					</p:inputText></td>
-				<td>Nombres y Apellidos/Razon Social<h:outputText value="*"
-						styleClass="obligatorio" /></td>
-				<td><p:inputText id="nombre"
-						value="#{clienteBean.cliente.razonSocial}" tabindex="2"
-						maxlength="200" styleClass="txt" /></td>
-			</tr>
-			<tr>
-				<td>Abreviatura<h:outputText value="*" styleClass="obligatorio" /></td>
+				<td>Abreviatura</td>
 				<td><p:inputText id="abreviatura"
-						value="#{clienteBean.cliente.abreviatura}" tabindex="3"
+						value="#{clienteBean.cliente.abreviatura}" tabindex="4"
 						maxlength="60" styleClass="txt" /></td>
-				<td>Dirección<h:outputText value="*" styleClass="obligatorio" /></td>
-				<td><p:inputText id="direccion"
-						value="#{clienteBean.cliente.direccion}" tabindex="4"
-						maxlength="200" styleClass="txt" /></td>
+
 			</tr>
 			<tr>
-				<td>Teléfono<h:outputText value="*" styleClass="obligatorio" /></td>
+				<td>Dirección</td>
+				<td><p:inputText id="direccion"
+						value="#{clienteBean.cliente.direccion}" tabindex="5"
+						maxlength="200" styleClass="txt" /></td>
+				<td>Teléfono</td>
 				<td><p:inputText id="telefono"
-						value="#{clienteBean.cliente.telefono}" tabindex="5"
+						value="#{clienteBean.cliente.telefono}" tabindex="6"
 						maxlength="15" styleClass="txt">
 						<pe:keyFilter for="telefono" regEx="/[0-9]/i" />
 					</p:inputText></td>
+			</tr>
+			<tr>
 				<td>Agencia<h:outputText value="*" styleClass="obligatorio" /></td>
 				<td><p:selectOneMenu id="comboAgencia"
 						value="#{clienteBean.agenciaSelec}" style="width:210px;"
-						tabindex="6">
+						tabindex="7">
 						<f:selectItems value="#{clienteBean.comboAgencia}" />
 					</p:selectOneMenu></td>
+				<td></td>
+				<td></td>
 			</tr>
 		</table>
 		<p:separator id="s1" />
@@ -61,42 +71,51 @@
 						icon="ui-icon-disk" tabindex="7" /></td>
 				<td><p:commandButton value="Limpiar"
 						update="pnlCliente, messages" action="#{clienteBean.limpiar}"
-						icon="ui-icon-close" tabindex="8" /></td>
+						icon="ui-icon-close" tabindex="8"
+						oncomplete='clienteTable.clearFilters();' /></td>
 			</tr>
 		</table>
 		<p:separator id="s2" />
 		<p:dataTable var="c" value="#{clienteBean.listaCliente}"
-			id="dtListaCliente" scrollable="true" scrollHeight="180"
-			paginator="true" rows="8"
+			widgetVar="clienteTable" id="dtListaCliente" scrollable="true"
+			scrollHeight="180" paginator="true" rows="8"
+			filteredValue="#{clienteBean.filteredListaCliente}"
 			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
 			emptyMessage="No hay datos">
 
 			<f:facet name="header">  
             Lista de Clientes
         </f:facet>
+        <p:column headerText="Id" style="width:6%">
+				<h:outputText value="#{c.idCliente}" />
+			</p:column>
 			<p:column headerText="DNI/RUC" style="width:10%">
 				<h:outputText value="#{c.nroDocumento}" />
 			</p:column>
-			<p:column headerText="Nombres y Apellidos/Razon Social"
-				style="width:30%">
+			<p:column headerText="Nombres/Razon Social"
+				style="width:20%" filterBy="#{c.razonSocial}">
 				<h:outputText value="#{c.razonSocial}" />
 			</p:column>
-			<p:column headerText="Abreviatura" style="width:10%">
+			<p:column headerText="Apellidos"
+				style="width:10%" >
+				<h:outputText value="#{c.apellidos}" />
+			</p:column>
+			<p:column headerText="Abreviatura" style="width:8%">
 				<h:outputText value="#{c.abreviatura}" />
 			</p:column>
 			<p:column headerText="Dirección" style="width:10%">
 				<h:outputText value="#{c.direccion}" />
 			</p:column>
-			<p:column headerText="Teléfono" style="width:10%">
+			<p:column headerText="Teléfono" style="width:8%">
 				<h:outputText value="#{c.telefono}" />
 			</p:column>
-			<p:column headerText="Agencia" style="width:10%">
+			<p:column headerText="Agencia" style="width:12%">
 				<h:outputText value="#{c.agencia.nombre}" />
 			</p:column>
-			<p:column headerText="Estado" style="width:10%">
+			<p:column headerText="Estado" style="width:8%">
 				<h:outputText value="#{c.estado.equals('A')?'Activo':'Inactivo'}" />
-			</p:column>
-			<p:column headerText="#{messages.lblOpciones}" style="width:10%">
+			</p:column> 
+			<p:column headerText="#{messages.lblOpciones}" style="width:8%">
 				<p:commandButton value="" icon="ui-icon-pencil"
 					update=":frm:pnlCliente" title="Editar">
 					<f:setPropertyActionListener value="#{c}"

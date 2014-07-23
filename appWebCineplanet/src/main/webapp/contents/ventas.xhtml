@@ -25,14 +25,25 @@
 		<table style="width: 100%;">
 			<tr>
 				<td>Cliente<h:outputText value="*" styleClass="obligatorio" /></td>
-				<td><p:selectOneMenu id="comboCliente"
+				<td>
+				
+				<p:autoComplete id="themePojo"   value="#{ventasBean.cliente}" completeMethod="#{ventasBean.complete}"
+                        var="c" itemLabel="#{c.razonSocial}" itemValue="#{c}" converter="clienteConverter" forceSelection="true" >
+                        
+<!--                         <p:ajax event="itemSelect" listener="#{ventasBean.onItemSelect}" update="agencia" /> -->
+                        </p:autoComplete>
+				
+				
+				
+				<!--  <p:selectOneMenu id="comboCliente"
 						value="#{ventasBean.clienteSelec}" style="width:210px;"
 						tabindex="1">
 						<f:selectItems value="#{ventasBean.comboCliente}" />
 						<p:ajax event="change"
 							listener="#{ventasBean.cargarDescAgenciaByCliente}"
 							update="agencia" />
-					</p:selectOneMenu></td>
+					</p:selectOneMenu>-->
+					</td>
 				<td>Agencia</td>
 				<td><h:outputText id="agencia"
 						value="#{ventasBean.descAgencia}" /></td>

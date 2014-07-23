@@ -36,23 +36,23 @@
 						icon="ui-icon-disk" tabindex="3" /></td>
 				<td><p:commandButton value="Limpiar"
 						update="pnlAgencia, messages" action="#{agenciaBean.limpiar}"
-						icon="ui-icon-close" tabindex="4" /></td>
+						icon="ui-icon-close" tabindex="4" oncomplete='agenciaTable.clearFilters();' /></td>
 			</tr>
 		</table>
-		<p:separator id="s2" />
+		<p:separator id="s2" /> 
 		<p:dataTable var="a" value="#{agenciaBean.listaAgencia}"
-			id="dtListAgencia" scrollable="true" scrollHeight="180"
-			paginator="true" rows="8"
+			id="dtListAgencia" scrollable="true" scrollHeight="180" widgetVar="agenciaTable" 
+			paginator="true" rows="8" filteredValue="#{agenciaBean.filteredListaAgencia}"
 			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
 			emptyMessage="No hay datos">
 
-			<f:facet name="header">  
+			<f:facet name="header">   
             Lista de Agencias
         </f:facet>
 			<p:column headerText="Codigo" style="width:20%">
 				<h:outputText value="#{a.idAgencia}" />
 			</p:column>
-			<p:column headerText="Nombre" style="width:50%">
+			<p:column id="nombre" headerText="Nombre" style="width:50%" filterBy="#{a.nombre}">
 				<h:outputText value="#{a.nombre}" />
 			</p:column>
 			<p:column headerText="Estado" style="width:15%">
