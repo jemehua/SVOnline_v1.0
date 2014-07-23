@@ -47,6 +47,7 @@ public class ClienteBean implements Serializable {
 	// private Message message = new Message();
 
 	private List<Cliente> listaCliente = new ArrayList<Cliente>();
+	private List<Cliente> filteredListaCliente = new ArrayList<Cliente>();
 	private List<SelectItem> comboAgencia = new ArrayList<SelectItem>();
 	private Long agenciaSelec;
 
@@ -94,25 +95,20 @@ public class ClienteBean implements Serializable {
 
 		try {
 
-			Cliente e = clienteService.find(cliente.getNroDocumento());
+			// Cliente e = clienteService.find(cliente.getNroDocumento());
 
-			if (e != null) {
-				
-				e.setNroDocumento(cliente.getNroDocumento());
-				e.setRazonSocial(cliente.getRazonSocial());
-				e.setAbreviatura(cliente.getAbreviatura());
-				e.setDireccion(cliente.getDireccion());
-				e.setTelefono(cliente.getTelefono());
-				e.setAgencia(agenciaService.find(agenciaSelec));
-				e.setUsuModifica(userSesion.getUsuario());
-				e.setFecModificacion(new Date());
-				clienteService.edit(e);
+			cliente.setAgencia(agenciaService.find(agenciaSelec));
+
+			if (cliente.getIdCliente() != null) {
+				cliente.setUsuModifica(userSesion.getUsuario());
+				cliente.setFecModificacion(new Date());
+				clienteService.edit(cliente);
 				FacesContext.getCurrentInstance().addMessage(
 						null,
 						new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
 								"Registro Modificado"));
 			} else {
-				cliente.setAgencia(agenciaService.find(agenciaSelec));
+				cliente.setIdCliente(clienteService.getMaxId());
 				cliente.setEstado(Constantes.ACTIVO);
 				cliente.setUsuRegistra(userSesion.getUsuario());
 				cliente.setFecRegistro(new Date());
@@ -136,48 +132,43 @@ public class ClienteBean implements Serializable {
 	public boolean validarDatos() {
 		FacesContext ctx = FacesContext.getCurrentInstance();
 
-		if (cliente.getNroDocumento().trim().length() == 0) {
-			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
-					"ADVERTENCIA", "Ingrese campos obligatorios"));
-			return false;
-		}
-		
-		if (!(cliente.getNroDocumento().length() == 8 || cliente.getNroDocumento().length() == 11)) {
-			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
-					"ADVERTENCIA", "Ingrese numero de documento valido"));
-			return false;
-		}
+		/*
+		 * if (cliente.getNroDocumento().trim().length() == 0) {
+		 * ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
+		 * "ADVERTENCIA", "Ingrese campos obligatorios")); return false; }
+		 * 
+		 * if (!(cliente.getNroDocumento().length() == 8 ||
+		 * cliente.getNroDocumento().length() == 11)) { ctx.addMessage(null, new
+		 * FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+		 * "Ingrese numero de documento valido")); return false; }
+		 */
 
 		if (cliente.getRazonSocial().trim().length() == 0) {
 			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
 					"ADVERTENCIA", "Ingrese campos obligatorios"));
 			return false;
 		}
-		
-		if (cliente.getAbreviatura().trim().length() == 0) {
-			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
-					"ADVERTENCIA", "Ingrese campos obligatorios"));
-			return false;
-		}
-		
-		if (cliente.getDireccion().trim().length() == 0) {
-			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
-					"ADVERTENCIA", "Ingrese campos obligatorios"));
-			return false;
-		}
-		
-		if (cliente.getTelefono().trim().length() == 0) {
-			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
-					"ADVERTENCIA", "Ingrese campos obligatorios"));
-			return false;
-		}
-		
+
+		/*
+		 * if (cliente.getAbreviatura().trim().length() == 0) {
+		 * ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
+		 * "ADVERTENCIA", "Ingrese campos obligatorios")); return false; }
+		 * 
+		 * if (cliente.getDireccion().trim().length() == 0) {
+		 * ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
+		 * "ADVERTENCIA", "Ingrese campos obligatorios")); return false; }
+		 * 
+		 * if (cliente.getTelefono().trim().length() == 0) {
+		 * ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
+		 * "ADVERTENCIA", "Ingrese campos obligatorios")); return false; }
+		 */
+
 		if (agenciaSelec == 0L) {
 			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
 					"ADVERTENCIA", "Seleccion Agencia"));
 			return false;
 		}
-		
+
 		return true;
 	}
 
@@ -189,16 +180,17 @@ public class ClienteBean implements Serializable {
 			e.printStackTrace();
 		}
 	}
-	
-	public void cargarListaClientes(){
+
+	public void cargarListaClientes() {
 		try {
-			setListaCliente(clienteService.getListaCliente());
+			listaCliente = clienteService.getListaCliente();
+			filteredListaCliente = listaCliente;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
+
 	// GET - SET
 
 	public Cliente getCliente() {
@@ -231,6 +223,14 @@ public class ClienteBean implements Serializable {
 
 	public void setAgenciaSelec(Long agenciaSelec) {
 		this.agenciaSelec = agenciaSelec;
+	}
+
+	public List<Cliente> getFilteredListaCliente() {
+		return filteredListaCliente;
+	}
+
+	public void setFilteredListaCliente(List<Cliente> filteredListaCliente) {
+		this.filteredListaCliente = filteredListaCliente;
 	}
 
 }

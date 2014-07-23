@@ -43,6 +43,8 @@ public class AgenciaBean implements Serializable {
 
 	private List<Agencia> listaAgencia = new ArrayList<Agencia>();
 
+	private List<Agencia> filteredListaAgencia = new ArrayList<Agencia>();
+
 	public AgenciaBean() {
 		super();
 	}
@@ -71,7 +73,9 @@ public class AgenciaBean implements Serializable {
 
 	public void limpiar() {
 		agencia = new Agencia();
+		//filteredListaAgencia = new ArrayList<Agencia>();
 		cargarListaAgencia();
+		
 	}
 
 	public void guardar() {
@@ -130,7 +134,8 @@ public class AgenciaBean implements Serializable {
 
 	public void cargarListaAgencia() {
 		try {
-			setListaAgencia(agenciaService.getListaAgencia());
+			 listaAgencia = agenciaService.getListaAgencia();
+			 filteredListaAgencia = listaAgencia;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -152,8 +157,16 @@ public class AgenciaBean implements Serializable {
 		this.agencia = agencia;
 	}
 
-	public void setListaAgencia(List<Agencia> listaAgencia) {
+	/*public void setListaAgencia(List<Agencia> listaAgencia) {
 		this.listaAgencia = listaAgencia;
+	}*/
+
+	public List<Agencia> getFilteredListaAgencia() {
+		return filteredListaAgencia;
+	}
+
+	public void setFilteredListaAgencia(List<Agencia> filteredListaAgencia) {
+		this.filteredListaAgencia = filteredListaAgencia;
 	}
 
 }
