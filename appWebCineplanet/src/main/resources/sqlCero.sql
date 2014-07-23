@@ -1,3 +1,47 @@
+drop table if exists "tipodocumento" cascade;
+drop table if exists "entrada" cascade;
+drop table if exists "task" cascade;
+drop table if exists "tipoentrada" cascade;
+drop table if exists "agencia" cascade;
+drop table if exists "detalleventa" cascade;
+drop table if exists "cliente" cascade;
+drop table if exists "rol" cascade;
+drop table if exists "menu" cascade;
+drop table if exists "movimiento" cascade;
+drop table if exists "venta" cascade;
+drop table if exists "permiso" cascade;
+drop table if exists "itemmenu" cascade;
+drop table if exists "usuario" cascade;
+drop table if exists "detalleentrada" cascade;
+
+
+--eliminar pkey
+ALTER TABLE cliente
+  DROP CONSTRAINT cliente_pkey CASCADE
+
+--
+ALTER TABLE venta DROP COLUMN idcliente;
+
+ALTER TABLE venta ADD idcliente bigint;
+
+ALTER TABLE cliente ADD idcliente bigint;
+
+UPDATE cliente SET idcliente=1 WHERE nrodocumento='42591173';
+UPDATE cliente SET idcliente=2 WHERE nrodocumento='42591172';
+
+UPDATE venta SET idcliente=1 WHERE idventa=1;
+UPDATE venta SET idcliente=2 WHERE idventa=2;
+
+ALTER TABLE cliente
+  ADD CONSTRAINT cliente_pkey PRIMARY KEY(idcliente);
+
+ALTER TABLE venta
+  ADD CONSTRAINT fk_venta_cliente FOREIGN KEY (idcliente)
+      REFERENCES cliente (idcliente) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE cliente ADD COLUMN apellidos character varying(200);
+
 --SELECT 'DROP TABLE '||table_name||' CASCADE CONSTRAINTS;' FROM user_tables
 
 INSERT INTO MENU (IDMENU, ESTADO, NOMBRE) VALUES ('1', 'A', 'Administración');
