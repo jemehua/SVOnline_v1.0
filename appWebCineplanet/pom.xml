@@ -21,6 +21,12 @@
 
 	<dependencies>
 
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>itextpdf</artifactId>
+			<version>5.3.4</version>
+		</dependency>
+
 		<!-- postgres -->
 
 		<dependency>
@@ -92,7 +98,7 @@
 			<groupId>com.lowagie</groupId>
 			<artifactId>itext</artifactId>
 			<version>2.1.7</version>
-<!-- 			<version>5.0.4</version> -->
+			<!-- <version>5.0.4</version> -->
 			<exclusions>
 				<exclusion>
 					<groupId>bouncycastle</groupId>
@@ -109,11 +115,11 @@
 			</exclusions>
 		</dependency>
 
-<!-- 		<dependency> -->
-<!-- 			<groupId>net.sf.jasperreports</groupId> -->
-<!-- 			<artifactId>jasperreports</artifactId> -->
-<!-- 			<version>5.0.4</version> -->
-<!-- 		</dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>net.sf.jasperreports</groupId> -->
+		<!-- <artifactId>jasperreports</artifactId> -->
+		<!-- <version>5.0.4</version> -->
+		<!-- </dependency> -->
 
 		<!-- poi setting jemehua -->
 		<dependency>
