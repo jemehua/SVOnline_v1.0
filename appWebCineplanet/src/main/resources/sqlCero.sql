@@ -44,6 +44,33 @@ ALTER TABLE cliente ADD COLUMN apellidos character varying(200);
 
 alter table tipoentrada add column precio type numeric(19,2); 
 
+
+
+--agencia
+ALTER TABLE agencia
+  DROP CONSTRAINT agencia_pkey CASCADE;
+
+ALTER TABLE cliente DROP COLUMN idagencia;
+
+ALTER TABLE cliente ADD idagencia character varying(16);
+
+ALTER TABLE agencia ALTER COLUMN idagencia TYPE character varying(16);
+
+update cliente set  idagencia = '1' where idcliente='1';
+
+update cliente set  idagencia = '2' where idcliente='2';
+
+ALTER TABLE agencia
+  ADD CONSTRAINT agencia_pkey PRIMARY KEY(idagencia);
+
+ALTER TABLE cliente
+  ADD CONSTRAINT fk_cliente_agencia FOREIGN KEY (idagencia)
+      REFERENCES agencia (idagencia) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+
+
+
 --SELECT 'DROP TABLE '||table_name||' CASCADE CONSTRAINTS;' FROM user_tables
 
 INSERT INTO MENU (IDMENU, ESTADO, NOMBRE) VALUES ('1', 'A', 'Administración');
