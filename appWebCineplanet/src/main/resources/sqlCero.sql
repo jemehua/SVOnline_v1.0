@@ -15,7 +15,7 @@ drop table if exists "usuario" cascade;
 drop table if exists "detalleentrada" cascade;
 
 
---eliminar pkey 
+--eliminar pkey  
 ALTER TABLE cliente
   DROP CONSTRAINT cliente_pkey CASCADE
 
