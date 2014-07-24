@@ -19,6 +19,7 @@ import javax.validation.constraints.Size;
 @Entity
 @NamedQueries({ 
 	@NamedQuery(name = "DetalleEntrada.getAllByIdEntrada", query = "SELECT d FROM DetalleEntrada d WHERE d.id.idEntrada =:idEntrada AND d.estado =:estado ORDER BY d.id.idCodigo ASC"),
+	@NamedQuery(name = "DetalleEntrada.getByIdCodigo", query = "SELECT d FROM DetalleEntrada d WHERE d.id.idCodigo =:idCodigo "),
 	@NamedQuery(name = "DetalleEntrada.getAllByIdTipoEntrada", query = "SELECT d FROM DetalleEntrada d WHERE d.entrada.tipoEntrada.idTipoEntrada =:idTipoEntrada AND d.estado =:estado ORDER BY d.id.idEntrada ASC")})
 public class DetalleEntrada implements Serializable {
 	private static final long serialVersionUID = 1L;

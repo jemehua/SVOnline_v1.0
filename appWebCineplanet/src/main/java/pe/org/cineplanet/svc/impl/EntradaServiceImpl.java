@@ -39,14 +39,29 @@ public class EntradaServiceImpl implements EntradaService {
 	}
 	
 	@Transactional
-	public void save(Entrada obj, List<DetalleEntrada> listaDetalle) throws Exception{
+	public Integer save(Entrada obj, List<DetalleEntrada> listaDetalle) throws Exception{
 		
 		entradaDao.save(obj);
 		
+		int count = 0;
 		for(DetalleEntrada row : listaDetalle){
 			
-			detalleEntradaDao.save(row);
+			//validacion codigo unico
+			DetalleEntrada detEntrada = detalleEntradaDao.getByIdCodigo(row.getId().getIdCodigo());
+			
+			if(detEntrada == null){
+				detalleEntradaDao.save(row);
+				count++;
+			}
+			/*else{
+				System.out.println("El codigo:"+row.getId().getIdCodigo()+" ya existe.");
+			}*/
 		}
+		
+		obj.setCantidad(count);
+		entradaDao.edit(obj);
+		
+		return count;
 		
 	}
 

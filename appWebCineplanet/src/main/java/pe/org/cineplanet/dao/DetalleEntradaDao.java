@@ -21,6 +21,8 @@ public interface DetalleEntradaDao {
 	public abstract List<DetalleEntrada> getListaDetalleEntrada(Long idEntrada) throws Exception;
 	
 	public abstract List<DetalleEntrada> getListaByTipoEntrada(Long idTipoEntrada) throws Exception;
+	
+	public abstract DetalleEntrada getByIdCodigo(String idCodigo) throws Exception;
 
 
 }

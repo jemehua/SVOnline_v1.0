@@ -20,6 +20,8 @@ public interface MovimientoDao {
 
 	public abstract List<Movimiento> getListaMovimiento() throws Exception;
 	
-	public List<VentaDTO> getListaVenta(Long idVenta) throws Exception;
+	public abstract List<VentaDTO> getListaVenta(Long idVenta) throws Exception;
+	
+	public abstract Movimiento getByIdCodigo(String idCodigo) throws Exception;
 
 }

@@ -16,7 +16,7 @@ public interface VentasService {
 
 	public abstract Venta save(Venta obj) throws Exception;
 	
-	public abstract void save(Venta obj, List<DetalleVenta> listaDetalleVenta) throws Exception;
+	public abstract Integer save(Venta obj, List<DetalleVenta> listaDetalleVenta) throws Exception;
 
 	public abstract Venta edit(Venta obj) throws Exception;
 

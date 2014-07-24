@@ -18,7 +18,7 @@ public interface EntradaService {
 
 	public abstract Entrada save(Entrada obj) throws Exception;
 	
-	public abstract void save(Entrada obj, List<DetalleEntrada> listaDetalle) throws Exception;
+	public abstract Integer save(Entrada obj, List<DetalleEntrada> listaDetalle) throws Exception;
 
 	public abstract Entrada edit(Entrada obj) throws Exception;
 

@@ -55,5 +55,13 @@ public class DetalleEntradaDaoImpl implements DetalleEntradaDao {
 		tq.setParameter("idTipoEntrada", idTipoEntrada);
 		return tq.getResultList();
 	}
+	
+	public DetalleEntrada getByIdCodigo(String idCodigo)
+			throws Exception {
+		TypedQuery<DetalleEntrada> tq = em.createNamedQuery(
+				"DetalleEntrada.getByIdCodigo", DetalleEntrada.class);
+		tq.setParameter("idCodigo", idCodigo);
+		return tq.getSingleResult();
+	}
 
 }

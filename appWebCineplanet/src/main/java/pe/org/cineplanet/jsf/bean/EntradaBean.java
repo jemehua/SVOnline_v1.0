@@ -157,14 +157,14 @@ public class EntradaBean implements Serializable {
 					// rownum++;
 				}
 
-				entrada.setCantidad(listaDetalle.size());
+				//entrada.setCantidad(listaDetalle.size());
 
-				entrdService.save(entrada, listaDetalle);
+				Integer rpta = entrdService.save(entrada, listaDetalle);
 
 				FacesContext.getCurrentInstance().addMessage(
 						null,
 						new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
-								"Registro Exitoso"));
+								"Se ha registrado " +rpta+ " registros, por favor verifique"));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

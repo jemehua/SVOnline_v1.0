@@ -75,6 +75,7 @@ public class VentasBean implements Serializable {
 	// private Message message = new Message();
 	private Venta venta;
 	private List<Venta> listaVenta = new ArrayList<Venta>();
+	private List<Venta> filteredListaVenta = new ArrayList<Venta>();
 
 	private List<DetalleVenta> listaDetalleVenta = new ArrayList<DetalleVenta>();
 
@@ -152,7 +153,7 @@ public class VentasBean implements Serializable {
 		cargarComboCliente();
 		cargarComboTipoDocumento();
 		cargarListaVentas();
-		
+
 		cliente = new Cliente();
 	}
 
@@ -245,7 +246,8 @@ public class VentasBean implements Serializable {
 
 		try {
 
-			venta.setCliente(clienteService.find(clienteSelec));
+			// venta.setCliente(clienteService.find(clienteSelec));
+			venta.setCliente(cliente);
 			venta.setTipoDocumento(tipoDocumentoService
 					.find(tipoDocumentoSelec));
 
@@ -264,12 +266,12 @@ public class VentasBean implements Serializable {
 				venta.setUsuRegistra(userSesion.getUsuario());
 				venta.setFecRegistro(new Date());
 
-				ventasService.save(venta, listaDetalleVenta);
+				Integer rpta = ventasService.save(venta, listaDetalleVenta);
 
 				FacesContext.getCurrentInstance().addMessage(
 						null,
 						new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
-								"Registro Exitoso"));
+								"Se ha registrado " +rpta+ " registros, por favor verifique"));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -285,15 +287,24 @@ public class VentasBean implements Serializable {
 	public boolean validarDatos() {
 		FacesContext ctx = FacesContext.getCurrentInstance();
 
-		if (venta.getOtorgado().trim().length() == 0) {
+		/*
+		 * if (clienteSelec != 0L) { ctx.addMessage(null, new
+		 * FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+		 * "Seleccione Cliente")); return false; }
+		 */
+
+		if (cliente == null) {
 			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
-					"ADVERTENCIA", "Ingrese campos obligatorios"));
+					"ADVERTENCIA", "Seleccione Cliente"));
 			return false;
 		}
 
-		if (clienteSelec != 0L) {
+		System.out.println("cliente " + cliente.getIdCliente()
+				+ cliente.toString());
+
+		if (venta.getOtorgado().trim().length() == 0) {
 			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
-					"ADVERTENCIA", "Seleccione Cliente"));
+					"ADVERTENCIA", "Ingrese campos obligatorios"));
 			return false;
 		}
 
@@ -347,7 +358,8 @@ public class VentasBean implements Serializable {
 
 	public void cargarListaVentas() {
 		try {
-			setListaVenta(ventasService.getListaVentas());
+			listaVenta = ventasService.getListaVentas();
+			filteredListaVenta = listaVenta;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -359,8 +371,6 @@ public class VentasBean implements Serializable {
 		cargarCantidadDisponibleByTipoEntrada();
 
 	}
-	
-	
 
 	public void cargarDescTipoEntrada() {
 		descTipoEntrada = "";
@@ -445,32 +455,34 @@ public class VentasBean implements Serializable {
 		System.out.println("downloadAction " + idVentaSelec);
 		idVentaSelec = idVenta;
 	}
-	
-	 public List<Cliente> complete(String query) throws Exception {
-	        List<Cliente> allThemes = clienteService.getListaCliente();
-	        List<Cliente> filteredThemes = new ArrayList<Cliente>();
-	         
-	        for (int i = 0; i < allThemes.size(); i++) {
-	        	Cliente skin = allThemes.get(i);
-	            if(skin.getRazonSocial().toLowerCase().startsWith(query)) {
-	                filteredThemes.add(skin);
-	            }
-	        }
-	         
-	        return filteredThemes;
-	    }
-	 
-	 public void onItemSelect(SelectEvent event) {
-	        Cliente cliente =  (Cliente)event.getObject();
-	        
-	        System.out.println("cliente"+cliente.getRazonSocial());
-	        
-	        if(cliente != null) {
-	        	clienteSelec = cliente.getIdCliente();
-		        cargarDescAgenciaByCliente();
-	        }
-	        
-	    }
+
+	public List<Cliente> complete(String query) throws Exception {
+
+		System.out.println("query=" + query);
+		List<Cliente> allThemes = clienteService.getListaCliente();
+		List<Cliente> filteredThemes = new ArrayList<Cliente>();
+
+		for (int i = 0; i < allThemes.size(); i++) {
+			Cliente skin = allThemes.get(i);
+			if (skin.getRazonSocial().toLowerCase().startsWith(query)) {
+				filteredThemes.add(skin);
+			}
+		}
+
+		return filteredThemes;
+	}
+
+	public void onItemSelect(SelectEvent event) {
+		Cliente cliente = (Cliente) event.getObject();
+
+		System.out.println("cliente" + cliente.getRazonSocial());
+
+		if (cliente != null) {
+			clienteSelec = cliente.getIdCliente();
+			cargarDescAgenciaByCliente();
+		}
+
+	}
 
 	// GET - SET
 
@@ -592,6 +604,14 @@ public class VentasBean implements Serializable {
 
 	public void setCliente(Cliente cliente) {
 		this.cliente = cliente;
+	}
+
+	public List<Venta> getFilteredListaVenta() {
+		return filteredListaVenta;
+	}
+
+	public void setFilteredListaVenta(List<Venta> filteredListaVenta) {
+		this.filteredListaVenta = filteredListaVenta;
 	}
 
 }

@@ -1,6 +1,7 @@
 package pe.org.cineplanet.model.jpa;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -31,6 +32,9 @@ public class TipoEntrada implements Serializable {
 
 	@Column
 	private Integer tipoVale;
+
+	@Column
+	private BigDecimal precio;
 
 	@Column(length = 1)
 	@Size(max = 1)
@@ -77,6 +81,14 @@ public class TipoEntrada implements Serializable {
 
 	public void setTipoVale(Integer tipoVale) {
 		this.tipoVale = tipoVale;
+	}
+
+	public BigDecimal getPrecio() {
+		return precio;
+	}
+
+	public void setPrecio(BigDecimal precio) {
+		this.precio = precio;
 	}
 
 	@Override

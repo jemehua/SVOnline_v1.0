@@ -46,7 +46,7 @@ public class VentasServiceImpl implements VentasService {
 	}
 
 	@Transactional
-	public void save(Venta obj, List<DetalleVenta> listaDetalleVenta)
+	public Integer save(Venta obj, List<DetalleVenta> listaDetalleVenta)
 			throws Exception {
 		ventasDao.save(obj);
 
@@ -61,27 +61,48 @@ public class VentasServiceImpl implements VentasService {
 					.getTipoEntrada().getIdTipoEntrada());
 			
 			//System.out.println("listaDetalleEntradas por tipoEntrada"+listaDetalleEntradas.size());
-			
+			int count = 0;
 			for(int i=0; i<row.getCantidad(); i++){
 				
 				DetalleEntrada detalleEntrada = listaDetalleEntradas.get(i);
 				
-				MovimientoPK idMov = new MovimientoPK(id.getIdVenta(), id.getIdTipoEntrada(), detalleEntrada.getId().getIdCodigo(), detalleEntrada.getId().getIdEntrada());
+				Movimiento mov;
+				try {
+					mov = movimientoDao.getByIdCodigo(detalleEntrada.getId().getIdCodigo());
+				} catch (Exception e) {
+					// TODO: handle exception
+					mov = null;
+				}
 				
-				Movimiento movimiento = new Movimiento();
-				movimiento.setId(idMov);
-				movimiento.setEstado(Constantes.ACTIVO);
 				
-				movimientoDao.save(movimiento);
 				
-				detalleEntrada.setEstado(Constantes.VENDIDO);
-				detalleEntradaDao.edit(detalleEntrada);
+				if(mov == null) {
+					MovimientoPK idMov = new MovimientoPK(id.getIdVenta(), id.getIdTipoEntrada(), detalleEntrada.getId().getIdCodigo(), detalleEntrada.getId().getIdEntrada());
+					
+					Movimiento movimiento = new Movimiento();
+					movimiento.setId(idMov);
+					movimiento.setEstado(Constantes.ACTIVO);
+					
+					movimientoDao.save(movimiento);
+					
+					detalleEntrada.setEstado(Constantes.VENDIDO);
+					detalleEntradaDao.edit(detalleEntrada);
+					
+					count++;
+				}else{
+					System.out.println("El codigo "+detalleEntrada.getId().getIdCodigo()+" ya ha sido asignado");
+				}
 			}
 			
-			total += row.getCantidad();
+			if(row.getCantidad() == count)
+				total += row.getCantidad();
+			else
+				total = count;
 		}
 		obj.setTotal(total);
 		ventasDao.edit(obj);
+		
+		return total;
 	}
 
 	@Transactional

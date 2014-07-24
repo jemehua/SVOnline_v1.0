@@ -42,6 +42,8 @@ ALTER TABLE venta
 
 ALTER TABLE cliente ADD COLUMN apellidos character varying(200);
 
+alter table tipoentrada add column precio type numeric(19,2); 
+
 --SELECT 'DROP TABLE '||table_name||' CASCADE CONSTRAINTS;' FROM user_tables
 
 INSERT INTO MENU (IDMENU, ESTADO, NOMBRE) VALUES ('1', 'A', 'Administración');

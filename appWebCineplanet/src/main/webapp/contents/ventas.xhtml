@@ -16,22 +16,30 @@
 			PF('statusDialog').hide();
 		}
 	</script>
+	<style>
+	
+		.ui-autocomplete input {
+    width:200px;
+	</style>
+
+}
+	
 </h:head>
 <h:body>
 	<h:outputStylesheet name="css/cssContent.css" />
 	<p:growl id="messages" showDetail="true" life="40000" />
 	<p:panel id="pnlVentas" header="Ventas">
 		<p:focus context="pnlVentas" />
-		<table style="width: 100%;">
+		<table style="width: 100%;" cellpadding="1" cellspacing="2">
 			<tr>
 				<td>Cliente<h:outputText value="*" styleClass="obligatorio" /></td>
 				<td>
 				
-				<p:autoComplete id="themePojo"   value="#{ventasBean.cliente}" completeMethod="#{ventasBean.complete}"
-                        var="c" itemLabel="#{c.razonSocial}" itemValue="#{c}" converter="clienteConverter" forceSelection="true" >
-                        
-<!--                         <p:ajax event="itemSelect" listener="#{ventasBean.onItemSelect}" update="agencia" /> -->
-                        </p:autoComplete>
+				<p:autoComplete id="themePojo" value="#{ventasBean.cliente}" completeMethod="#{ventasBean.complete}" 
+                        var="c" itemLabel="#{c.razonSocial}" itemValue="#{c}" forceSelection="true"  style="width:210px;">
+                        <f:converter binding="#{clienteConverter}" />
+<!--                      converter="clienteConverter"    <p:ajax event="itemSelect" listener="#{ventasBean.onItemSelect}" update="agencia" /> -->
+                        </p:autoComplete> 
 				
 				
 				
@@ -146,14 +154,14 @@
 						icon="ui-icon-disk" tabindex="7" /></td>
 				<td><p:commandButton value="Limpiar"
 						update="pnlVentas, messages" action="#{ventasBean.limpiar}"
-						icon="ui-icon-close" tabindex="8" /></td>
+						icon="ui-icon-close" tabindex="8" oncomplete='ventaTable.clearFilters();'/></td>
 				<td></td>
 			</tr>
 		</table>
 		<p:separator id="s2" />
 		<p:dataTable var="v" value="#{ventasBean.listaVenta}"
-			id="dtListaVenta" scrollable="true" scrollHeight="180"
-			paginator="true" rows="8"
+			id="dtListaVenta" scrollable="true" scrollHeight="180" widgetVar="ventaTable"
+			paginator="true" rows="8" filteredValue="#{ventasBean.filteredListaVenta}"
 			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
 			emptyMessage="No hay datos">
 
@@ -166,7 +174,7 @@
 			<p:column headerText="Agencia" style="width:12%">
 				<h:outputText value="#{v.cliente.agencia.nombre}" />
 			</p:column>
-			<p:column headerText="Cliente" style="width:22%">
+			<p:column headerText="Cliente" style="width:22%" filterBy="#{v.cliente.razonSocial}">
 				<h:outputText value="#{v.cliente.razonSocial}" />
 			</p:column>
 			<p:column headerText="Otorgado a" style="width:22%">
