@@ -464,7 +464,7 @@ public class VentasBean implements Serializable {
 
 		for (int i = 0; i < allThemes.size(); i++) {
 			Cliente skin = allThemes.get(i);
-			if (skin.getRazonSocial().toLowerCase().startsWith(query)) {
+			if (skin.getRazonSocial().toLowerCase().startsWith(query.toLowerCase())) {
 				filteredThemes.add(skin);
 			}
 		}
