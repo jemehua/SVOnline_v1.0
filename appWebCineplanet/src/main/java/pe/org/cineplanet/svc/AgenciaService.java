@@ -13,7 +13,7 @@ import pe.org.cineplanet.model.jpa.Agencia;
  */
 public interface AgenciaService {
 
-	public abstract Agencia find(Long id) throws Exception;
+	public abstract Agencia find(String id) throws Exception;
 
 	public abstract Agencia save(Agencia obj) throws Exception;
 

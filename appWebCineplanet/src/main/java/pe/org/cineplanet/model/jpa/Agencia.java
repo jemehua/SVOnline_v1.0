@@ -19,7 +19,9 @@ public class Agencia implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	private Long idAgencia;
+	@Column(length=16)
+	@Size(max=16)
+	private String idAgencia;
 
 	@Column(length=200)
 	@Size(max=200)
@@ -32,11 +34,11 @@ public class Agencia implements Serializable {
 	public Agencia() {
 	}
 
-	public Long getIdAgencia() {
+	public String getIdAgencia() {
 		return idAgencia;
 	}
 
-	public void setIdAgencia(Long idAgencia) {
+	public void setIdAgencia(String idAgencia) {
 		this.idAgencia = idAgencia;
 	}
 

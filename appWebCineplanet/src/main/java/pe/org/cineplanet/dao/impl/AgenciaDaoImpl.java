@@ -21,7 +21,7 @@ public class AgenciaDaoImpl implements AgenciaDao {
 	@PersistenceContext
 	private EntityManager em;
 
-	public Agencia find(Long id) throws Exception {
+	public Agencia find(String id) throws Exception {
 		return em.find(Agencia.class, id);
 	}
 

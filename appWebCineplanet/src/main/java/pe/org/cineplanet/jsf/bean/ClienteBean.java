@@ -49,7 +49,7 @@ public class ClienteBean implements Serializable {
 	private List<Cliente> listaCliente = new ArrayList<Cliente>();
 	private List<Cliente> filteredListaCliente = new ArrayList<Cliente>();
 	private List<SelectItem> comboAgencia = new ArrayList<SelectItem>();
-	private Long agenciaSelec;
+	private String agenciaSelec;
 
 	public ClienteBean() {
 		super();
@@ -59,7 +59,7 @@ public class ClienteBean implements Serializable {
 	public void init() {
 		System.out.println("Init");
 		cliente = new Cliente();
-		agenciaSelec = 0L;
+		agenciaSelec = "";
 		cargarComboAgencia();
 		cargarListaClientes();
 		// message = new Message();
@@ -82,7 +82,7 @@ public class ClienteBean implements Serializable {
 
 	public void limpiar() {
 		cliente = new Cliente();
-		agenciaSelec = 0L;
+		agenciaSelec = "";
 		cargarComboAgencia();
 		cargarListaClientes();
 	}
@@ -163,7 +163,7 @@ public class ClienteBean implements Serializable {
 		 * "ADVERTENCIA", "Ingrese campos obligatorios")); return false; }
 		 */
 
-		if (agenciaSelec == 0L) {
+		if (agenciaSelec.equalsIgnoreCase("")) {
 			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
 					"ADVERTENCIA", "Seleccion Agencia"));
 			return false;
@@ -217,11 +217,11 @@ public class ClienteBean implements Serializable {
 		this.comboAgencia = comboAgencia;
 	}
 
-	public Long getAgenciaSelec() {
+	public String getAgenciaSelec() {
 		return agenciaSelec;
 	}
 
-	public void setAgenciaSelec(Long agenciaSelec) {
+	public void setAgenciaSelec(String agenciaSelec) {
 		this.agenciaSelec = agenciaSelec;
 	}
 

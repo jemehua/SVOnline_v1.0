@@ -25,7 +25,7 @@ public class AgenciaServiceImpl implements AgenciaService {
 	private AgenciaDao agenciaDao;
 
 	@Transactional
-	public Agencia find(Long id) throws Exception{
+	public Agencia find(String id) throws Exception{
 		return agenciaDao.find(id);
 	}
 
@@ -47,7 +47,7 @@ public class AgenciaServiceImpl implements AgenciaService {
 	public List<SelectItem> getComboAgencia(){
 		//return agenciaDao.getComboAgencia();
 		List<SelectItem> listaCombo = new ArrayList<SelectItem>();
-		SelectItem fila = new SelectItem(0L, "Seleccione Agencia");
+		SelectItem fila = new SelectItem("", "Seleccione Agencia");
 		listaCombo.add(fila);
 		
 		List<Agencia> lista = new ArrayList<Agencia>();
