@@ -70,20 +70,23 @@ public class ReporteEntradas {
 				
 				Font fontCuerpoNegrita = FontFactory.getFont("Garamond", 8,
 						Font.BOLD);
+				
 				Font fontCuerpo = FontFactory.getFont("Garamond", 7);
+				Font fontCuerpoVP = FontFactory.getFont("Garamond", 6);
+				
 				Font fontRestNegrita = FontFactory.getFont("Garamond", 6,
 						Font.BOLD);
 				Font fontRest = FontFactory.getFont("Garamond", 5);
 				String restriccionTitulo = "Restricciones";
 
-				String phraseRC = "No valido en la primera semana de estreno. \n No renovables / No ampliables. \n"
-						+ "No validos en salas 3D  (de acuerdo al tarifario). \n No se aceptan cambios ni devoluciones. \n"
-						+ "No acumula puntos Premium. \n No valido salas prime.";
+				String phraseRC = "No valido en la primera semana de estreno. \nNo renovables / No ampliables. \n"
+						+ "No validos en salas 3D  (de acuerdo al tarifario). \nNo se aceptan cambios ni devoluciones. \n"
+						+ "No acumula puntos Premium. \nNo valido salas prime.";
 
-				String phraseRCC = "No renovables / No ampliables. \n No acumula puntos Premium.";
+				String phraseRCC = "No renovables / No ampliables. \nNo acumula puntos Premium.";
 
 				String nota = "Nota:";
-				String phraseN = "Prohibida su reventa y/o reproducci�n. \n Una vez canjeado este vale ser� inactivado.";
+				String phraseN = "Prohibida su reventa y/o reproducción. \nUna vez canjeado este vale será inactivado.";
 
 				String rutaImagen = "/images/log.jpg";
 				String ruta2 = FacesContext.getCurrentInstance()
@@ -161,8 +164,8 @@ public class ReporteEntradas {
 					tablaContenido.addCell(textoDos);
 
 					PdfPCell respDos = new PdfPCell(new Phrase(
-							ventaDTO.getDescVale(), fontCuerpo));
-					respDos.setHorizontalAlignment(Element.ALIGN_LEFT);
+							ventaDTO.getDescVale(), fontCuerpoVP));
+					respDos.setHorizontalAlignment(Element.ALIGN_JUSTIFIED);
 					respDos.setColspan(2);
 					respDos.setBorder(Rectangle.NO_BORDER);
 					tablaContenido.addCell(respDos);
