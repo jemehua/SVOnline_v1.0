@@ -5,18 +5,30 @@
       http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
 	version="1.0">
 
-	<persistence-unit name="acme" transaction-type="RESOURCE_LOCAL">
-<!-- 		<persistence-unit name="acme" transaction-type="JTA"> -->
-<!-- 		<jta-data-source>java:jboss/datasources/Desempenio</jta-data-source> -->
+	<persistence-unit name="acme" transaction-type="RESOURCE_LOCAL"> 
+		<!-- <persistence-unit name="acme" transaction-type="JTA"> 
+ 		<jta-data-source>java:/pgDS</jta-data-source> -->
 
+		<class>pe.org.cineplanet.model.jpa.Agencia</class>
+		<class>pe.org.cineplanet.model.jpa.Cliente</class>
+		<class>pe.org.cineplanet.model.jpa.DetalleEntrada</class>
+		<class>pe.org.cineplanet.model.jpa.DetalleEntradaPK</class>
+		<class>pe.org.cineplanet.model.jpa.DetalleVenta</class>
+		<class>pe.org.cineplanet.model.jpa.DetalleVentaPK</class>
+		<class>pe.org.cineplanet.model.jpa.Entrada</class>
+		<class>pe.org.cineplanet.model.jpa.EntradaPK</class>
 		<class>pe.org.cineplanet.model.jpa.ItemMenu</class>
-		<class>pe.org.cineplanet.model.jpa.Menu</class>
+		<class>pe.org.cineplanet.model.jpa.Menu</class>		
+		<class>pe.org.cineplanet.model.jpa.Movimiento</class>
+		<class>pe.org.cineplanet.model.jpa.MovimientoPK</class>
 		<class>pe.org.cineplanet.model.jpa.Permiso</class>
 		<class>pe.org.cineplanet.model.jpa.Rol</class>
 		<class>pe.org.cineplanet.model.jpa.Task</class>
-		<class>pe.org.cineplanet.model.jpa.Usuario</class>
-		
-		<class>pe.org.cineplanet.model.jpa.Agencia</class>
+		<class>pe.org.cineplanet.model.jpa.TipoDocumento</class>
+		<class>pe.org.cineplanet.model.jpa.TipoEntrada</class>
+		<class>pe.org.cineplanet.model.jpa.Usuario</class>		
+		<class>pe.org.cineplanet.model.jpa.Venta</class>
+
 		
 		<properties>
 <!-- 			<property name="hibernate.dialect" value="org.hibernate.dialect.Oracle10gDialect" /> -->

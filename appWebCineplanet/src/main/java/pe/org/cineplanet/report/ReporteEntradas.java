@@ -54,7 +54,7 @@ public class ReporteEntradas {
 				SimpleDateFormat formatoFecha = new SimpleDateFormat(
 						"dd/MM/yyyy", new Locale("ES"));
 				String fechaEmision = formatoFecha.format(new Date());
-				String diasValido = "Lu-Ma-Mi-Ju-Vi-Sa-Do";
+				String diasValido = "Lu-Ma-Mi-Ju-Vi-Sa-Do-Fe";
 				String path = "font/Bar.ttf";
 				String ruta = FacesContext.getCurrentInstance()
 						.getExternalContext().getRealPath(path);
@@ -63,10 +63,11 @@ public class ReporteEntradas {
 				
 				
 				Font fontTitulo = new Font(FontFamily.HELVETICA, 9, Font.BOLD,
-						BaseColor.BLUE);
-				BaseFont bf1 = BaseFont.createFont(ruta, BaseFont.IDENTITY_H,
-						BaseFont.EMBEDDED);
-				Font FONT1 = new Font(bf1, 12);
+						BaseColor.BLUE);				
+
+				BaseFont bf1 = BaseFont.createFont(ruta, BaseFont.WINANSI, BaseFont.EMBEDDED);				
+				Font FONT1 = new Font(bf1, 14);
+				
 				Font fontCuerpoNegrita = FontFactory.getFont("Garamond", 8,
 						Font.BOLD);
 				Font fontCuerpo = FontFactory.getFont("Garamond", 7);
@@ -207,7 +208,9 @@ public class ReporteEntradas {
 
 					tablaContenido.addCell(cellvacio);
 
-					String codigoBarra = "*" + ventaDTO.getIdCodigo() + "*";
+					String numerocortado = ventaDTO.getIdCodigo().substring(5);					
+					String codigoBarra = "*" + numerocortado + "*";
+					
 					PdfPCell cellNumeroCodigobarra = new PdfPCell(new Phrase(
 							codigoBarra, FONT1));
 					cellNumeroCodigobarra

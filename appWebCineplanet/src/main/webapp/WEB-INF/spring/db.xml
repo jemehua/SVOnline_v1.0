@@ -35,20 +35,22 @@
 <!-- 		<property name="persistenceUnitName" value="acme" /> -->
 	</bean>
 
-	<!-- --> <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+	 <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
 		<property name="driverClassName" value="${db.driver}" />
 		<property name="url" value="${db.url}" />
 		<property name="username" value="${db.username}" />
 		<property name="password" value="${db.password}" />
 	</bean>
 
-	<!--<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+	
+<!--  
+	<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
 		<property name="jndiName">
-			<value>java:jboss/datasources/Desempenio</value>
-			<value>java:jboss/datasources/OracleDS</value>
+			<value>java:/pgDS</value>
 		</property>
-	</bean> -->
+	</bean> 
 
+-->
 	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
