@@ -22,7 +22,7 @@ public class DetalleEntradaServiceImpl implements DetalleEntradaService {
 	@Autowired
 	private DetalleEntradaDao detalleEntradaDao;
 
-	@Transactional
+	//@Transactional
 	public DetalleEntrada find(DetalleEntradaPK id) throws Exception {
 		return detalleEntradaDao.find(id);
 	}

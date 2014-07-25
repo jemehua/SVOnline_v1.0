@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import pe.org.cineplanet.model.jpa.Agencia;
 import pe.org.cineplanet.model.jpa.Cliente;
 import pe.org.cineplanet.model.jpa.Usuario;
 import pe.org.cineplanet.svc.AgenciaService;
@@ -51,6 +52,9 @@ public class ClienteBean implements Serializable {
 	private List<SelectItem> comboAgencia = new ArrayList<SelectItem>();
 	private String agenciaSelec;
 
+	// autocomplete
+	private Agencia agencia;
+
 	public ClienteBean() {
 		super();
 	}
@@ -83,6 +87,7 @@ public class ClienteBean implements Serializable {
 	public void limpiar() {
 		cliente = new Cliente();
 		agenciaSelec = "";
+		agencia = null;
 		cargarComboAgencia();
 		cargarListaClientes();
 	}
@@ -96,8 +101,8 @@ public class ClienteBean implements Serializable {
 		try {
 
 			// Cliente e = clienteService.find(cliente.getNroDocumento());
-
-			cliente.setAgencia(agenciaService.find(agenciaSelec));
+			//cliente.setAgencia(agenciaService.find(agenciaSelec));
+			cliente.setAgencia(agencia);
 
 			if (cliente.getIdCliente() != null) {
 				cliente.setUsuModifica(userSesion.getUsuario());
@@ -132,43 +137,24 @@ public class ClienteBean implements Serializable {
 	public boolean validarDatos() {
 		FacesContext ctx = FacesContext.getCurrentInstance();
 
-		/*
-		 * if (cliente.getNroDocumento().trim().length() == 0) {
-		 * ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
-		 * "ADVERTENCIA", "Ingrese campos obligatorios")); return false; }
-		 * 
-		 * if (!(cliente.getNroDocumento().length() == 8 ||
-		 * cliente.getNroDocumento().length() == 11)) { ctx.addMessage(null, new
-		 * FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
-		 * "Ingrese numero de documento valido")); return false; }
-		 */
-
 		if (cliente.getRazonSocial().trim().length() == 0) {
 			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
 					"ADVERTENCIA", "Ingrese campos obligatorios"));
 			return false;
 		}
 
-		/*
-		 * if (cliente.getAbreviatura().trim().length() == 0) {
-		 * ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
-		 * "ADVERTENCIA", "Ingrese campos obligatorios")); return false; }
-		 * 
-		 * if (cliente.getDireccion().trim().length() == 0) {
-		 * ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
-		 * "ADVERTENCIA", "Ingrese campos obligatorios")); return false; }
-		 * 
-		 * if (cliente.getTelefono().trim().length() == 0) {
-		 * ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
-		 * "ADVERTENCIA", "Ingrese campos obligatorios")); return false; }
-		 */
+		/*if (agenciaSelec.equalsIgnoreCase("")) {
+			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
+					"ADVERTENCIA", "Seleccion Agencia"));
+			return false;
+		}*/
 
-		if (agenciaSelec.equalsIgnoreCase("")) {
+		if (agencia == null) {
 			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
 					"ADVERTENCIA", "Seleccion Agencia"));
 			return false;
 		}
-
+		
 		return true;
 	}
 
@@ -189,6 +175,23 @@ public class ClienteBean implements Serializable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public List<Agencia> complete(String query) throws Exception {
+
+		System.out.println("query=" + query);
+		List<Agencia> allThemes = agenciaService.getListaAgencia();
+		List<Agencia> filteredAgencia = new ArrayList<Agencia>();
+
+		for (int i = 0; i < allThemes.size(); i++) {
+			Agencia skin = allThemes.get(i);
+			if (skin.getNombre().toLowerCase()
+					.startsWith(query.toLowerCase())) {
+				filteredAgencia.add(skin);
+			}
+		}
+
+		return filteredAgencia;
 	}
 
 	// GET - SET
@@ -231,6 +234,14 @@ public class ClienteBean implements Serializable {
 
 	public void setFilteredListaCliente(List<Cliente> filteredListaCliente) {
 		this.filteredListaCliente = filteredListaCliente;
+	}
+
+	public Agencia getAgencia() {
+		return agencia;
+	}
+
+	public void setAgencia(Agencia agencia) {
+		this.agencia = agencia;
 	}
 
 }

@@ -12,6 +12,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
 /**
@@ -34,7 +35,10 @@ public class Cliente implements Serializable {
 	@Column(length = 200)
 	@Size(max = 200)
 	private String razonSocial;
-	
+
+	@Transient
+	private String label;
+
 	@Column(length = 200)
 	@Size(max = 200)
 	private String apellidos;
@@ -182,6 +186,17 @@ public class Cliente implements Serializable {
 		this.apellidos = apellidos;
 	}
 
+	public String getLabel() {
+		if (razonSocial != null) 
+			return razonSocial + " " + apellidos;
+		else
+			return "";
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -211,7 +226,17 @@ public class Cliente implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append(razonSocial);
+
+		if (razonSocial != null) {
+			builder.append(razonSocial);
+
+			if (apellidos != null) {
+				builder.append(" ");
+				builder.append(apellidos);
+			}
+		} else
+			builder.append("");
+
 		return builder.toString();
 	}
 

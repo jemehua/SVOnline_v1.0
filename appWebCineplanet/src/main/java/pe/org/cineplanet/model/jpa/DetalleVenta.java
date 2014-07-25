@@ -1,6 +1,7 @@
 package pe.org.cineplanet.model.jpa;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
@@ -9,6 +10,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
 /**
@@ -16,7 +18,7 @@ import javax.validation.constraints.Size;
  * @author Hever Pumallihua
  */
 @Entity
-@NamedQueries({ @NamedQuery(name = "DetalleVenta.getAll", query = "SELECT d FROM DetalleVenta d WHERE d.estado =:estado ORDER BY d.id.idVenta ASC") })
+@NamedQueries({ @NamedQuery(name = "DetalleVenta.getAllByIdVenta", query = "SELECT d FROM DetalleVenta d WHERE d.id.idVenta =:idVenta ORDER BY d.id.idTipoEntrada ASC ") })
 public class DetalleVenta implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -25,6 +27,9 @@ public class DetalleVenta implements Serializable {
 
 	@Column
 	private Integer cantidad;
+	
+	@Transient
+	private BigDecimal total;
 
 	@Column(length = 1)
 	@Size(max = 1)
@@ -81,6 +86,16 @@ public class DetalleVenta implements Serializable {
 
 	public void setTipoEntrada(TipoEntrada tipoEntrada) {
 		this.tipoEntrada = tipoEntrada;
+	}
+	
+	
+
+	public BigDecimal getTotal() {
+		return total;
+	}
+
+	public void setTotal(BigDecimal total) {
+		this.total = total;
 	}
 
 	@Override

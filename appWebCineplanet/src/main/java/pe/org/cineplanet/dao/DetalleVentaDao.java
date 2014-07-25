@@ -18,7 +18,7 @@ public interface DetalleVentaDao {
 
 	public abstract DetalleVenta edit(DetalleVenta obj) throws Exception;
 
-	public abstract List<DetalleVenta> getListaDetalleVenta() throws Exception;
+	public abstract List<DetalleVenta> getListaByIdVenta(Long idVenta) throws Exception;
 
 
 }

@@ -14,7 +14,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import pe.org.cineplanet.dao.MovimientoDao;
+import pe.org.cineplanet.dto.MovimientoDTO;
 import pe.org.cineplanet.dto.VentaDTO;
+import pe.org.cineplanet.model.jpa.DetalleVentaPK;
 import pe.org.cineplanet.model.jpa.Movimiento;
 import pe.org.cineplanet.model.jpa.MovimientoPK;
 import pe.org.cineplanet.util.Constantes;
@@ -30,6 +32,15 @@ public class MovimientoDaoImpl implements MovimientoDao {
 
 	public Movimiento find(MovimientoPK id) throws Exception {
 		return em.find(Movimiento.class, id);
+	}
+	
+	public Movimiento find(String idCodigo) throws Exception {
+		
+		TypedQuery<Movimiento> tq = em.createNamedQuery(
+				"Movimiento.getByIdCodigo", Movimiento.class);
+		tq.setParameter("idCodigo", idCodigo);
+		return tq.getSingleResult();
+		
 	}
 
 	@Transactional
@@ -108,6 +119,39 @@ public class MovimientoDaoImpl implements MovimientoDao {
 		tq.setParameter("idCodigo", idCodigo);
 		tq.setParameter("estado", Constantes.ACTIVO);
 		return tq.getSingleResult();
+	}
+	
+	
+	public List<MovimientoDTO> getListaMovimiento(DetalleVentaPK id )
+			throws Exception {
+	
+		StringBuilder sb = new StringBuilder();
+		sb.append("SELECT m.id.idCodigo, ");
+		sb.append("m.detalleEntrada.estado ");
+		sb.append("FROM Movimiento m ");
+		sb.append("WHERE m.id.idVenta =:idVenta AND m.id.idTipoEntrada =:idTipoEntrada AND m.estado =:estado ");
+		
+		Query q = em.createQuery(sb.toString());
+		q.setParameter("idVenta", id.getIdVenta());
+		q.setParameter("idTipoEntrada", id.getIdTipoEntrada());
+		q.setParameter("estado", Constantes.ACTIVO);
+		
+		List<Object[]> listaObjetos = new ArrayList<Object[]>();
+
+		listaObjetos = q.getResultList();
+
+		List<MovimientoDTO> lista = new ArrayList<MovimientoDTO>();
+
+		for (Object[] row : listaObjetos) {
+			MovimientoDTO ventaDTO = new MovimientoDTO();
+
+			ventaDTO.setIdCodigo((String) row[0]);
+			ventaDTO.setEstado((String) row[1]);
+
+			lista.add(ventaDTO);
+		}
+
+		return lista;
 	}
 
 }

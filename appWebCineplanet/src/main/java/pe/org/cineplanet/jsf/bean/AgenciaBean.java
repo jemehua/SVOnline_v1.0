@@ -87,7 +87,7 @@ public class AgenciaBean implements Serializable {
 		try {
 
 			agencia.setEstado(Constantes.ACTIVO);
-
+			agencia.setNombre(agencia.getNombre().toUpperCase());
 			Agencia a = agenciaService.find(agencia.getIdAgencia());
 
 			if (a != null) {

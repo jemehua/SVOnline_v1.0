@@ -10,10 +10,10 @@
 
 </h:head>
 <h:body>
-	<h:outputStylesheet name="css/cssContent.css" />
+	<h:outputStylesheet name="css/cssContent.css" /> 
 	<p:growl id="messages" showDetail="true" life="40000" />
 	<p:panel id="pnlAgencia" header="Agencia">
-		<p:focus context="pnlAgencia" />
+		<p:focus context="pnlAgencia" /> 
 		<table cellpadding="2" cellspacing="2" style="width: 100%;">
 			<tr>
 				<td>Codigo<h:outputText value="*" styleClass="obligatorio" /></td>
@@ -25,7 +25,7 @@
 				<td>Nombre<h:outputText value="*" styleClass="obligatorio" /></td>
 				<td><p:inputText id="nombre"
 						value="#{agenciaBean.agencia.nombre}" tabindex="2" maxlength="200"
-						styleClass="txt" style="text-transform: uppercase;" /></td>
+						styleClass="txt" /></td>
 			</tr>
 		</table>
 		<p:separator id="s1" />

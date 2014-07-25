@@ -17,12 +17,10 @@
 		}
 	</script>
 	<style>
-	
-		.ui-autocomplete input {
-    width:200px;
-	</style>
-
+.ui-autocomplete input {
+	width: 200px;
 }
+</style>
 	
 </h:head>
 <h:body>
@@ -33,28 +31,14 @@
 		<table style="width: 100%;" cellpadding="1" cellspacing="2">
 			<tr>
 				<td>Cliente<h:outputText value="*" styleClass="obligatorio" /></td>
-				<td>
-				
-				<p:autoComplete id="themePojo" value="#{ventasBean.cliente}" completeMethod="#{ventasBean.complete}" 
-                        var="c" itemLabel="#{c.razonSocial}" itemValue="#{c}" forceSelection="true"  style="width:210px;">
-                        <f:converter binding="#{clienteConverter}" />
-<!--                      converter="clienteConverter"    <p:ajax event="itemSelect" listener="#{ventasBean.onItemSelect}" update="agencia" /> -->
-                        </p:autoComplete> 
-				
-				
-				
-				<!--  <p:selectOneMenu id="comboCliente"
-						value="#{ventasBean.clienteSelec}" style="width:210px;"
-						tabindex="1">
-						<f:selectItems value="#{ventasBean.comboCliente}" />
-						<p:ajax event="change"
-							listener="#{ventasBean.cargarDescAgenciaByCliente}"
-							update="agencia" />
-					</p:selectOneMenu>-->
-					</td>
-				<td>Agencia</td>
-				<td><h:outputText id="agencia"
-						value="#{ventasBean.descAgencia}" /></td>
+				<td><p:autoComplete id="themePojo"
+						value="#{ventasBean.cliente}"
+						completeMethod="#{ventasBean.complete}" var="c"
+						itemLabel="#{c.label}" itemValue="#{c}" forceSelection="true">
+						<f:converter binding="#{clienteConverter}" />
+					</p:autoComplete></td>
+				<td></td>
+				<td></td>
 			</tr>
 			<tr>
 				<td>Otorgado a<h:outputText value="*" styleClass="obligatorio" /></td>
@@ -123,14 +107,17 @@
 				<f:facet name="header">  
             Lista de Pedidos
         </f:facet>
-				<p:column headerText="Tipo de Vale" style="width:50%">
+				<p:column headerText="Tipo de Vale" style="width:30%">
 					<h:outputText value="#{d.tipoEntrada.nombre}" />
 				</p:column>
 				<p:column headerText="Cantidad" style="width:20%">
 					<h:outputText value="#{d.cantidad}" />
 				</p:column>
-				<p:column headerText="Estado" style="width:20%">
-					<h:outputText value="#{d.estado.equals('A')?'Activo':'Inactivo'}" />
+				<p:column headerText="Precio" style="width:20%">
+					<h:outputText value="#{d.tipoEntrada.precio}" />
+				</p:column>
+				<p:column headerText="Total" style="width:20%">
+					<h:outputText value="#{d.total}" />
 				</p:column>
 				<p:column headerText="#{messages.lblOpciones}" style="width:10%">
 					<p:commandButton value="" icon="ui-icon-pencil"
@@ -154,30 +141,36 @@
 						icon="ui-icon-disk" tabindex="7" /></td>
 				<td><p:commandButton value="Limpiar"
 						update="pnlVentas, messages" action="#{ventasBean.limpiar}"
-						icon="ui-icon-close" tabindex="8" oncomplete='ventaTable.clearFilters();'/></td>
+						icon="ui-icon-close" tabindex="8"
+						oncomplete='ventaTable.clearFilters();' /></td>
 				<td></td>
 			</tr>
 		</table>
 		<p:separator id="s2" />
 		<p:dataTable var="v" value="#{ventasBean.listaVenta}"
-			id="dtListaVenta" scrollable="true" scrollHeight="180" widgetVar="ventaTable"
-			paginator="true" rows="8" filteredValue="#{ventasBean.filteredListaVenta}"
+			id="dtListaVenta" scrollable="true" scrollHeight="184"
+			widgetVar="ventaTable" paginator="true" rows="8"
+			filteredValue="#{ventasBean.filteredListaVenta}"
 			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
 			emptyMessage="No hay datos">
 
 			<f:facet name="header">  
             Lista de ventas
         </f:facet>
-        <p:column headerText="Id" style="width:8%">
+			<p:column headerText="Id" style="width:7%">
 				<h:outputText value="#{v.idVenta}" />
 			</p:column>
 			<p:column headerText="Agencia" style="width:12%">
 				<h:outputText value="#{v.cliente.agencia.nombre}" />
 			</p:column>
-			<p:column headerText="Cliente" style="width:22%" filterBy="#{v.cliente.razonSocial}">
+			<p:column headerText="Cliente" style="width:15%"
+				filterBy="#{v.cliente.razonSocial}">
 				<h:outputText value="#{v.cliente.razonSocial}" />
 			</p:column>
-			<p:column headerText="Otorgado a" style="width:22%">
+			<p:column headerText="Apellidos" style="width:15%">
+				<h:outputText value="#{v.cliente.apellidos}" />
+			</p:column>
+			<p:column headerText="Otorgado a" style="width:15%">
 				<h:outputText value="#{v.otorgado}" />
 			</p:column>
 			<p:column headerText="Fecha de venta" style="width:10%">
@@ -199,22 +192,89 @@
 					<f:setPropertyActionListener value="#{v.cliente.nroDocumento}"
 						target="#{ventasBean.clienteSelec}" />
 				</p:commandButton>-->
-				<p:commandButton value="Generar" ajax="false"
+				<p:commandButton value="" title="Generar" ajax="false"
 					onclick="PrimeFaces.monitorDownload(start, stop);"
-					icon="ui-icon-arrowthick-1-s" actionListener="#{ventasBean.downloadAction(v.idVenta)}">
+					icon="ui-icon-arrowthick-1-s"
+					actionListener="#{ventasBean.downloadAction(v.idVenta)}">
 					<p:fileDownload value="#{ventasBean.file}" />
-<!-- 					<f:setPropertyActionListener value="#{v.idVenta}" -->
-<!-- 						target="#{ventasBean.idVentaSelec}" /> -->
+				</p:commandButton>
+
+				<p:commandButton value="" icon="ui-icon-pencil"
+					update=":frm:pnlEdit"
+					actionListener="#{ventasBean.verDetalleVenta(v.idVenta)}"
+					oncomplete="editDialog.show()" title="Editar">
 				</p:commandButton>
 
 			</p:column>
 		</p:dataTable>
 	</p:panel>
+
+	<p:dialog id="dlgEdit" header="Detalles de venta"
+		widgetVar="editDialog" modal="true" resizable="false" width="650"
+		showEffect="clip" closable="true" hideEffect="fold">
+		<p:panel id="pnlEdit">
+
+			<p:dataTable id="idDetVenta" var="d"
+				value="#{ventasBean.listaDetVenta}" emptyMessage="No hay datos">
+
+				<f:facet name="header">  
+            Lista de entradas vendidas
+        </f:facet>
+				<p:ajax event="rowToggle" listener="#{ventasBean.onRowToggle}" />
+				<p:column style="width:20%">
+					<p:rowToggler />
+				</p:column>
+				<p:column headerText="ID Venta" style="width:10%">
+					<h:outputText value="#{d.id.idVenta}" />
+				</p:column>
+				<p:column headerText="Tipo de vale" style="width:50%">
+					<h:outputText value="#{d.tipoEntrada.nombre}" />
+				</p:column>
+				<p:column headerText="Cantidad" style="width:10%">
+					<h:outputText value="#{d.cantidad}" />
+				</p:column>
+				<p:column headerText="Estado" style="width:10%">
+					<h:outputText value="#{v.estado.equals('A')?'Activo':'Inactivo'}" />
+				</p:column>
+
+				<p:rowExpansion>
+
+					<p:dataTable var="m" value="#{ventasBean.listaMovimiento}"
+						emptyMessage="No hay datos">
+						<p:column headerText="Codigo vale" style="width:60%">
+							<h:outputText value="#{m.idCodigo}" />
+						</p:column>
+						<p:column headerText="Estado venta" style="width:30%">
+							<h:outputText
+								value="#{m.estado.equals('V')?'Vendido':'Disponible'} " />
+						</p:column>
+						<p:column headerText="#{messages.lblOpciones}" style="width:10%">
+							<p:commandButton value="" icon="ui-icon-pencil"
+								update=":frm:idDetVenta :frm:dtListaVenta :frm:messages"
+								actionListener="#{ventasBean.anularVenta(m.idCodigo)}"
+								title="Anular venta" />
+						</p:column>
+					</p:dataTable>
+				</p:rowExpansion>
+			</p:dataTable>
+
+			<f:facet name="footer">
+
+			</f:facet>
+		</p:panel>
+	</p:dialog>
+
 </h:body>
+
+
+
+
 <p:dialog modal="true" widgetVar="statusDialog" header="Status"
 	draggable="false" closable="true">
 	<p:graphicImage value="./images/ajax-loader.gif" />
 </p:dialog>
+
+
 <p:ajaxStatus
 	style="width:64px;height:64px;position:fixed;right:5px;bottom:5px"
 	id="ajaxStatusPanel">

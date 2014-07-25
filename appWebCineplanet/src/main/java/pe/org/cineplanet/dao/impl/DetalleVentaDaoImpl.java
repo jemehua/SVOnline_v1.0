@@ -9,13 +9,9 @@ import javax.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import pe.org.cineplanet.dao.DetalleEntradaDao;
 import pe.org.cineplanet.dao.DetalleVentaDao;
-import pe.org.cineplanet.model.jpa.DetalleEntrada;
-import pe.org.cineplanet.model.jpa.DetalleEntradaPK;
 import pe.org.cineplanet.model.jpa.DetalleVenta;
 import pe.org.cineplanet.model.jpa.DetalleVentaPK;
-import pe.org.cineplanet.util.Constantes;
 
 /**
  * 
@@ -41,10 +37,10 @@ public class DetalleVentaDaoImpl implements DetalleVentaDao {
 		return em.merge(obj);
 	}
 
-	public List<DetalleVenta> getListaDetalleVenta() throws Exception {
+	public List<DetalleVenta> getListaByIdVenta(Long idVenta) throws Exception {
 		TypedQuery<DetalleVenta> tq = em.createNamedQuery(
-				"DetalleVenta.getAll", DetalleVenta.class);
-		tq.setParameter("estado", Constantes.ACTIVO);
+				"DetalleVenta.getAllByIdVenta", DetalleVenta.class);
+		tq.setParameter("idVenta", idVenta);
 		return tq.getResultList();
 	}
 

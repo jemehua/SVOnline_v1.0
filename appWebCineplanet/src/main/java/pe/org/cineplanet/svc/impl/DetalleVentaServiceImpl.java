@@ -36,8 +36,8 @@ public class DetalleVentaServiceImpl implements DetalleVentaService {
 		return detalleVentaDao.edit(obj);
 	}
 
-	public List<DetalleVenta> getListaDetalleVenta() throws Exception {
-		return detalleVentaDao.getListaDetalleVenta();
+	public List<DetalleVenta> getListaByIdVenta(Long idVenta) throws Exception {
+		return detalleVentaDao.getListaByIdVenta(idVenta);
 	}
 
 }
