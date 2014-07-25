@@ -3,6 +3,7 @@ package pe.org.cineplanet.dao;
 
 import java.util.List;
 
+import pe.org.cineplanet.dto.ReporteDTO;
 import pe.org.cineplanet.model.jpa.DetalleVenta;
 import pe.org.cineplanet.model.jpa.DetalleVentaPK;
 
@@ -20,5 +21,5 @@ public interface DetalleVentaDao {
 
 	public abstract List<DetalleVenta> getListaByIdVenta(Long idVenta) throws Exception;
 
-
+	public abstract List<ReporteDTO> getListaReporteDTO() throws Exception;
 }
