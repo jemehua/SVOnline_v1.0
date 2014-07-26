@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+<script type="text/javascript">
+		function start() {
+			PF('statusDialog').show();
+		}
+
+		function stop() {
+			PF('statusDialog').hide();
+		}
+	</script>
+</h:head>
+<h:body>
+	<h:outputStylesheet name="css/cssContent.css" />
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="pnlReporte" header="Agencia">
+		<p:focus context="pnlReporte" />
+		<table cellpadding="2" cellspacing="2" style="width: 100%;">
+			<tr>
+				<td>Desde<h:outputText value="*" styleClass="obligatorio" /></td>
+				<td><p:calendar id="desde" locale="es"
+						value="#{reporteBean.fecInicio}" showOn="button" navigator="true"
+						tabindex="1" pattern="dd/MM/yyyy" /></td>
+			</tr>
+			<tr>
+				<td>Hasta<h:outputText value="*" styleClass="obligatorio" /></td>
+				<td><p:calendar id="hasta" locale="es"
+						value="#{reporteBean.fecFin}" showOn="button" navigator="true"
+						tabindex="2" pattern="dd/MM/yyyy" /></td>
+			</tr>
+		</table>
+		<p:separator id="s1" />
+		<table>
+			<tr>
+				<td><p:commandButton value="Generar" title="Generar"
+						ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
+						icon="ui-icon-arrowthick-1-s" tabindex="3" update="pnlReporte, messages"
+						actionListener="#{reporteBean.guardar}">
+						<p:fileDownload value="#{reporteBean.file}" />
+					</p:commandButton></td>
+				<td><p:commandButton value="Limpiar"
+						update="pnlReporte, messages" action="#{reporteBean.limpiar}"
+						icon="ui-icon-close" tabindex="4" /></td>
+			</tr>
+		</table>
+	</p:panel>
+</h:body>
+
+<p:dialog modal="true" widgetVar="statusDialog" header="Status"
+	draggable="false" closable="true">
+	<p:graphicImage value="./images/ajax-loader.gif" />
+</p:dialog>
+
+<p:ajaxStatus
+	style="width:64px;height:64px;position:fixed;right:5px;bottom:5px"
+	id="ajaxStatusPanel">
+	<f:facet name="start">
+		<p:graphicImage value="./images/loading.gif" />
+	</f:facet>
+
+	<f:facet name="complete">
+		<h:outputText value="" />
+	</f:facet>
+</p:ajaxStatus>
+
+</html>
