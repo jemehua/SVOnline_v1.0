@@ -1,25 +1,24 @@
-drop table if exists "tipodocumento" cascade;
-drop table if exists "entrada" cascade;
-drop table if exists "task" cascade;
-drop table if exists "tipoentrada" cascade;
-drop table if exists "agencia" cascade;
-drop table if exists "detalleventa" cascade;
-drop table if exists "cliente" cascade;
-drop table if exists "rol" cascade;
-drop table if exists "menu" cascade;
-drop table if exists "movimiento" cascade;
-drop table if exists "venta" cascade;
-drop table if exists "permiso" cascade;
-drop table if exists "itemmenu" cascade;
-drop table if exists "usuario" cascade;
-drop table if exists "detalleentrada" cascade;
+--drop table if exists "tipodocumento" cascade;
+--drop table if exists "entrada" cascade;
+--drop table if exists "task" cascade;
+--drop table if exists "tipoentrada" cascade;
+--drop table if exists "agencia" cascade;
+--drop table if exists "detalleventa" cascade;
+--drop table if exists "cliente" cascade;
+--drop table if exists "rol" cascade;
+--drop table if exists "menu" cascade;
+--drop table if exists "movimiento" cascade;
+--drop table if exists "venta" cascade;
+--drop table if exists "permiso" cascade;
+--drop table if exists "itemmenu" cascade;
+--drop table if exists "usuario" cascade;
+--drop table if exists "detalleentrada" cascade;
 
 
 --eliminar pkey  
 ALTER TABLE cliente
   DROP CONSTRAINT cliente_pkey CASCADE
 
---
 ALTER TABLE venta DROP COLUMN idcliente;
 
 ALTER TABLE venta ADD idcliente bigint;
@@ -44,8 +43,6 @@ ALTER TABLE cliente ADD COLUMN apellidos character varying(200);
 
 alter table tipoentrada add column precio type numeric(19,2); 
 
-
-
 --agencia
 ALTER TABLE agencia
   DROP CONSTRAINT agencia_pkey CASCADE;
@@ -68,33 +65,41 @@ ALTER TABLE cliente
       REFERENCES agencia (idagencia) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION;
 
-
-
-
 --SELECT 'DROP TABLE '||table_name||' CASCADE CONSTRAINTS;' FROM user_tables
 
 INSERT INTO MENU (IDMENU, ESTADO, NOMBRE) VALUES ('1', 'A', 'Administración');
 INSERT INTO MENU (IDMENU, ESTADO, NOMBRE) VALUES ('2', 'A', 'Operación');
 
 --administracion
---INSERT INTO ITEMMENU (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('1', 'A', 'Usuario', 'contents/usuario.xhtml', '1');
+INSERT INTO ITEMMENU (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('1', 'A', 'Usuario', 'contents/usuario.xhtml', '1');
 INSERT INTO ITEMMENU (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('2', 'A', 'Agencia', 'contents/agencia.xhtml', '1');
 INSERT INTO ITEMMENU (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('4', 'A', 'Cliente', 'contents/cliente.xhtml', '1');
 INSERT INTO ITEMMENU (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('5', 'A', 'Entradas', 'contents/entradas.xhtml', '1');
 
 --opreaciones
 INSERT INTO ITEMMENU (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('3', 'A', 'Ventas', 'contents/ventas.xhtml', '2');
+INSERT INTO ITEMMENU (IDITEMMENU, ESTADO, NOMBRE, URLXHTML, IDMENU) VALUES ('6', 'A', 'Reporte', 'contents/reporte.xhtml', '2');
 
 --roles
 INSERT INTO ROL (IDROL, ESTADO, NOMBRE) VALUES ('1', 'A', 'Administrador');
+INSERT INTO ROL (IDROL, ESTADO, NOMBRE) VALUES ('2', 'A', 'Vendedor(a)');
 
 --administrador
---INSERT INTO PERMISO (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('1', '1', '1', '1');
+INSERT INTO PERMISO (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('1', '1', '1', '1');
 INSERT INTO PERMISO (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('2', '1', '2', '1');
 INSERT INTO PERMISO (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('4', '1', '4', '1');
 INSERT INTO PERMISO (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('5', '1', '5', '1');
 
 INSERT INTO PERMISO (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('3', '1', '3', '1');
+INSERT INTO PERMISO (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('6', '1', '6', '1');
+
+--vendedor
+INSERT INTO PERMISO (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('7', '1', '2', '2');
+INSERT INTO PERMISO (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('8', '1', '4', '2');
+INSERT INTO PERMISO (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('9', '1', '5', '2');
+
+INSERT INTO PERMISO (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('10', '1', '3', '2');
+INSERT INTO PERMISO (IDPERMISO, ESTADO, IDITEMMENU, IDROL) VALUES ('11', '1', '6', '2');
 
 --usuario
 INSERT INTO USUARIO (IDUSUARIO, APMATERNO, APPATERNO, ESTADO, NOMBRE, USUARIO, IDROL, CLAVE) VALUES ('1', 'Salazar', 'Salinas', 'A', 'Laura', 'admin', '1', 'admin');

@@ -20,7 +20,7 @@ import javax.validation.constraints.Size;
 @Entity
 @NamedQueries({
 		@NamedQuery(name = "Movimiento.getAllByIdVenta", query = "SELECT m FROM Movimiento m WHERE m.id.idVenta =:idVenta AND m.estado =:estado ORDER BY m.id.idCodigo ASC"),
-		@NamedQuery(name = "Movimiento.getByIdCodigo", query = "SELECT m FROM Movimiento m WHERE m.id.idCodigo =:idCodigo ") })
+		@NamedQuery(name = "Movimiento.getByIdCodigo", query = "SELECT m FROM Movimiento m WHERE m.id.idCodigo =:idCodigo AND m.estado =:estado ") })
 public class Movimiento implements Serializable {
 	private static final long serialVersionUID = 1L;
 

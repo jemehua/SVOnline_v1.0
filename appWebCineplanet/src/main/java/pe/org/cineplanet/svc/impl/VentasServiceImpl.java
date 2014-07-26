@@ -1,5 +1,6 @@
 package pe.org.cineplanet.svc.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import pe.org.cineplanet.dao.DetalleEntradaDao;
 import pe.org.cineplanet.dao.DetalleVentaDao;
 import pe.org.cineplanet.dao.MovimientoDao;
 import pe.org.cineplanet.dao.VentasDao;
+import pe.org.cineplanet.dto.ReporteDTO;
 import pe.org.cineplanet.model.jpa.DetalleEntrada;
 import pe.org.cineplanet.model.jpa.DetalleVenta;
 import pe.org.cineplanet.model.jpa.DetalleVentaPK;
@@ -74,9 +76,8 @@ public class VentasServiceImpl implements VentasService {
 					mov = null;
 				}
 				
-				
-				
 				if(mov == null) {
+		
 					MovimientoPK idMov = new MovimientoPK(id.getIdVenta(), id.getIdTipoEntrada(), detalleEntrada.getId().getIdCodigo(), detalleEntrada.getId().getIdEntrada());
 					
 					Movimiento movimiento = new Movimiento();
@@ -121,6 +122,10 @@ public class VentasServiceImpl implements VentasService {
 			// TODO: handle exception
 			return 1L;
 		}
+	}
+	
+	public List<ReporteDTO> getListaReporte(Date fecInicio, Date fecFin, String usr) throws Exception {
+		return ventasDao.getListaReporte(fecInicio, fecFin, usr);
 	}
 
 }

@@ -3,31 +3,32 @@ body {
 	font-size: 9pt;
 	background-image: url('../../images/franja_3.png');
 	background-repeat: repeat-x;
-}
-
-.contenedor {
-	width: 600px;
-	height: auto;
-	margin: 0 auto;
-	background-color: white;
-	border-right: solid 2px #a0a0a0;
-	border-bottom: solid 2px #a0a0a0;
 	clear:both;
 }
 
-.contenedor .tituloLogin {
-	width: 540px;
+.tituloLogin {
+	width: 400px;
 	height: 21px;
+	margin: 20px auto;
 	line-height: 21px;
 	color: #b60400;
-	font-size: 11pt;
+	text-transform: uppercase;
+	font-size: 14pt;
 	font-weight: bold;
-	text-align: left;
-	margin-bottom: 10px;
+	text-align: center;
+}
+
+.contenedor {
+	width: 400px;
+	height: auto;
+	margin: 0 auto;
+	background-color: white;
+	border-right: solid 4px #a0a0a0;
+	border-bottom: solid 4px #a0a0a0;
 }
 
 .contenedor .fila {
-	width: 540px;
+	width: 390px;
 	height: 21px;
 	color: #58585a;
 	line-height: 21px;
@@ -38,19 +39,22 @@ body {
 }
 
 .contenedor .captcha {
-	width: 318px;
-	height: 80px;
+	width: 390px;
+	height: 70px;
 	margin-bottom: 10px;
 }
 
-.contenedor .boton {
-	width: 129px;
-	height: 30px;
-	float: left;
-	margin-bottom: 10px;
+
+.contenedor .btn {
+	height: 40px;
+	padding-left: 5px;
+	padding-top:5px;
+	background-color:#d6d6d6;
+	border-top: solid 2px #a0a0a0;
+	clear:both;
 }
 
 .boton .btn:hover {
 	background: -moz-linear-gradient(#fff 0%, #DEDEDE 100%);
 	color: #999;
-}}
+}

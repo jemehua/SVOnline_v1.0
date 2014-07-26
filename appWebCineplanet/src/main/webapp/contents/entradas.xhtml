@@ -73,7 +73,7 @@
 		</table>
 		<p:separator id="s2" />
 		<p:dataTable var="e" value="#{entradaBean.listaEntrada}"
-			id="dtListaEntrada" scrollable="true" scrollHeight="180"
+			id="dtListaEntrada" scrollable="true" scrollHeight="185"
 			paginator="true" rows="8"
 			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
 			emptyMessage="No hay datos">
@@ -97,7 +97,7 @@
 			</p:column>
 			<p:column headerText="Fecha de carga" style="width:10%">
 				<h:outputText value="#{e.fecRegistro}">
-					<f:convertDateTime pattern="dd/MM/yyyy" locale="es" />
+					<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="America/Lima"  />
 				</h:outputText>
 			</p:column>
 			<p:column headerText="Total" style="width:8%">

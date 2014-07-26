@@ -15,21 +15,19 @@ import org.springframework.stereotype.Component;
 import pe.org.cineplanet.model.jpa.Usuario;
 import pe.org.cineplanet.svc.UsuarioService;
 import pe.org.cineplanet.util.Message;
-import pe.org.cineplanet.util.Seguridad;
-import pe.org.cineplanet.util.StringUtils;
 
 /**
  * 
  * @author Hever Pumallihua
  */
 
-@Component("cambioClaveController")
+@Component("claveBean")
 @Scope("session")
-public class CambioClaveController implements Serializable {
+public class ClaveBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = LoggerFactory
-			.getLogger(CambioClaveController.class);
+			.getLogger(ClaveBean.class);
 	
 	@Autowired
 	private LoginController loginController;
@@ -43,7 +41,7 @@ public class CambioClaveController implements Serializable {
 	private String nuevaClave = "";
 	private String confirmarClave = "";
 
-	public CambioClaveController() {
+	public ClaveBean() {
 
 	}
 
@@ -80,8 +78,8 @@ public class CambioClaveController implements Serializable {
 			if (!validarDatos())
 				return;
 
-			userSesion.setPassword(Seguridad.encrypt(nuevaClave));
-			//userSesion.setClave(nuevaClave);
+			//userSesion.setPassword(Seguridad.encrypt(nuevaClave));
+			userSesion.setClave(nuevaClave);
 			usuarioService.edit(userSesion);
 			FacesContext.getCurrentInstance().addMessage(
 					null,
@@ -133,47 +131,19 @@ public class CambioClaveController implements Serializable {
 			return false;
 		}
 
-		if (StringUtils.validarClave(nuevaClave)) {
-			FacesContext.getCurrentInstance().addMessage(
-					null,
-					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
-							message.getMessage("msgClaveError")));
-			return false;
-		}
-
-		/*if (validarCuenta()) {
-			FacesContext.getCurrentInstance().addMessage(
-					null,
-					new FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
-							"Nombre de usuario / contraseña ya existe"));
-			return false;
-		}*/
-
 		return true;
 	}
 	
 	public boolean verificarClaveActual() throws Exception {
 
-		String plainText = Seguridad.decrypt(userSesion.getPassword());
+		//String plainText = Seguridad.decrypt(userSesion.getPassword());
 				
-		if (plainText.equalsIgnoreCase(clave))
+		if (userSesion.getClave().equalsIgnoreCase(clave))
 			return false;
 		else
 			return true;
 
 	}
-
-	/*public boolean validarCuenta() {
-
-		Usuario usuario = usuarioService.findUsuarioByUsername(
-				userSesion.getUsuario(), nuevaClave);
-
-		if (usuario != null)
-			return true;
-		else
-			return false;
-
-	}*/
 
 	public void validarSesion() {
 		FacesContext context = FacesContext.getCurrentInstance();

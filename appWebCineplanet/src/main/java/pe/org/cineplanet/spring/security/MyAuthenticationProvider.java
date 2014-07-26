@@ -54,16 +54,8 @@ public class MyAuthenticationProvider implements AuthenticationProvider {
 				
 				if(usr.getRol().getIdRol() == Constantes.ROL_ADM)
 					grantedAuths.add(new GrantedAuthorityImpl("ROLE_ADMIN"));
-				if(usr.getRol().getIdRol() == Constantes.ROL_EVA)
-					grantedAuths.add(new GrantedAuthorityImpl("ROLE_EVALUADOR"));
-				if(usr.getRol().getIdRol() == Constantes.ROL_GP)
-					grantedAuths.add(new GrantedAuthorityImpl("ROLE_GP"));
-				if(usr.getRol().getIdRol() == Constantes.ROL_JI)
-					grantedAuths.add(new GrantedAuthorityImpl("ROLE_JI"));
-				if(usr.getRol().getIdRol() == Constantes.ROL_TE)
-					grantedAuths.add(new GrantedAuthorityImpl("ROLE_TE"));
-				if(usr.getRol().getIdRol() == Constantes.ROL_JI_AND_TE)
-					grantedAuths.add(new GrantedAuthorityImpl("ROLE_JI_TE"));
+				if(usr.getRol().getIdRol() == Constantes.ROL_VEN)
+					grantedAuths.add(new GrantedAuthorityImpl("ROLE_VENDEDOR"));
 				// grantedAuths.add(new SimpleGrantedAuthority("Gerente Público"));
 
 				FacesContext ctx = FacesContext.getCurrentInstance();

@@ -282,7 +282,7 @@ public class VentasBean implements Serializable {
 						null,
 						new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
 								"Se ha registrado " + rpta
-										+ " pediso, por favor verifique"));
+										+ " pedidos, por favor verifique."));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -291,7 +291,7 @@ public class VentasBean implements Serializable {
 					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
 							"Error al registrar"));
 		}
-		// cargarListaDetalleVenta();
+		
 		limpiar();
 	}
 
@@ -441,9 +441,9 @@ public class VentasBean implements Serializable {
 			}
 		}
 
-		for (VentaDTO row : listaVentas) {
+		/*for (VentaDTO row : listaVentas) {
 			System.out.println("Codigo=" + row.getIdCodigo());
-		}
+		}*/
 
 		ReporteEntradas ventaReport = new ReporteEntradas();
 		return ventaReport.entradas(listaVentas);
@@ -525,8 +525,8 @@ public class VentasBean implements Serializable {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-					"EXITO", "Error al anular pedido"));
+			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
+					"ADVERTENCIA", "Error al anular pedido"));
 		}
 		
 		

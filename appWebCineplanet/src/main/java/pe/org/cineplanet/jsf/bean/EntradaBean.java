@@ -134,10 +134,6 @@ public class EntradaBean implements Serializable {
 						bFile);
 				XSSFWorkbook wb = new XSSFWorkbook(byteArrayInputStream);
 				XSSFSheet sheet = wb.getSheetAt(0);
-				//Iterator iterator = sheet.rowIterator();
-				// int rownum = 0;
-				// boolean ultimoRegistro = false;
-				// while (iterator.hasNext()) {
 
 				for (int i = 0, z = sheet.getLastRowNum(); i <= z; i++) {
 					detalleEntrada = new DetalleEntrada();
@@ -153,8 +149,6 @@ public class EntradaBean implements Serializable {
 							listaDetalle.add(detalleEntrada);
 						}
 					}
-
-					// rownum++;
 				}
 
 				//entrada.setCantidad(listaDetalle.size());

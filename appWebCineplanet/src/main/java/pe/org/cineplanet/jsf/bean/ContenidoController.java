@@ -1,6 +1,5 @@
 package pe.org.cineplanet.jsf.bean;
 
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +34,7 @@ public class ContenidoController implements Serializable {
 	private LoginController loginController;
 	@Autowired
 	private PermisoDao permisoDao;
-	
+
 	private String includedPage = "";
 	private Usuario userSesion = null;
 	private List<Permiso> listaPermisoAdm = new ArrayList<Permiso>();
@@ -47,35 +46,40 @@ public class ContenidoController implements Serializable {
 	public ContenidoController() {
 		includedPage = "contents/bienvenido.xhtml";
 	}
-	
+
 	@PostConstruct
-	public void init(){
+	public void init() {
 		validarSesion();
 		getPermisoUsuario();
 	}
 
-	public void getPermisoUsuario(){
-		listaPermisoAdm = permisoDao.getListaPermiso(1L, userSesion.getRol().getIdRol());
-		listaPermisoOpe = permisoDao.getListaPermiso(2L, userSesion.getRol().getIdRol());
-		listaPermisoMon = permisoDao.getListaPermiso(3L, userSesion.getRol().getIdRol());
-		listaPermisoNoti = permisoDao.getListaPermiso(4L, userSesion.getRol().getIdRol());
-		listaPermisoRep = permisoDao.getListaPermiso(5L, userSesion.getRol().getIdRol());
+	public void getPermisoUsuario() {
+		listaPermisoAdm = permisoDao.getListaPermiso(1L, userSesion.getRol()
+				.getIdRol());
+		listaPermisoOpe = permisoDao.getListaPermiso(2L, userSesion.getRol()
+				.getIdRol());
+		listaPermisoMon = permisoDao.getListaPermiso(3L, userSesion.getRol()
+				.getIdRol());
+		listaPermisoNoti = permisoDao.getListaPermiso(4L, userSesion.getRol()
+				.getIdRol());
+		listaPermisoRep = permisoDao.getListaPermiso(5L, userSesion.getRol()
+				.getIdRol());
 	}
-	
+
 	public String getIncludedPage() {
 		validarSesion();
 		return includedPage;
 	}
 
 	public void setIncludedPage(String includedPage) {
-		//validarSesion();
+		// validarSesion();
 		eliminarSesion(includedPage);
 		this.includedPage = includedPage;
 	}
 
 	public void validarSesion() {
 		FacesContext context = FacesContext.getCurrentInstance();
-		
+
 		userSesion = (Usuario) context.getExternalContext().getSessionMap()
 				.get(loginController.getUsername());
 
@@ -85,7 +89,7 @@ public class ContenidoController implements Serializable {
 			try {
 				context.getExternalContext().redirect(ctxPath + "/login.jsf");
 			} catch (Exception e) {
-				//e.printStackTrace();
+				// e.printStackTrace();
 			}
 		}
 	}
@@ -93,43 +97,17 @@ public class ContenidoController implements Serializable {
 	public void eliminarSesion(String nombre) {
 		try {
 			String nombreControl = "";
-			if (nombre.equalsIgnoreCase("contents/aprobacionMetas.xhtml")) {
-				nombreControl = "aprobacionMetasController";
-			} else if (nombre
-					.equalsIgnoreCase("contents/planDesarrolloCompetencias.xhtml")) {
-				nombreControl = "planCompetenciasController";
-			} else if (nombre
-					.equalsIgnoreCase("contents/planAccionMetas.xhtml")) {
-				nombreControl = "planMetasController";
-			} else if (nombre
-					.equalsIgnoreCase("contents/verificarPlanesGP.xhtml")) {
-				nombreControl = "verificarPlanesGPController";
-			} else if (nombre
-					.equalsIgnoreCase("contents/cualitativaCompetencias.xhtml")) {
-				nombreControl = "cualitativaCompetenciasController";
-			} else if (nombre
-					.equalsIgnoreCase("contents/cualitativaMetas.xhtml")) {
-				nombreControl = "cualitativaMetasController";
-			} else if (nombre
-					.equalsIgnoreCase("contents/cuantitativaCompetencias.xhtml")) {
-				nombreControl = "cuantitativaCompetenciasController";
-			} else if (nombre
-					.equalsIgnoreCase("contents/cuantitativaMetas.xhtml")) {
-				nombreControl = "cuantitativaMetasController";
-			} else if (nombre
-					.equalsIgnoreCase("contents/descargarAdjuntarPlanesGP.xhtml")) {
-				nombreControl = "adjuntarPlanesGPController";
-			} else if (nombre
-					.equalsIgnoreCase("contents/evaluacionFinalGP.xhtml")) {
-				nombreControl = "evaluacionFinalGPController";
-			} else if (nombre
-					.equalsIgnoreCase("contents/reporteMonitoreo.xhtml")) {
-				nombreControl = "reporteMonitoreoController";
+			if (nombre.equalsIgnoreCase("contents/entradas.xhtml")) {
+				nombreControl = "entradaBean";
 			}
-			
-			if(nombreControl.length() > 0){
+			if (nombre.equalsIgnoreCase("contents/ventas.xhtml")) {
+				nombreControl = "ventasBean";
+			}
+
+			if (nombreControl.length() > 0) {
 				FacesContext context = FacesContext.getCurrentInstance();
-				context.getExternalContext().getSessionMap().remove(nombreControl);
+				context.getExternalContext().getSessionMap()
+						.remove(nombreControl);
 			}
 		} catch (Exception e) {
 			System.out.println("Error al eliminar sesión");
@@ -143,7 +121,7 @@ public class ContenidoController implements Serializable {
 	public void setUserSesion(Usuario userSesion) {
 		this.userSesion = userSesion;
 	}
-	
+
 	public List<Permiso> getListaPermisoAdm() {
 		return listaPermisoAdm;
 	}
@@ -183,5 +161,5 @@ public class ContenidoController implements Serializable {
 	public void setListaPermisoRep(List<Permiso> listaPermisoRep) {
 		this.listaPermisoRep = listaPermisoRep;
 	}
-	
+
 }

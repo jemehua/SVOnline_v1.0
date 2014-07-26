@@ -13,7 +13,7 @@
 		<intercept-url pattern="/resources/**" filters="none" />
 		<intercept-url pattern="/images/**" filters="none" />
 		<intercept-url pattern="/login.jsf" access="permitAll" />
-		<intercept-url pattern="/login.jsf*" access="hasAnyRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/login.jsf*" access="hasAnyRole('ROLE_ADMIN','ROLE_VENDEDOR')" />
 		<form-login login-processing-url="/j_spring_security_check"
 			login-page="/login.jsf" default-target-url="/home.jsf"
 			authentication-failure-url="/login.jsf" />

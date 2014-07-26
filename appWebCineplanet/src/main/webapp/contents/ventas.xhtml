@@ -68,23 +68,21 @@
 
 		<p:panel id="pnlPedidos" header="Pedidos">
 
-			<table style="width: 100%;">
-				<tr>
-					<td>Tipo de Vale<h:outputText value="*"
+			<table width="100%;">
+				<tr > 
+					<td style="width:10%;">Tipo de Vale<h:outputText value="*"
 							styleClass="obligatorio" /></td>
-					<td><p:selectOneMenu id="comboTipoVale"
+					<td style="width:20%;"><p:selectOneMenu id="comboTipoVale"
 							value="#{ventasBean.tipoEntradaSelec}" style="width:210px;"
 							tabindex="6">
 							<f:selectItems value="#{ventasBean.comboTipoEntrada}" />
 							<p:ajax event="change" listener="#{ventasBean.handleItemSelect}"
 								update="validoPara cantidadDisponible" />
 						</p:selectOneMenu></td>
-					<td>Valido para</td>
-					<td><h:outputText id="validoPara"
-							value="#{ventasBean.descTipoEntrada}" /></td>
-					<td>Cantidad disponible</td>
-					<td><h:outputText id="cantidadDisponible"
-							value="#{ventasBean.cantidadDisponible}" /></td>
+					<td style="width:50%;">Valido para <h:outputText id="validoPara" 
+							value="#{ventasBean.descTipoEntrada}" style="color:blue; font-weight: bold;"/></td>
+					<td style="width:20%;">Cantidad disponible <h:outputText id="cantidadDisponible"
+							value="#{ventasBean.cantidadDisponible}" style="color:blue; font-weight: bold;" /></td>
 				</tr>
 				<tr>
 					<td>Cantidad<h:outputText value="*" styleClass="obligatorio" /></td>
@@ -94,9 +92,7 @@
 						</p:inputText></td>
 					<td><p:commandButton value="Agregar"
 							action="#{ventasBean.agregar}" update="pnlPedidos, messages"
-							icon="ui-icon-disk" tabindex="8" /></td>
-					<td></td>
-					<td></td>
+							icon="ui-icon-plusthick" tabindex="8" /></td>
 					<td></td>
 				</tr>
 			</table>
@@ -148,7 +144,7 @@
 		</table>
 		<p:separator id="s2" />
 		<p:dataTable var="v" value="#{ventasBean.listaVenta}"
-			id="dtListaVenta" scrollable="true" scrollHeight="184"
+			id="dtListaVenta" scrollable="true" scrollHeight="185"
 			widgetVar="ventaTable" paginator="true" rows="8"
 			filteredValue="#{ventasBean.filteredListaVenta}"
 			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
@@ -175,7 +171,7 @@
 			</p:column>
 			<p:column headerText="Fecha de venta" style="width:10%">
 				<h:outputText value="#{v.fecRegistro}">
-					<f:convertDateTime pattern="dd/MM/yyyy" locale="es" />
+					<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="America/Lima"  />
 				</h:outputText>
 			</p:column>
 			<p:column headerText="Total" style="width:8%">
@@ -214,7 +210,7 @@
 		showEffect="clip" closable="true" hideEffect="fold">
 		<p:panel id="pnlEdit">
 
-			<p:dataTable id="idDetVenta" var="d"
+			<p:dataTable id="idDetVenta" var="d" scrollable="true" scrollHeight="240"
 				value="#{ventasBean.listaDetVenta}" emptyMessage="No hay datos">
 
 				<f:facet name="header">  
@@ -227,7 +223,7 @@
 				<p:column headerText="ID Venta" style="width:10%">
 					<h:outputText value="#{d.id.idVenta}" />
 				</p:column>
-				<p:column headerText="Tipo de vale" style="width:50%">
+				<p:column headerText="Tipo de vale" style="width:40%">
 					<h:outputText value="#{d.tipoEntrada.nombre}" />
 				</p:column>
 				<p:column headerText="Cantidad" style="width:10%">
@@ -241,7 +237,7 @@
 
 					<p:dataTable var="m" value="#{ventasBean.listaMovimiento}"
 						emptyMessage="No hay datos">
-						<p:column headerText="Codigo vale" style="width:60%">
+						<p:column headerText="Codigo vale" style="width:50%">
 							<h:outputText value="#{m.idCodigo}" />
 						</p:column>
 						<p:column headerText="Estado venta" style="width:30%">
@@ -249,7 +245,7 @@
 								value="#{m.estado.equals('V')?'Vendido':'Disponible'} " />
 						</p:column>
 						<p:column headerText="#{messages.lblOpciones}" style="width:10%">
-							<p:commandButton value="" icon="ui-icon-pencil"
+							<p:commandButton value="" icon="ui-icon-trash"
 								update=":frm:idDetVenta :frm:dtListaVenta :frm:messages"
 								actionListener="#{ventasBean.anularVenta(m.idCodigo)}"
 								title="Anular venta" />

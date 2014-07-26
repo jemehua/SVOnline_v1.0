@@ -11,7 +11,7 @@ function RealPerson() {
 	this._defaults = {
 		length: 6, // Number of characters to use
 		includeNumbers: false, // True to use numbers as well as letters
-		regenerate: 'Click to change', // Instruction text to regenerate
+		regenerate: 'Clic para cambiar', // Instruction text to regenerate
 		hashName: '{n}Hash' // Name of the hash value field to compare with,
 			// use {n} to substitute with the original field name
 	};

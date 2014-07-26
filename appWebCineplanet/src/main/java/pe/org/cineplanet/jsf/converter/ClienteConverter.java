@@ -28,14 +28,19 @@ public class ClienteConverter implements Converter, Serializable {
 
 	public Object getAsObject(FacesContext fc, UIComponent arg1, String value) {
 		System.out.println("value=" + value);
-		if(value != null && value.trim().length() > 0) {
-			try {
-				return clienteService.find(Long.parseLong(value));
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		if(value != null ) {
+			
+			if(value.trim().length() > 0){
+				try {
+					return clienteService.find(Long.parseLong(value));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					return null;
+				}
+			}else
 				return null;
-			}
+			
 		} else {
 			return null;
 		}

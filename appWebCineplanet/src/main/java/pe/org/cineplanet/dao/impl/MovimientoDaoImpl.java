@@ -39,6 +39,7 @@ public class MovimientoDaoImpl implements MovimientoDao {
 		TypedQuery<Movimiento> tq = em.createNamedQuery(
 				"Movimiento.getByIdCodigo", Movimiento.class);
 		tq.setParameter("idCodigo", idCodigo);
+		tq.setParameter("estado", Constantes.ACTIVO);
 		return tq.getSingleResult();
 		
 	}

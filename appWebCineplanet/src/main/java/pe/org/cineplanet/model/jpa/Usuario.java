@@ -1,12 +1,20 @@
 package pe.org.cineplanet.model.jpa;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  * 
@@ -15,24 +23,9 @@ import javax.persistence.*;
 @Entity
 @NamedQueries({
 		@NamedQuery(name = "Usuario.getAllListaUsuario", query = "SELECT u FROM Usuario u ORDER BY u.apPaterno"),
-		@NamedQuery(name = "Usuario.getListaUsuarioCampania", query = "SELECT u "
-				+ "FROM Usuario u "
-				+ "WHERE (u.rol.idRol=:idRol or (u.rol.idRol <>:idRol and :idRol = 0)) AND (u.idCampania =:idCampania or ((u.idCampania <>:idCampania or u.idCampania is null) and :idCampania = 0)) ORDER BY u.apPaterno"),
 		@NamedQuery(name = "Usuario.findByUsername", query = "SELECT u "
 				+ "FROM Usuario u "
-				+ "WHERE u.usuario =:username AND u.estado =:estado"),
-		@NamedQuery(name = "Usuario.findByUserAndPwAndRol", query = "SELECT u "
-				+ "FROM Usuario u "
-				+ "WHERE u.usuario =:username AND u.dni =:dni AND u.rol.idRol=:idRol AND u.idCampania =:idCampania "),
-		@NamedQuery(name = "Usuario.findByDniAndCampaniaAndRol", query = "SELECT u "
-				+ "FROM Usuario u "
-				+ "WHERE u.dni =:dni AND u.rol.idRol=:idRol AND u.idCampania =:idCampania "),
-		@NamedQuery(name = "Usuario.validarUsrJiAndTe", query = "SELECT u "
-				+ "FROM Usuario u "
-				+ "WHERE u.usuario =:username AND u.dni =:dni AND u.anioCampania =:anioCampania AND (u.rol.idRol <>:rolAdm AND u.rol.idRol <>:rolEva AND u.rol.idRol <>:rolGp) "),
-		@NamedQuery(name = "Usuario.getUsrByDniAndAnio", query = "SELECT u "
-				+ "FROM Usuario u "
-				+ "WHERE u.dni =:dni AND u.anioCampania =:anioCampania AND (u.rol.idRol <>:rolAdm AND u.rol.idRol <>:rolEva AND u.rol.idRol <>:rolGp) ") })
+				+ "WHERE u.usuario =:username AND u.estado =:estado") })
 public class Usuario implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -46,9 +39,9 @@ public class Usuario implements Serializable {
 	private String apMaterno;
 	@Column
 	private String usuario;
-	@Column
-	@Lob
-	private byte[] password;
+	//@Column
+	//@Lob
+	//private byte[] password;
 	@Column
 	private String clave;
 	@Column
@@ -61,18 +54,18 @@ public class Usuario implements Serializable {
 	@Column
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date fechaModificacion;
-	@Column
-	private String dni;
-	@Column
-	private String correo;
-	@Column
-	private Long idCampania;
-	@Column
-	private String anioCampania;
+	//@Column
+	//private String dni;
+	//@Column
+	//private String correo;
+	//@Column
+	//private Long idCampania;
+	//@Column
+	//private String anioCampania;
 	@Column
 	private String estado;
-	@Transient
-	private List<String> listaGPublicos = new ArrayList<String>();
+	//@Transient
+	//private List<String> listaGPublicos = new ArrayList<String>();
 	@JoinColumn(name = "idRol")
 	@ManyToOne
 	private Rol rol;
@@ -166,54 +159,6 @@ public class Usuario implements Serializable {
 
 	public void setRol(Rol rol) {
 		this.rol = rol;
-	}
-
-	public String getDni() {
-		return dni;
-	}
-
-	public void setDni(String dni) {
-		this.dni = dni;
-	}
-
-	public Long getIdCampania() {
-		return idCampania;
-	}
-
-	public void setIdCampania(Long idCampania) {
-		this.idCampania = idCampania;
-	}
-
-	public String getCorreo() {
-		return correo;
-	}
-
-	public void setCorreo(String correo) {
-		this.correo = correo;
-	}
-
-	public String getAnioCampania() {
-		return anioCampania;
-	}
-
-	public void setAnioCampania(String anioCampania) {
-		this.anioCampania = anioCampania;
-	}
-
-	public List<String> getListaGPublicos() {
-		return listaGPublicos;
-	}
-
-	public void setListaGPublicos(List<String> listaGPublicos) {
-		this.listaGPublicos = listaGPublicos;
-	}
-
-	public byte[] getPassword() {
-		return password;
-	}
-
-	public void setPassword(byte[] password) {
-		this.password = password;
 	}
 
 	public String getClave() {
