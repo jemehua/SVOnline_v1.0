@@ -1,7 +1,9 @@
 package pe.org.cineplanet.jsf.bean;
 
+import java.io.ByteArrayInputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -12,6 +14,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 
 import org.primefaces.event.ToggleEvent;
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,25 +89,24 @@ public class VentasBean implements Serializable {
 	private String cantidad;
 	private String descTipoEntrada;
 	private Integer cantidadDisponible;
-	//private String descAgencia;
 
 	private List<SelectItem> comboTipoEntrada = new ArrayList<SelectItem>();
 	private Long tipoEntradaSelec;
-	// private List<SelectItem> comboCliente = new ArrayList<SelectItem>();
-	// private Long clienteSelec;
 	private List<SelectItem> comboTipoDocumento = new ArrayList<SelectItem>();
 	private Long tipoDocumentoSelec;
 
 	private Long idVentaSelec;
+	private String nombreSelec;
 	private StreamedContent file;
 
 	// autocomplete
 	private Cliente cliente;
 
 	// detalle
-	//private Long idVentaSelec2;
 	private List<DetalleVenta> listaDetVenta;
 	private List<MovimientoDTO> listaMovimiento;
+
+	private BigDecimal totalVenta = new BigDecimal(0.00);
 
 	public VentasBean() {
 		super();
@@ -114,18 +116,14 @@ public class VentasBean implements Serializable {
 	public void init() {
 		System.out.println("Init");
 		venta = new Venta();
-		// detalleVenta = new DetalleVenta();
 		tipoEntradaSelec = 0L;
-		// clienteSelec = 0L;
 		tipoDocumentoSelec = 0L;
 		cantidad = "";
 		descTipoEntrada = "";
 		cantidadDisponible = 0;
-		//descAgencia = "";
 		idVentaSelec = 0L;
 		listaDetalleVenta = new ArrayList<DetalleVenta>();
 		cargarComboTipoEntrada();
-		// cargarComboCliente();
 		cargarComboTipoDocumento();
 		cargarListaVentas();
 		// message = new Message();
@@ -148,18 +146,14 @@ public class VentasBean implements Serializable {
 
 	public void limpiar() {
 		venta = new Venta();
-		// detalleVenta = new DetalleVenta();
 		tipoEntradaSelec = 0L;
-		// clienteSelec = 0L;
 		tipoDocumentoSelec = 0L;
 		cantidad = "";
 		descTipoEntrada = "";
 		cantidadDisponible = 0;
-		//descAgencia = "";
 		idVentaSelec = 0L;
 		listaDetalleVenta = new ArrayList<DetalleVenta>();
 		cargarComboTipoEntrada();
-		// cargarComboCliente();
 		cargarComboTipoDocumento();
 		cargarListaVentas();
 
@@ -184,13 +178,18 @@ public class VentasBean implements Serializable {
 
 			int index = 0;
 			boolean existe = false;
+			BigDecimal total = new BigDecimal(0.00);
 			for (DetalleVenta row : listaDetalleVenta) {
 				if (row.getTipoEntrada().getIdTipoEntrada() == tipoEntradaSelec) {
 					row.setCantidad(Integer.valueOf(cantidad));
+					row.setTotal(row.getTipoEntrada().getPrecio()
+							.multiply(new BigDecimal(row.getCantidad())));
+					total = total.add(row.getTotal());
 					listaDetalleVenta.set(index, row);
 					existe = true;
-					break;
-				}
+					// break;
+				} else
+					total = total.add(row.getTotal());
 				index++;
 			}
 
@@ -201,11 +200,14 @@ public class VentasBean implements Serializable {
 				DetalleVenta detalleVenta = new DetalleVenta();
 				detalleVenta.setTipoEntrada(tipoEntrada);
 				detalleVenta.setCantidad(Integer.valueOf(cantidad));
-				detalleVenta.setTotal(tipoEntrada.getPrecio().multiply(new BigDecimal(detalleVenta.getCantidad())));
+				detalleVenta.setTotal(tipoEntrada.getPrecio().multiply(
+						new BigDecimal(detalleVenta.getCantidad())));
 				detalleVenta.setEstado(Constantes.ACTIVO);
 				listaDetalleVenta.add(detalleVenta);
+				total = total.add(detalleVenta.getTotal());
 			}
 
+			totalVenta = total;
 			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
 					"EXITO", "Se agrego el pedido con exito"));
 		} catch (Exception e) {
@@ -291,7 +293,7 @@ public class VentasBean implements Serializable {
 					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
 							"Error al registrar"));
 		}
-		
+
 		limpiar();
 	}
 
@@ -339,12 +341,6 @@ public class VentasBean implements Serializable {
 			e.printStackTrace();
 		}
 	}
-
-	/*
-	 * public void cargarComboCliente() { try {
-	 * setComboCliente(clienteService.getComboCliente()); } catch (Exception e)
-	 * { // TODO Auto-generated catch block e.printStackTrace(); } }
-	 */
 
 	public void cargarComboTipoDocumento() {
 		try {
@@ -406,24 +402,6 @@ public class VentasBean implements Serializable {
 
 	}
 
-	 /*public void cargarDescAgenciaByCliente() {
-		descAgencia = "";
-		if (cliente != null) {
-
-			Cliente cliente = null;
-			try {
-				cliente = clienteService.find(cliente.getIdCliente());
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			if (cliente != null) {
-				descAgencia = cliente.getAgencia().toString();
-			}
-		}
-	}*/
-
 	public StreamedContent getFile() {
 
 		System.out.println("StreamedContent.getFile()");
@@ -432,7 +410,6 @@ public class VentasBean implements Serializable {
 		System.out.println("idVentaSelec" + idVentaSelec);
 
 		if (idVentaSelec != 0L) {
-
 			try {
 				listaVentas = movimientoService.getListaVenta(idVentaSelec);
 			} catch (Exception e) {
@@ -441,17 +418,21 @@ public class VentasBean implements Serializable {
 			}
 		}
 
-		/*for (VentaDTO row : listaVentas) {
-			System.out.println("Codigo=" + row.getIdCodigo());
-		}*/
-
 		ReporteEntradas ventaReport = new ReporteEntradas();
-		return ventaReport.entradas(listaVentas);
+		byte[] bytes = ventaReport.entradas(listaVentas);
 
+		SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
+
+		String fileName = nombreSelec+"_"+sdf.format(new Date())+".pdf";
+		file = new DefaultStreamedContent(new ByteArrayInputStream(bytes),
+				"application/pdf", fileName);
+
+		return file;
 	}
 
-	public void downloadAction(Long idVenta) {
+	public void downloadAction(Long idVenta, String nombre) {
 		System.out.println("downloadAction " + idVentaSelec);
+		nombreSelec = nombre;
 		idVentaSelec = idVenta;
 	}
 
@@ -508,28 +489,27 @@ public class VentasBean implements Serializable {
 		}
 
 	}
-	
-	public void anularVenta(String idCodigo){
+
+	public void anularVenta(String idCodigo) {
 		FacesContext ctx = FacesContext.getCurrentInstance();
 
 		try {
 			Movimiento m = movimientoService.find(idCodigo);
 			movimientoService.anularVenta(m);
-			
+
 			verDetalleVenta(m.getId().getIdVenta());
 			cargarListaVentas();
-			
+
 			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-						"EXITO", "Pedido anulado con exito"));
-			
+					"EXITO", "Pedido anulado con exito"));
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
 					"ADVERTENCIA", "Error al anular pedido"));
 		}
-		
-		
+
 	}
 
 	// GET - SET
@@ -652,6 +632,22 @@ public class VentasBean implements Serializable {
 
 	public void setListaMovimiento(List<MovimientoDTO> listaMovimiento) {
 		this.listaMovimiento = listaMovimiento;
+	}
+
+	public BigDecimal getTotalVenta() {
+		return totalVenta;
+	}
+
+	public void setTotalVenta(BigDecimal totalVenta) {
+		this.totalVenta = totalVenta;
+	}
+
+	public String getNombreSelec() {
+		return nombreSelec;
+	}
+
+	public void setNombreSelec(String nombreSelec) {
+		this.nombreSelec = nombreSelec;
 	}
 
 }

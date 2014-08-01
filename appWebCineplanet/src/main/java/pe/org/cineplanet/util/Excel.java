@@ -9,7 +9,6 @@ import java.util.List;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -18,11 +17,10 @@ import pe.org.cineplanet.dto.ReporteDTO;
 
 public class Excel {
 
-	private static final String[] TITLES = { "Nº",
-			"FECHA PEDIDO", "CODIGO AGENCIA", "NOMBRES Y APELLIDOS",
-			"E-S/.17", "E-S/.10", "E-S/.9",
-			"E-S/.7", "C-S/.11", "C-S/.10",
-			"C-S/.9", "C-S/.7", "TOTAL VENTA" };
+	private static final String[] TITLES = { "Nº", "FECHA PEDIDO", "DOCUMENTO",
+			"SERIE", "NUMERO", "CODIGO AGENCIA", "NOMBRE AGENCIA",
+			"NOMBRES Y APELLIDOS", "E-S/.17", "E-S/.10", "E-S/.9", "E-S/.7",
+			"C-S/.11", "C-S/.10", "C-S/.9", "C-S/.7", "TOTAL VENTA" };
 
 	public Excel() {
 		super();
@@ -40,13 +38,13 @@ public class Excel {
 		font.setBoldweight(Font.BOLDWEIGHT_BOLD);
 		font.setItalic(false);
 		font.setStrikeout(false);
-		//font.setColor(IndexedColors.WHITE.getIndex());
+		// font.setColor(IndexedColors.WHITE.getIndex());
 
 		// Aqua background
 		CellStyle cellStyle = workbook.createCellStyle();
-		//cellStyle.setFillBackgroundColor(IndexedColors.LIGHT_ORANGE.getIndex());
-		//cellStyle.setFillPattern(CellStyle.SQUARES);
-		//cellStyle.setAlignment(CellStyle.ALIGN_JUSTIFY);
+		// cellStyle.setFillBackgroundColor(IndexedColors.LIGHT_ORANGE.getIndex());
+		// cellStyle.setFillPattern(CellStyle.SQUARES);
+		// cellStyle.setAlignment(CellStyle.ALIGN_JUSTIFY);
 		// cellStyle.setVerticalAlignment(CellStyle.VERTICAL_JUSTIFY);
 		cellStyle.setFont(font);
 
@@ -93,8 +91,8 @@ public class Excel {
 							cell.setCellValue((Long) value);
 					} else if (tipo.contains("double"))
 						cell.setCellValue((Double) value);
-					else if (tipo.contains("int")){
-						if(value != null)
+					else if (tipo.contains("int")) {
+						if (value != null)
 							cell.setCellValue((Integer) value);
 					}
 				} catch (Exception e) {
@@ -104,17 +102,12 @@ public class Excel {
 
 		}
 
-		/*try {
-			File yourFile = new File("C:\\prueba.xlsx");
-			if (!yourFile.exists()) {
-				yourFile.createNewFile();
-			}
-			FileOutputStream oFile = new FileOutputStream(yourFile, false);
-			workbook.write(oFile);
-			oFile.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}*/
+		/*
+		 * try { File yourFile = new File("C:\\prueba.xlsx"); if
+		 * (!yourFile.exists()) { yourFile.createNewFile(); } FileOutputStream
+		 * oFile = new FileOutputStream(yourFile, false); workbook.write(oFile);
+		 * oFile.close(); } catch (Exception e) { e.printStackTrace(); }
+		 */
 
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		try {
