@@ -1,8 +1,6 @@
 package pe.org.cineplanet.report;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -10,21 +8,18 @@ import java.util.Locale;
 
 import javax.faces.context.FacesContext;
 
-import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.StreamedContent;
-
 import pe.org.cineplanet.dto.VentaDTO;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
+import com.itextpdf.text.Font.FontFamily;
 import com.itextpdf.text.FontFactory;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.Font.FontFamily;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfPCell;
@@ -32,9 +27,10 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
 public class ReporteEntradas {
-	public StreamedContent entradas(List<VentaDTO> listVentaDTO) {
-		StreamedContent pdfFile = null;
 
+	public byte[] entradas(List<VentaDTO> listVentaDTO) {
+		//StreamedContent pdfFile = null;
+		byte[] bytes = null;
 		try {
 
 			if (!listVentaDTO.isEmpty()) {
@@ -59,21 +55,21 @@ public class ReporteEntradas {
 				String ruta = FacesContext.getCurrentInstance()
 						.getExternalContext().getRealPath(path);
 
-				System.out.println("ruta"+ruta);
-				
-				
-				Font fontTitulo = new Font(FontFamily.HELVETICA, 9, Font.BOLD,
-						BaseColor.BLUE);				
+				System.out.println("ruta" + ruta);
 
-				BaseFont bf1 = BaseFont.createFont(ruta, BaseFont.WINANSI, BaseFont.EMBEDDED);				
+				Font fontTitulo = new Font(FontFamily.HELVETICA, 9, Font.BOLD,
+						BaseColor.BLUE);
+
+				BaseFont bf1 = BaseFont.createFont(ruta, BaseFont.WINANSI,
+						BaseFont.EMBEDDED);
 				Font FONT1 = new Font(bf1, 14);
-				
+
 				Font fontCuerpoNegrita = FontFactory.getFont("Garamond", 8,
 						Font.BOLD);
-				
+
 				Font fontCuerpo = FontFactory.getFont("Garamond", 7);
 				Font fontCuerpoVP = FontFactory.getFont("Garamond", 6);
-				
+
 				Font fontRestNegrita = FontFactory.getFont("Garamond", 6,
 						Font.BOLD);
 				Font fontRest = FontFactory.getFont("Garamond", 5);
@@ -91,8 +87,8 @@ public class ReporteEntradas {
 				String rutaImagen = "/images/log.jpg";
 				String ruta2 = FacesContext.getCurrentInstance()
 						.getExternalContext().getRealPath(rutaImagen);
-				
-				System.out.println("ruta2+"+ruta2);
+
+				System.out.println("ruta2+" + ruta2);
 				Image img = Image.getInstance(ruta2);
 
 				PdfPTable tablaGeneral = new PdfPTable(2);
@@ -102,9 +98,9 @@ public class ReporteEntradas {
 				PdfPCell cellvacio = new PdfPCell(new Phrase(""));
 				cellvacio.setColspan(4);
 				cellvacio.setBorder(Rectangle.NO_BORDER);
-				
+
 				int cantidad = listVentaDTO.size();
-				
+
 				for (VentaDTO ventaDTO : listVentaDTO) {
 
 					PdfPTable tablaContenido = new PdfPTable(4);
@@ -211,9 +207,9 @@ public class ReporteEntradas {
 
 					tablaContenido.addCell(cellvacio);
 
-					String numerocortado = ventaDTO.getIdCodigo().substring(5);					
+					String numerocortado = ventaDTO.getIdCodigo().substring(5);
 					String codigoBarra = "*" + numerocortado + "*";
-					
+
 					PdfPCell cellNumeroCodigobarra = new PdfPCell(new Phrase(
 							codigoBarra, FONT1));
 					cellNumeroCodigobarra
@@ -283,36 +279,36 @@ public class ReporteEntradas {
 
 				}
 
-				if(cantidad%2==0){  
-		             System.out.println(cantidad+" es par");  
-		        }else{  
+				if (cantidad % 2 == 0) {
+					System.out.println(cantidad + " es par");
+				} else {
 					PdfPTable tablaContenido = new PdfPTable(4);
 					float[] anchoTabla2Celda = { 8f, 4f, 8f, 4f };
 					tablaContenido.setWidths(anchoTabla2Celda);
 					tablaContenido.setTotalWidth(230.0F);
 					tablaContenido.setLockedWidth(true);
-					
+
 					PdfPCell cellGen = new PdfPCell(tablaContenido);
 					cellGen.setCellEvent(new DottedCell());
 					cellGen.setBorder(PdfPCell.NO_BORDER);
 					cellGen.setPadding(10f);
-					tablaGeneral.addCell(cellGen); 
-		        } 
-				
+					tablaGeneral.addCell(cellGen);
+				}
+
 				document.add(tablaGeneral);
 
 				document.close();
 
-				byte[] bytes = baos.toByteArray();
+				bytes = baos.toByteArray();
 				baos.close();
-				String fileName = "Vales_"+fechaEmision+".pdf";
-				pdfFile = new DefaultStreamedContent(new ByteArrayInputStream(
-						bytes), "application/pdf", fileName);
+				//String fileName = "Vales_" + fechaEmision + ".pdf";
+				/*pdfFile = new DefaultStreamedContent(new ByteArrayInputStream(
+						bytes), "application/pdf", fileName);*/
 			}
 		} catch (Exception e) {
 			System.err.println("pdf error" + e.toString());
 		}
 
-		return pdfFile;
+		return bytes;
 	}
 }

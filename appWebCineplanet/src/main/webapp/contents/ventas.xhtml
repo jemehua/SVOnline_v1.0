@@ -21,7 +21,7 @@
 	width: 200px;
 }
 </style>
-	
+
 </h:head>
 <h:body>
 	<h:outputStylesheet name="css/cssContent.css" />
@@ -57,7 +57,7 @@
 			<tr>
 				<td>Serie<h:outputText value="*" styleClass="obligatorio" /></td>
 				<td><p:inputText id="serie" value="#{ventasBean.venta.serie}"
-						tabindex="4" maxlength="3" styleClass="txt">
+						tabindex="4" maxlength="15" styleClass="txt">
 					</p:inputText></td>
 				<td>Numero<h:outputText value="*" styleClass="obligatorio" /></td>
 				<td><p:inputText id="numero" value="#{ventasBean.venta.numero}"
@@ -69,25 +69,27 @@
 		<p:panel id="pnlPedidos" header="Pedidos">
 
 			<table width="100%;">
-				<tr > 
-					<td style="width:10%;">Tipo de Vale<h:outputText value="*"
+				<tr>
+					<td style="width: 10%;">Tipo de Vale<h:outputText value="*"
 							styleClass="obligatorio" /></td>
-					<td style="width:20%;"><p:selectOneMenu id="comboTipoVale"
+					<td style="width: 20%;"><p:selectOneMenu id="comboTipoVale"
 							value="#{ventasBean.tipoEntradaSelec}" style="width:210px;"
 							tabindex="6">
 							<f:selectItems value="#{ventasBean.comboTipoEntrada}" />
 							<p:ajax event="change" listener="#{ventasBean.handleItemSelect}"
 								update="validoPara cantidadDisponible" />
 						</p:selectOneMenu></td>
-					<td style="width:50%;">Valido para <h:outputText id="validoPara" 
-							value="#{ventasBean.descTipoEntrada}" style="color:blue; font-weight: bold;"/></td>
-					<td style="width:20%;">Cantidad disponible <h:outputText id="cantidadDisponible"
-							value="#{ventasBean.cantidadDisponible}" style="color:blue; font-weight: bold;" /></td>
+					<td style="width: 50%;">Valido para <h:outputText
+							id="validoPara" value="#{ventasBean.descTipoEntrada}"
+							style="color:blue; font-weight: bold;" /></td>
+					<td style="width: 20%;">Cantidad disponible <h:outputText
+							id="cantidadDisponible" value="#{ventasBean.cantidadDisponible}"
+							style="color:blue; font-weight: bold;" /></td>
 				</tr>
 				<tr>
 					<td>Cantidad<h:outputText value="*" styleClass="obligatorio" /></td>
 					<td><p:inputText id="cantidad" value="#{ventasBean.cantidad}"
-							tabindex="7" maxlength="2" styleClass="txt">
+							tabindex="7" maxlength="15" styleClass="txt">
 							<pe:keyFilter for="cantidad" regEx="/[0-9]/i" />
 						</p:inputText></td>
 					<td><p:commandButton value="Agregar"
@@ -126,6 +128,15 @@
 							target="#{ventasBean.tipoEntradaSelec}" />
 					</p:commandButton>
 				</p:column>
+
+				<p:columnGroup type="footer">
+					<p:row>
+						<p:column colspan="3" style="text-align:right" footerText="Total:" />
+						<p:column footerText="s/. #{ventasBean.totalVenta}" style="color:blue;" />
+						<p:column footerText="" />
+					</p:row>
+				</p:columnGroup>
+
 			</p:dataTable>
 		</p:panel>
 
@@ -163,7 +174,8 @@
 				filterBy="#{v.cliente.razonSocial}">
 				<h:outputText value="#{v.cliente.razonSocial}" />
 			</p:column>
-			<p:column headerText="Apellidos" style="width:15%">
+			<p:column headerText="Apellidos" style="width:15%"
+				filterBy="#{v.cliente.apellidos}">
 				<h:outputText value="#{v.cliente.apellidos}" />
 			</p:column>
 			<p:column headerText="Otorgado a" style="width:15%">
@@ -171,7 +183,8 @@
 			</p:column>
 			<p:column headerText="Fecha de venta" style="width:10%">
 				<h:outputText value="#{v.fecRegistro}">
-					<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="America/Lima"  />
+					<f:convertDateTime pattern="dd/MM/yyyy" locale="es"
+						timeZone="America/Lima" />
 				</h:outputText>
 			</p:column>
 			<p:column headerText="Total" style="width:8%">
@@ -191,7 +204,7 @@
 				<p:commandButton value="" title="Generar" ajax="false"
 					onclick="PrimeFaces.monitorDownload(start, stop);"
 					icon="ui-icon-arrowthick-1-s"
-					actionListener="#{ventasBean.downloadAction(v.idVenta)}">
+					actionListener="#{ventasBean.downloadAction(v.idVenta, v.cliente.razonSocial)}">
 					<p:fileDownload value="#{ventasBean.file}" />
 				</p:commandButton>
 
@@ -210,8 +223,9 @@
 		showEffect="clip" closable="true" hideEffect="fold">
 		<p:panel id="pnlEdit">
 
-			<p:dataTable id="idDetVenta" var="d" scrollable="true" scrollHeight="240"
-				value="#{ventasBean.listaDetVenta}" emptyMessage="No hay datos">
+			<p:dataTable id="idDetVenta" var="d" scrollable="true"
+				scrollHeight="240" value="#{ventasBean.listaDetVenta}"
+				emptyMessage="No hay datos">
 
 				<f:facet name="header">  
             Lista de entradas vendidas

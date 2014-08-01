@@ -1,12 +1,15 @@
 package pe.org.cineplanet.dto;
 
-
 public class ReporteDTO {
 
 	private Integer contador;
 
 	private String fechaPedido;
+	private String tipoDocumento;
+	private String serie;
+	private String numero;
 	private String idAgencia;
+	private String nomAgencia;
 	private String nombres;
 	private Integer cantEntrada17;
 	private Integer cantEntrada10;
@@ -122,6 +125,38 @@ public class ReporteDTO {
 
 	public void setTotalVenta(Double totalVenta) {
 		this.totalVenta = totalVenta;
+	}
+
+	public String getSerie() {
+		return serie;
+	}
+
+	public void setSerie(String serie) {
+		this.serie = serie;
+	}
+
+	public String getNumero() {
+		return numero;
+	}
+
+	public void setNumero(String numero) {
+		this.numero = numero;
+	}
+
+	public String getNomAgencia() {
+		return nomAgencia;
+	}
+
+	public void setNomAgencia(String nomAgencia) {
+		this.nomAgencia = nomAgencia;
+	}
+
+	public String getTipoDocumento() {
+		return tipoDocumento;
+	}
+
+	public void setTipoDocumento(String tipoDocumento) {
+		this.tipoDocumento = tipoDocumento;
 	}
 
 }

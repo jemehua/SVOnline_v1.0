@@ -64,7 +64,11 @@ public class VentasDaoImpl implements VentasDao {
 		sb.append("v.cliente.razonSocial, ");
 		sb.append("v.cliente.apellidos, ");
 		sb.append("v.cliente.agencia.idAgencia, ");
-		sb.append("v.fecRegistro ");
+		sb.append("v.fecRegistro, ");
+		sb.append("v.cliente.agencia.nombre, ");
+		sb.append("v.serie, ");
+		sb.append("v.numero, ");
+		sb.append("v.tipoDocumento.nombre ");
 		sb.append("FROM Venta v ");
 		sb.append("WHERE v.estado =:estado ");
 		sb.append("AND v.fecRegistro BETWEEN  :fecInicio AND :fecFin ");
@@ -105,7 +109,11 @@ public class VentasDaoImpl implements VentasDao {
 			reporteDTO.setContador(count);
 			reporteDTO.setNombres((String) row[1] +" "+ row[2]);
 			reporteDTO.setIdAgencia((String) row[3]);
-
+			reporteDTO.setNomAgencia((String) row[5]);
+			reporteDTO.setSerie((String) row[6]);
+			reporteDTO.setNumero((String) row[7]);
+			reporteDTO.setTipoDocumento((String) row[8]);
+			
 			String fechaInicio = sdf.format((Date) row[4]);
 			reporteDTO.setFechaPedido(fechaInicio);
 
