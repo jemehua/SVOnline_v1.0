@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+
+</h:head>
+<h:body>
+	<h:outputStylesheet name="css/cssContent.css" /> 
+	<p:growl id="messages" showDetail="true" life="40000" />
+	<p:panel id="pnlTipoEntrada" header="Tipo Entrada">
+		<p:focus context="pnlTipoEntrada" /> 
+		<table cellpadding="2" cellspacing="2" style="width: 100%;" border="0">
+		 	<tr>
+				<td>
+					Tipo Vale<h:outputText value="*" styleClass="obligatorio" />
+				</td>
+				<td>
+					<p:selectOneMenu id="comboTipoVale"
+						value="#{tipoEntradaBean.tipoValeSelec}" style="width:210px;"
+						tabindex="1">
+						<f:selectItems value="#{tipoEntradaBean.comboTipoVale}" />
+						<!-- <p:ajax event="change" listener="#{tipoEntradaBean.handleItemSelect}"
+								update="dtListTipoEntrada" /> -->
+					</p:selectOneMenu>
+				</td>
+				<td>Codigo</td>
+				<td>
+				<p:inputText id="codigo"
+						value="#{tipoEntradaBean.tipoEntrada.idTipoEntrada}" disabled="true" styleClass="txt100">
+					</p:inputText>
+				</td>
+			</tr>
+			<tr>
+				<td>Nombre<h:outputText value="*" styleClass="obligatorio" /></td>
+				<td><p:inputText id="nombre"
+						value="#{tipoEntradaBean.tipoEntrada.nombre}" tabindex="2"
+						maxlength="60" styleClass="txt">
+					</p:inputText>
+				</td>
+				<td>Precio (s/.)<h:outputText value="*" styleClass="obligatorio" /></td>
+				<td>
+					<p:inputText id="precio"
+						value="#{tipoEntradaBean.tipoEntrada.precio}" tabindex="3" maxlength="16"
+						styleClass="txt100" />
+				</td>
+			</tr>
+			<tr>
+				<td>Descripcion<h:outputText value="*" styleClass="obligatorio" /></td>
+				<td colspan="3">
+				<p:inputTextarea rows="3" cols="100" value="#{tipoEntradaBean.tipoEntrada.descripcion}" tabindex="4" counter="counterDesc" maxlength="200" counterTemplate="{0} caracteres restantes." autoResize="false" />
+    <h:outputText id="counterDesc" />
+<!-- 					<p:inputText id="counterDesc" -->
+<!-- 						value="#{tipoEntradaBean.tipoEntrada.descripcion}" tabindex="4" -->
+<!-- 						maxlength="200" styleClass="txt"> -->
+<!-- 					</p:inputText> -->
+				</td>
+			</tr>
+			<tr>
+				<td>Restricciones<h:outputText value="*" styleClass="obligatorio" /></td>
+				<td colspan="3">
+				
+				<p:inputTextarea rows="4" cols="100" value="#{tipoEntradaBean.tipoEntrada.restricciones}" tabindex="5" counter="display" maxlength="500" counterTemplate="{0} caracteres restantes." autoResize="false" />
+    <h:outputText id="display" />
+				
+<!-- 				<p:inputText id="restricciones" -->
+<!-- 						value="#{tipoEntradaBean.tipoEntrada.restricciones}" tabindex="5" -->
+<!-- 						maxlength="500" styleClass="txt"> -->
+<!-- 					</p:inputText> -->
+				</td>
+			</tr>
+		</table>
+		<p:separator id="s1" />
+		<table>
+			<tr>
+				<td><p:commandButton value="Guardar"
+						action="#{tipoEntradaBean.guardar}" update="pnlTipoEntrada, messages"
+						icon="ui-icon-disk" tabindex="6" /></td>
+				<td><p:commandButton value="Limpiar"
+						update="pnlTipoEntrada, messages" action="#{tipoEntradaBean.limpiar}"
+						icon="ui-icon-close" tabindex="7"
+						oncomplete='agenciaTable.clearFilters();' /></td>
+			</tr>
+		</table>
+		<p:separator id="s2" />
+		<p:dataTable var="a" value="#{tipoEntradaBean.listaTipoEntrada}"
+			id="dtListTipoEntrada" scrollable="true" scrollHeight="180"
+			widgetVar="agenciaTable" paginator="true" rows="8"
+			filteredValue="#{tipoEntradaBean.filteredListaTipoEntrada}"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			emptyMessage="No hay datos">
+
+			<f:facet name="header">   
+            Lista de Tipo Entrada
+        </f:facet>
+			<p:column headerText="Codigo" style="width:8%; text-align: right;">
+				<h:outputText value="#{a.idTipoEntrada}" />
+			</p:column>
+			<p:column id="nombre" headerText="Nombre" style="width:20%"
+				filterBy="#{a.nombre}">
+				<h:outputText value="#{a.nombre}" />
+			</p:column>
+			<p:column id="descripcion" headerText="Descripcion" style="width:40%">
+				<h:outputText value="#{a.descripcion}" />
+			</p:column>
+			<p:column headerText="Tipo Vale" style="width:8%">
+				<h:outputText value="#{a.tipoVale eq 1 ? 'Entradas':'Combo'}" />
+			</p:column>
+			<p:column id="precio" headerText="Precio (s/.)" style="width:8%; text-align: right;">
+				<h:outputText value="#{a.precio}" />
+			</p:column>
+			<p:column headerText="Estado" style="width:8%; text-align: center;">
+				<h:outputText value="#{a.estado.equals('A')?'Activo':'Inactivo'}" />
+			</p:column>
+			<p:column headerText="#{messages.lblOpciones}" style="width:8%">
+				<p:commandButton value="" icon="ui-icon-pencil" 
+					update=":frm:pnlTipoEntrada" title="Editar" >
+					<f:setPropertyActionListener value="#{a}"
+						target="#{tipoEntradaBean.tipoEntrada}" />
+					<f:setPropertyActionListener value="#{a.tipoVale}"
+						target="#{tipoEntradaBean.tipoValeSelec}" />					
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+	</p:panel>
+</h:body>
+
+<p:ajaxStatus
+	style="width:64px;height:64px;position:fixed;right:5px;bottom:5px"
+	id="ajaxStatusPanel">
+	<f:facet name="start">
+		<p:graphicImage value="./images/loading.gif" />
+	</f:facet>
+
+	<f:facet name="complete">
+		<h:outputText value="" />
+	</f:facet>
+</p:ajaxStatus>
+
+</html>
