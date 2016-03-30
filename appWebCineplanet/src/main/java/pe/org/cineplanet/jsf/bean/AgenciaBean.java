@@ -7,6 +7,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,12 +38,13 @@ public class AgenciaBean implements Serializable {
 	@Autowired
 	private AgenciaService agenciaService;
 
+	private String empresaSelec = "";
 	private Usuario userSesion = null;
 	private Agencia agencia;
 	// private Message message = new Message();
 
+	private List<SelectItem> comboEmpresa = new ArrayList<SelectItem>();
 	private List<Agencia> listaAgencia = new ArrayList<Agencia>();
-
 	private List<Agencia> filteredListaAgencia = new ArrayList<Agencia>();
 
 	public AgenciaBean() {
@@ -52,7 +54,8 @@ public class AgenciaBean implements Serializable {
 	@PostConstruct
 	public void init() {
 		agencia = new Agencia();
-		cargarListaAgencia();
+		cargarComboEmpresa();
+		cargarListaAgencia(Constantes.VACIO);
 		// message = new Message();
 	}
 
@@ -73,9 +76,14 @@ public class AgenciaBean implements Serializable {
 
 	public void limpiar() {
 		agencia = new Agencia();
-		//filteredListaAgencia = new ArrayList<Agencia>();
-		cargarListaAgencia();
-		
+		empresaSelec = "";
+		cargarListaAgencia(Constantes.VACIO);
+
+	}
+	
+	public void handleItemSelect() {
+		logger.info("empresaSelec: " + empresaSelec);
+		cargarListaAgencia(empresaSelec);
 	}
 
 	public void guardar() {
@@ -85,19 +93,22 @@ public class AgenciaBean implements Serializable {
 			return;
 
 		try {
-
-			agencia.setEstado(Constantes.ACTIVO);
+			agencia.setIdAgenciaPadre(empresaSelec);
 			agencia.setNombre(agencia.getNombre().toUpperCase());
-			Agencia a = agenciaService.find(agencia.getIdAgencia());
+			//Agencia a = agenciaService.find(agencia.getIdAgencia());
 
-			if (a != null) {
+			//if (a != null) {
+			if (agencia.getIdAgencia() != null
+					&& agencia.getIdAgencia().length() > 0) {
 				agenciaService.edit(agencia);
 				FacesContext.getCurrentInstance().addMessage(
 						null,
 						new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
 								"Registro Modificado"));
 			} else {
-				agenciaService.save(agencia);
+				agencia.setEstado(Constantes.ACTIVO);
+				//agenciaService.save(agencia);
+				agenciaService.save(agencia, Constantes.TIPO_AGENCIA);
 				FacesContext.getCurrentInstance().addMessage(
 						null,
 						new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
@@ -110,18 +121,24 @@ public class AgenciaBean implements Serializable {
 					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
 							"Error al registrar"));
 		}
-		cargarListaAgencia();
+		cargarListaAgencia(empresaSelec);
 		limpiar();
 	}
 
 	public boolean validarDatos() {
 		FacesContext ctx = FacesContext.getCurrentInstance();
 
-		if (agencia.getIdAgencia().equals("")) {
+		if (empresaSelec.equals("")) {
 			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
 					"ADVERTENCIA", "Ingrese campos obligatorios"));
 			return false;
 		}
+		
+		/*if (agencia.getIdAgencia().equals("")) {
+			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
+					"ADVERTENCIA", "Ingrese campos obligatorios"));
+			return false;
+		}*/
 
 		if (agencia.getNombre().trim().length() == 0) {
 			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
@@ -132,10 +149,19 @@ public class AgenciaBean implements Serializable {
 		return true;
 	}
 
-	public void cargarListaAgencia() {
+	public void cargarComboEmpresa() {
 		try {
-			 listaAgencia = agenciaService.getListaAgencia();
-			 filteredListaAgencia = listaAgencia;
+			comboEmpresa = agenciaService.getComboEmpresa();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void cargarListaAgencia(String codigoEmpresa) {
+		try {
+			listaAgencia = agenciaService.getListaAgencia(codigoEmpresa);
+			filteredListaAgencia = listaAgencia;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -157,9 +183,10 @@ public class AgenciaBean implements Serializable {
 		this.agencia = agencia;
 	}
 
-	/*public void setListaAgencia(List<Agencia> listaAgencia) {
-		this.listaAgencia = listaAgencia;
-	}*/
+	/*
+	 * public void setListaAgencia(List<Agencia> listaAgencia) {
+	 * this.listaAgencia = listaAgencia; }
+	 */
 
 	public List<Agencia> getFilteredListaAgencia() {
 		return filteredListaAgencia;
@@ -167,6 +194,22 @@ public class AgenciaBean implements Serializable {
 
 	public void setFilteredListaAgencia(List<Agencia> filteredListaAgencia) {
 		this.filteredListaAgencia = filteredListaAgencia;
+	}
+
+	public List<SelectItem> getComboEmpresa() {
+		return comboEmpresa;
+	}
+
+	public void setComboEmpresa(List<SelectItem> comboEmpresa) {
+		this.comboEmpresa = comboEmpresa;
+	}
+
+	public String getEmpresaSelec() {
+		return empresaSelec;
+	}
+
+	public void setEmpresaSelec(String empresaSelec) {
+		this.empresaSelec = empresaSelec;
 	}
 
 }

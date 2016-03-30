@@ -37,6 +37,10 @@ public class Entrada implements Serializable {
 	@Column
 	private Integer cantidad;
 
+	@Column(length = 5)
+	@Size(max = 5)
+	private String lote;
+
 	@Column(length = 60)
 	@Size(max = 60)
 	private String usuRegistra;
@@ -142,6 +146,14 @@ public class Entrada implements Serializable {
 
 	public void setTipoEntrada(TipoEntrada tipoEntrada) {
 		this.tipoEntrada = tipoEntrada;
+	}
+
+	public String getLote() {
+		return lote;
+	}
+
+	public void setLote(String lote) {
+		this.lote = lote;
 	}
 
 	@Override

@@ -1,13 +1,18 @@
 package pe.org.cineplanet.dto;
 
+import java.util.Date;
+
 public class ReporteDTO {
 
 	private Integer contador;
 
-	private String fechaPedido;
+	private Date fechaPedido;
 	private String tipoDocumento;
 	private String serie;
 	private String numero;
+	private String tipoPago;
+	private String idEmpresa;
+	private String nomEmpresa;
 	private String idAgencia;
 	private String nomAgencia;
 	private String nombres;
@@ -23,11 +28,11 @@ public class ReporteDTO {
 
 	private Double totalVenta;
 
-	public String getFechaPedido() {
+	public Date getFechaPedido() {
 		return fechaPedido;
 	}
 
-	public void setFechaPedido(String fechaPedido) {
+	public void setFechaPedido(Date fechaPedido) {
 		this.fechaPedido = fechaPedido;
 	}
 
@@ -157,6 +162,30 @@ public class ReporteDTO {
 
 	public void setTipoDocumento(String tipoDocumento) {
 		this.tipoDocumento = tipoDocumento;
+	}
+
+	public String getTipoPago() {
+		return tipoPago;
+	}
+
+	public void setTipoPago(String tipoPago) {
+		this.tipoPago = tipoPago;
+	}
+
+	public String getIdEmpresa() {
+		return idEmpresa;
+	}
+
+	public void setIdEmpresa(String idEmpresa) {
+		this.idEmpresa = idEmpresa;
+	}
+
+	public String getNomEmpresa() {
+		return nomEmpresa;
+	}
+
+	public void setNomEmpresa(String nomEmpresa) {
+		this.nomEmpresa = nomEmpresa;
 	}
 
 }

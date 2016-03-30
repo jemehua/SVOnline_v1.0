@@ -5,7 +5,8 @@
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui"
-	xmlns:pe="http://primefaces.org/ui/extensions">
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
 <h:head>
 	<script type="text/javascript">
 		function start() {
@@ -28,41 +29,98 @@
 	<p:growl id="messages" showDetail="true" life="40000" />
 	<p:panel id="pnlVentas" header="Ventas">
 		<p:focus context="pnlVentas" />
-		<table style="width: 100%;" cellpadding="1" cellspacing="2">
+		<table style="width: 100%;" cellpadding="0" cellspacing="0" border="0">
+			<tr>
+				<td width="15%">
+					Empresa
+				</td>
+				<td width="25%">
+					<p:selectOneMenu id="comboEmpresaAdd"
+						value="#{ventasBean.empresaSelec}" style="width:210px;"
+						tabindex="1">
+						<f:selectItems value="#{ventasBean.comboEmpresa}" />
+						<p:ajax event="change" listener="#{ventasBean.handleItemSelectEmpresa}"
+								update="comboAgenciaAdd, btnAddCliente" />
+					</p:selectOneMenu>
+				</td>
+				<td width="10%">
+					<p:commandButton value="" icon="ui-icon-plusthick" action="#{ventasBean.agregarEmpresa}"
+					update="pnlAddAgencia" oncomplete="addAgenciaDialog.show()" title="Agregar Empresa">
+						<f:setPropertyActionListener target="#{ventasBean.esEmpresa}" value="1" />
+					</p:commandButton>
+				</td>
+				<td width="15%">
+					Agencia
+				</td>
+				<td width="25%">
+					<p:selectOneMenu id="comboAgenciaAdd"
+						value="#{ventasBean.agenciaSelec}" style="width:210px;"
+						tabindex="2">
+						<f:selectItems value="#{ventasBean.comboAgencia}" />
+						<p:ajax event="change" update="comboAgenciaAdd" />
+					</p:selectOneMenu>
+				</td>
+				<td width="10%">
+					<p:commandButton value="" icon="ui-icon-plusthick" action="#{ventasBean.agregarEmpresa}"
+					update="pnlAddAgencia" oncomplete="addAgenciaDialog.show()" title="Agregar Agencia">
+						<f:setPropertyActionListener target="#{ventasBean.esEmpresa}" value="0" />
+					</p:commandButton>
+				</td>
+			</tr>
 			<tr>
 				<td>Cliente<h:outputText value="*" styleClass="obligatorio" /></td>
-				<td><p:autoComplete id="themePojo"
-						value="#{ventasBean.cliente}"
+				<td>
+					<p:autoComplete id="themePojo"
+						value="#{ventasBean.cliente}" tabindex="3"
 						completeMethod="#{ventasBean.complete}" var="c"
 						itemLabel="#{c.label}" itemValue="#{c}" forceSelection="true">
 						<f:converter binding="#{clienteConverter}" />
-					</p:autoComplete></td>
-				<td></td>
+					</p:autoComplete>
+				</td>
+				<td>
+					<p:commandButton id="btnAddCliente" value="" icon="ui-icon-plusthick" action="#{ventasBean.agregarCliente}"
+					update="pnlAddCliente" oncomplete="addClienteDialog.show()" title="Agregar Cliente" 
+					>
+					</p:commandButton>
+				</td>
+<!-- 				disabled="#{ventasBean.disabledAddEmpresa}" -->
+				<td>Tipo Pago<h:outputText value="*" styleClass="obligatorio" /></td>
+				<td>
+					<p:selectOneMenu id="comboTipoPago"
+						value="#{ventasBean.tipoPagoSelec}" style="width:210px;"
+						tabindex="4">
+						<f:selectItems value="#{ventasBean.comboTipoPago}" />
+					</p:selectOneMenu>
+				</td>
 				<td></td>
 			</tr>
 			<tr>
 				<td>Otorgado a<h:outputText value="*" styleClass="obligatorio" /></td>
 				<td><p:inputText id="otorgado"
-						value="#{ventasBean.venta.otorgado}" tabindex="2" maxlength="200"
+						value="#{ventasBean.venta.otorgado}" tabindex="3" maxlength="200"
 						styleClass="txt">
 					</p:inputText></td>
+					<td></td>
 				<td>Documento venta<h:outputText value="*"
 						styleClass="obligatorio" /></td>
 				<td><p:selectOneMenu id="comboTipoDoc"
 						value="#{ventasBean.tipoDocumentoSelec}" style="width:210px;"
-						tabindex="3">
+						tabindex="4">
 						<f:selectItems value="#{ventasBean.comboTipoDocumento}" />
 					</p:selectOneMenu></td>
+					<td></td>
 			</tr>
 			<tr>
 				<td>Serie<h:outputText value="*" styleClass="obligatorio" /></td>
 				<td><p:inputText id="serie" value="#{ventasBean.venta.serie}"
-						tabindex="4" maxlength="15" styleClass="txt">
+						tabindex="5" maxlength="15" styleClass="txt">
 					</p:inputText></td>
+					<td></td>
 				<td>Numero<h:outputText value="*" styleClass="obligatorio" /></td>
 				<td><p:inputText id="numero" value="#{ventasBean.venta.numero}"
-						tabindex="5" maxlength="20" styleClass="txt">
+						tabindex="6" maxlength="20" styleClass="txt">
 					</p:inputText></td>
+					<td></td>
 			</tr>
 		</table>
 
@@ -74,7 +132,7 @@
 							styleClass="obligatorio" /></td>
 					<td style="width: 20%;"><p:selectOneMenu id="comboTipoVale"
 							value="#{ventasBean.tipoEntradaSelec}" style="width:210px;"
-							tabindex="6">
+							tabindex="7">
 							<f:selectItems value="#{ventasBean.comboTipoEntrada}" />
 							<p:ajax event="change" listener="#{ventasBean.handleItemSelect}"
 								update="validoPara cantidadDisponible" />
@@ -89,35 +147,35 @@
 				<tr>
 					<td>Cantidad<h:outputText value="*" styleClass="obligatorio" /></td>
 					<td><p:inputText id="cantidad" value="#{ventasBean.cantidad}"
-							tabindex="7" maxlength="15" styleClass="txt">
+							tabindex="8" maxlength="15" styleClass="txt">
 							<pe:keyFilter for="cantidad" regEx="/[0-9]/i" />
 						</p:inputText></td>
 					<td><p:commandButton value="Agregar"
 							action="#{ventasBean.agregar}" update="pnlPedidos, messages"
-							icon="ui-icon-plusthick" tabindex="8" /></td>
+							icon="ui-icon-plusthick" tabindex="9" /></td>
 					<td></td>
 				</tr>
 			</table>
 			<p:separator id="s3" />
-			<p:dataTable var="d" value="#{ventasBean.listaDetalleVenta}"
+			<p:dataTable var="d" value="#{ventasBean.listaDetalleVenta}" paginatorPosition="bottom" 
 				id="dtListaDetalleVenta" rows="4" emptyMessage="No hay datos">
 
-				<f:facet name="header">  
+				<f:facet name="header">    
             Lista de Pedidos
         </f:facet>
 				<p:column headerText="Tipo de Vale" style="width:30%">
 					<h:outputText value="#{d.tipoEntrada.nombre}" />
 				</p:column>
-				<p:column headerText="Cantidad" style="width:20%">
+				<p:column headerText="Cantidad" style="width:20%; text-align: right;">
 					<h:outputText value="#{d.cantidad}" />
 				</p:column>
-				<p:column headerText="Precio" style="width:20%">
+				<p:column headerText="Precio" style="width:20%; text-align: right;">
 					<h:outputText value="#{d.tipoEntrada.precio}" />
 				</p:column>
-				<p:column headerText="Total" style="width:20%">
+				<p:column headerText="Total" style="width:20%; text-align: right;">
 					<h:outputText value="#{d.total}" />
 				</p:column>
-				<p:column headerText="#{messages.lblOpciones}" style="width:10%">
+				<p:column headerText="#{messages.lblOpciones}" style="width:10%; text-align: center;">
 					<p:commandButton value="" icon="ui-icon-pencil"
 						update=":frm:pnlPedidos :frm:validoPara :frm:cantidadDisponible"
 						title="Editar" action="#{ventasBean.handleItemSelect}">
@@ -132,7 +190,7 @@
 				<p:columnGroup type="footer">
 					<p:row>
 						<p:column colspan="3" style="text-align:right" footerText="Total:" />
-						<p:column footerText="s/. #{ventasBean.totalVenta}" style="color:blue;" />
+						<p:column footerText="s/. #{ventasBean.totalVenta}" style="color:blue; text-align: right;" />
 						<p:column footerText="" />
 					</p:row>
 				</p:columnGroup>
@@ -145,10 +203,10 @@
 			<tr>
 				<td><p:commandButton value="Guardar"
 						action="#{ventasBean.guardar}" update="pnlVentas, messages"
-						icon="ui-icon-disk" tabindex="7" /></td>
+						icon="ui-icon-disk" tabindex="10" /></td>
 				<td><p:commandButton value="Limpiar"
 						update="pnlVentas, messages" action="#{ventasBean.limpiar}"
-						icon="ui-icon-close" tabindex="8"
+						icon="ui-icon-close" tabindex="11"
 						oncomplete='ventaTable.clearFilters();' /></td>
 				<td></td>
 			</tr>
@@ -164,7 +222,7 @@
 			<f:facet name="header">  
             Lista de ventas
         </f:facet>
-			<p:column headerText="Id" style="width:7%">
+			<p:column headerText="Id" style="width:7%; text-align: right;">
 				<h:outputText value="#{v.idVenta}" />
 			</p:column>
 			<p:column headerText="Agencia" style="width:12%">
@@ -181,19 +239,19 @@
 			<p:column headerText="Otorgado a" style="width:15%">
 				<h:outputText value="#{v.otorgado}" />
 			</p:column>
-			<p:column headerText="Fecha de venta" style="width:10%">
+			<p:column headerText="Fecha de venta" style="width:11%">
 				<h:outputText value="#{v.fecRegistro}">
 					<f:convertDateTime pattern="dd/MM/yyyy" locale="es"
 						timeZone="America/Lima" />
 				</h:outputText>
 			</p:column>
-			<p:column headerText="Total" style="width:8%">
+			<p:column headerText="Total" style="width:7%; text-align: right;">
 				<h:outputText value="#{v.total}" />
 			</p:column>
-			<p:column headerText="Estado" style="width:8%">
+			<p:column headerText="Estado" style="width:8%; text-align: center;">
 				<h:outputText value="#{v.estado.equals('A')?'Activo':'Inactivo'}" />
 			</p:column>
-			<p:column headerText="#{messages.lblOpciones}" style="width:10%">
+			<p:column headerText="#{messages.lblOpciones}" style="width:10%; text-align: center;">
 				<!-- <p:commandButton value="" icon="ui-icon-pencil"
 					update=":frm:pnlVentas" title="Editar">
 					<f:setPropertyActionListener value="#{v}"
@@ -273,17 +331,113 @@
 			</f:facet>
 		</p:panel>
 	</p:dialog>
+	
+	<p:dialog id="dlgAddAgencia" header="Agregar Empresa/Agencia"
+		widgetVar="addAgenciaDialog" modal="true" resizable="false" width="600"
+		showEffect="clip" closable="true" hideEffect="fold">
+		<p:panel id="pnlAddAgencia">
+			<table cellpadding="2" cellspacing="2" style="width: 100%;">
+				<tr>
+					<td>Codigo</td>
+					<td>
+						<p:inputText id="codigoAgencia" disabled="true"
+						value="#{ventasBean.agencia.idAgencia}" tabindex="1"
+						maxlength="4" styleClass="txt100"></p:inputText>
+					</td>
+				</tr>
+				<c:if test="${ventasBean.esEmpresa == 0}">
+				<tr>
+					<td>
+						Empresa<h:outputText value="*" styleClass="obligatorio" />
+					</td>
+					<td colspan="3">
+						<p:selectOneMenu id="comboAddEmpresa"
+							value="#{ventasBean.agencia.idAgenciaPadre}" style="width:210px;"
+							tabindex="1">
+							<f:selectItems value="#{agenciaBean.comboEmpresa}" />
+						</p:selectOneMenu>
+					</td>
+				</tr>
+				</c:if>
+				<tr>
+					<td>Nombre<h:outputText value="*" styleClass="obligatorio" /></td>
+					<td>
+						<p:inputText id="nombreAgencia"
+							value="#{ventasBean.agencia.nombre}" tabindex="2" maxlength="200"
+							styleClass="txt400" />
+					</td>
+				</tr>
+			</table>
+			<f:facet name="footer">
+				<p:commandButton value="#{messages.btnGuardar}"
+					actionListener="#{ventasBean.guardarEmpresa}" icon="ui-icon-disk"
+					update=":frm:comboEmpresaAdd, :frm:comboAgenciaAdd,:frm:messages"
+					oncomplete="addAgenciaDialog.hide()" />
+			</f:facet>
+		</p:panel>
+	</p:dialog>
+	
+	<p:dialog id="dlgAddCliente" header="Agregar Cliente"
+		widgetVar="addClienteDialog" modal="true" resizable="false" width="650"
+		showEffect="clip" closable="true" hideEffect="fold">
+		<p:panel id="pnlAddCliente">
+			
+			<table cellpadding="2" cellspacing="2" style="width: 100%;">
+				<tr>
+					<td>Nombres/Razon Social<h:outputText value="*"
+							styleClass="obligatorio" /></td>
+					<td><p:inputText id="nombre"
+							value="#{ventasBean.c.razonSocial}" tabindex="1"
+							maxlength="200" styleClass="txt" /></td>
+					<td>Apellidos</td>
+					<td><p:inputText id="apellidos"
+							value="#{ventasBean.c.apellidos}" tabindex="2"
+							maxlength="200" styleClass="txt">
+						</p:inputText></td>
+				</tr>
+				<tr>
+					<td>DNI/RUC</td>
+					<td><p:inputText id="codigo"
+							value="#{ventasBean.c.nroDocumento}" tabindex="3"
+							maxlength="11" styleClass="txt">
+							<pe:keyFilter for="codigo" regEx="/[0-9]/i" />
+						</p:inputText></td>
+					<td>Abreviatura</td>
+					<td><p:inputText id="abreviatura"
+							value="#{ventasBean.c.abreviatura}" tabindex="4"
+							maxlength="60" styleClass="txt" /></td>
+	
+				</tr>
+				<tr>
+					<td>Dirección</td>
+					<td><p:inputText id="direccion"
+							value="#{ventasBean.c.direccion}" tabindex="5"
+							maxlength="200" styleClass="txt" /></td>
+					<td>Teléfono</td>
+					<td><p:inputText id="telefono"
+							value="#{ventasBean.c.telefono}" tabindex="6"
+							maxlength="15" styleClass="txt">
+							<pe:keyFilter for="telefono" regEx="/[0-9]/i" />
+						</p:inputText></td>
+				</tr>
+			</table>
+			
+			
+			<f:facet name="footer">
+				<p:commandButton value="#{messages.btnGuardar}"
+					actionListener="#{ventasBean.guardarCliente}" icon="ui-icon-disk"
+					update=":frm:messages"
+					oncomplete="addClienteDialog.hide()" />
+			</f:facet>
+		</p:panel>
+	</p:dialog>
 
 </h:body>
-
-
-
 
 <p:dialog modal="true" widgetVar="statusDialog" header="Status"
 	draggable="false" closable="true">
 	<p:graphicImage value="./images/ajax-loader.gif" />
 </p:dialog>
-
 
 <p:ajaxStatus
 	style="width:64px;height:64px;position:fixed;right:5px;bottom:5px"

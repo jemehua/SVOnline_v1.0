@@ -11,6 +11,12 @@ public class VentaDTO {
 	private String diasValidos;
 	private Integer tipoVale;
 
+	private String restricciones;
+
+	public VentaDTO() {
+		super();
+	}
+
 	public String getIdCodigo() {
 		return idCodigo;
 	}
@@ -73,6 +79,14 @@ public class VentaDTO {
 
 	public void setTipoVale(Integer tipoVale) {
 		this.tipoVale = tipoVale;
+	}
+
+	public String getRestricciones() {
+		return restricciones;
+	}
+
+	public void setRestricciones(String restricciones) {
+		this.restricciones = restricciones;
 	}
 
 }

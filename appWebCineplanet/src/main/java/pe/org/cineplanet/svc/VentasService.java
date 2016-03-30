@@ -3,6 +3,7 @@ package pe.org.cineplanet.svc;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import pe.org.cineplanet.dto.ReporteDTO;
 import pe.org.cineplanet.model.jpa.DetalleVenta;
@@ -27,5 +28,7 @@ public interface VentasService {
 	public abstract Long getMaxId();
 	
 	public abstract List<ReporteDTO> getListaReporte(Date fecInicio, Date fecFin, String usr) throws Exception;
+	
+	public abstract Map<String, Object[]> getMapVentaReporte(Date fecInicio, Date fecFin, String usr) throws Exception;
 
 }

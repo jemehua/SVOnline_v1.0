@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pe.org.cineplanet.dao.ClienteDao;
 import pe.org.cineplanet.model.jpa.Cliente;
 import pe.org.cineplanet.svc.ClienteService;
+import pe.org.cineplanet.util.Constantes;
 
 /**
  * 
@@ -40,11 +41,19 @@ public class ClienteServiceImpl implements ClienteService {
 
 	}
 
-	public List<Cliente> getListaCliente() throws Exception{
-		return clienteDao.getListaCliente();
+	public List<Cliente> getListaCliente(String codigoEmpresa, String codigoAgencia) throws Exception{
+		if(codigoAgencia.equals(Constantes.VACIO)){
+			if(codigoEmpresa.equals(Constantes.VACIO)){//all
+				return clienteDao.getListaCliente();
+			}else{//by empresa
+				return clienteDao.getListaClienteByEmpresa(codigoEmpresa);
+			}
+		}else{//by agencia
+			return clienteDao.getListaClienteByAgencia(codigoAgencia);
+		}
 	}
 
-	public List<SelectItem> getComboCliente(){
+	/*public List<SelectItem> getComboCliente(){
 		//return agenciaDao.getComboAgencia();
 		List<SelectItem> listaCombo = new ArrayList<SelectItem>();
 		SelectItem fila = new SelectItem(0L, "Seleccione Cliente");
@@ -62,7 +71,7 @@ public class ClienteServiceImpl implements ClienteService {
 			listaCombo.add(fila);
 		}
 		return listaCombo;
-	}
+	}*/
 	
 	public Long getMaxId() {
 		try {

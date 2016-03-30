@@ -1,6 +1,7 @@
 package pe.org.cineplanet.svc.impl;
 
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +32,13 @@ public class TipoEntradaServiceImpl implements TipoEntradaService {
 
 	@Transactional
 	public TipoEntrada save(TipoEntrada obj) throws Exception{
+		Long idTipoEnrada = 1L;
+		try {
+			idTipoEnrada = tipoValeDao.getMaxId();
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		obj.setIdTipoEntrada(idTipoEnrada + 1);
 		return tipoValeDao.save(obj);
 	}
 
@@ -62,6 +70,11 @@ public class TipoEntradaServiceImpl implements TipoEntradaService {
 			listaCombo.add(fila);
 		}
 		return listaCombo;
+	}
+
+	public boolean existPrecioByTipoVale(Integer tipoVale, BigDecimal precio)
+			throws Exception {
+		return tipoValeDao.existPrecioByTipoVale(tipoVale, precio);
 	}
 
 }

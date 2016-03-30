@@ -27,12 +27,19 @@ public class ItemMenu implements Serializable {
 
 	@Id
 	private Long idItemMenu;
+
 	@Column
 	private String nombre;
+
 	@Column
 	private String urlXhtml;
+
+	@Column
+	private int orden;
+
 	@Column
 	private String estado;
+
 	@JoinColumn(name = "idMenu")
 	@ManyToOne
 	private Menu menu;
@@ -78,6 +85,14 @@ public class ItemMenu implements Serializable {
 
 	public void setMenu(Menu menu) {
 		this.menu = menu;
+	}
+
+	public int getOrden() {
+		return orden;
+	}
+
+	public void setOrden(int orden) {
+		this.orden = orden;
 	}
 
 	@Override

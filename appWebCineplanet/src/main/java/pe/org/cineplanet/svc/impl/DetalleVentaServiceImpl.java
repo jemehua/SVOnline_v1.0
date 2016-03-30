@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import pe.org.cineplanet.dao.DetalleVentaDao;
-import pe.org.cineplanet.dto.ReporteDTO;
 import pe.org.cineplanet.model.jpa.DetalleVenta;
 import pe.org.cineplanet.model.jpa.DetalleVentaPK;
 import pe.org.cineplanet.svc.DetalleVentaService;
@@ -41,8 +40,8 @@ public class DetalleVentaServiceImpl implements DetalleVentaService {
 		return detalleVentaDao.getListaByIdVenta(idVenta);
 	}
 	
-	public List<ReporteDTO> getListaReporteDTO() throws Exception {
+	/*public List<ReporteDTO> getListaReporteDTO() throws Exception {
 		return detalleVentaDao.getListaReporteDTO();
-	}
+	}*/
 
 }

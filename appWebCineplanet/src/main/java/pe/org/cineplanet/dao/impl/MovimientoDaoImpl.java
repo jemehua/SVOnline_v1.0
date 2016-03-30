@@ -77,7 +77,8 @@ public class MovimientoDaoImpl implements MovimientoDao {
 		sb.append("m.detalleEntrada.entrada.fecFin, ");
 		sb.append("m.detalleVenta.venta.otorgado, ");
 		sb.append("m.detalleVenta.venta.fecRegistro, ");
-		sb.append("m.estado ");
+		sb.append("m.estado, ");
+		sb.append("m.detalleVenta.tipoEntrada.restricciones  ");
 		sb.append("FROM Movimiento m ");
 		sb.append("WHERE m.id.idVenta =:idVenta AND m.estado =:estado ");
 		
@@ -106,6 +107,7 @@ public class MovimientoDaoImpl implements MovimientoDao {
 			ventaDTO.setOtorgado((String) row[6]);
 			ventaDTO.setFecVenta(sdf.format((Date) row[7]));
 			ventaDTO.setDiasValidos("Lu-Ma-Mi-Ju-Vi-Sa-Do");
+			ventaDTO.setRestricciones((String) row[9]);
 
 			lista.add(ventaDTO);
 		}

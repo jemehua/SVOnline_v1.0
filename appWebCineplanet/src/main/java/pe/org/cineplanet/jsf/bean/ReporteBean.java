@@ -6,6 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -19,17 +21,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.itextpdf.text.pdf.PdfStructTreeController.returnType;
-
 import pe.org.cineplanet.dto.ReporteDTO;
-import pe.org.cineplanet.dto.VentaDTO;
-import pe.org.cineplanet.model.jpa.Agencia;
 import pe.org.cineplanet.model.jpa.Usuario;
-import pe.org.cineplanet.report.ReporteEntradas;
-import pe.org.cineplanet.svc.AgenciaService;
 import pe.org.cineplanet.svc.VentasService;
-import pe.org.cineplanet.util.Constantes;
 import pe.org.cineplanet.util.Excel;
+import pe.org.cineplanet.util.ExcelUtil;
 
 /**
  * 
@@ -53,7 +49,8 @@ public class ReporteBean implements Serializable {
 	private Date fecInicio;
 	private Date fecFin;
 	
-	List<ReporteDTO> list = new ArrayList<ReporteDTO>();
+	//List<ReporteDTO> list = new ArrayList<ReporteDTO>();
+	Map<String, Object[]> dataReporte = new TreeMap<String, Object[]>();
 	
 	private StreamedContent file;
 	
@@ -95,11 +92,14 @@ public class ReporteBean implements Serializable {
 
 		try {
 
-			if(userSesion.getRol().getIdRol() == 1L)
-				list = ventasService.getListaReporte(fecInicio, fecFin, "");
-			else
-				list = ventasService.getListaReporte(fecInicio, fecFin, userSesion.getUsuario());
-			
+			if(userSesion.getRol().getIdRol() == 1L){
+				//list = ventasService.getListaReporte(fecInicio, fecFin, "");
+				dataReporte = ventasService.getMapVentaReporte(fecInicio, fecFin, "");
+			}else{
+				//list = ventasService.getListaReporte(fecInicio, fecFin, userSesion.getUsuario());
+				dataReporte = ventasService.getMapVentaReporte(fecInicio, fecFin, userSesion.getUsuario());
+			}
+			System.out.println("dataReporte: " + dataReporte.size());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -135,11 +135,12 @@ public class ReporteBean implements Serializable {
 
 		System.out.println("StreamedContent.getFile()");
 
-		if (list.size() > 0) {
+		if (dataReporte.size() > 0) {
 
-			Excel excel =  new Excel();
+			//Excel excel =  new Excel();
 			
-			byte[] bytes = excel.crearExcel(list);
+			//byte[] bytes = excel.crearExcel(list);
+			byte[] bytes = ExcelUtil.crearExcel(dataReporte);
 			
 			SimpleDateFormat sdf =  new SimpleDateFormat("ddMMyyyy");
 			

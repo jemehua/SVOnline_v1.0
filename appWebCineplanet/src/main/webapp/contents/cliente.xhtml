@@ -57,11 +57,11 @@
 					</p:inputText></td>
 			</tr>
 			<tr>
-				<td>Agencia<h:outputText value="*" styleClass="obligatorio" /></td>
+				<td>Empresa/Agencia<h:outputText value="*" styleClass="obligatorio" /></td>
 				<td>
 				
 				<p:autoComplete id="agenciaPojo"
-						value="#{clienteBean.agencia}"
+						value="#{clienteBean.agencia}" tabindex="7"
 						completeMethod="#{clienteBean.complete}" var="a"
 						itemLabel="#{a.label}" itemValue="#{a}" forceSelection="true">
 						<f:converter binding="#{agenciaConverter}" />
@@ -100,7 +100,7 @@
 			<f:facet name="header">  
             Lista de Clientes
         </f:facet>
-        <p:column headerText="Id" style="width:7%">
+        <p:column headerText="Id" style="width:7%; text-align: right;">
 				<h:outputText value="#{c.idCliente}" />
 			</p:column>
 			<p:column headerText="DNI/RUC" style="width:10%">
@@ -114,7 +114,7 @@
 				style="width:16%" >
 				<h:outputText value="#{c.apellidos}" />
 			</p:column>
-			<p:column headerText="Abreviatura" style="width:8%">
+			<p:column headerText="Abreviatura" style="width:9%">
 				<h:outputText value="#{c.abreviatura}" />
 			</p:column>
 			<p:column headerText="Dirección" style="width:10%">
@@ -129,7 +129,7 @@
 <!-- 			<p:column headerText="Estado" style="width:8%"> -->
 <!-- 				<h:outputText value="#{c.estado.equals('A')?'Activo':'Inactivo'}" /> -->
 <!-- 			</p:column>  -->
-			<p:column headerText="#{messages.lblOpciones}" style="width:8%">
+			<p:column headerText="#{messages.lblOpciones}" style="width:7%">
 				<p:commandButton value="" icon="ui-icon-pencil"
 					update=":frm:pnlCliente" title="Editar">
 					<f:setPropertyActionListener value="#{c}"

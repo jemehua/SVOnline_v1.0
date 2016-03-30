@@ -1,15 +1,19 @@
 package pe.org.cineplanet.dao.impl;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import pe.org.cineplanet.dao.DetalleEntradaDao;
+import pe.org.cineplanet.model.jpa.Agencia;
 import pe.org.cineplanet.model.jpa.DetalleEntrada;
 import pe.org.cineplanet.model.jpa.DetalleEntradaPK;
 import pe.org.cineplanet.util.Constantes;
@@ -62,6 +66,14 @@ public class DetalleEntradaDaoImpl implements DetalleEntradaDao {
 				"DetalleEntrada.getByIdCodigo", DetalleEntrada.class);
 		tq.setParameter("idCodigo", idCodigo);
 		return tq.getSingleResult();
+	}
+
+	public Integer getCountCodigoEntradasByEstado(Long idEntrada, String estado) throws Exception {
+		String sql = "select count(*) from detalleentrada where identrada = :idEntrada and estado = :estado ";
+		Query q = em.createNativeQuery(sql);
+		q.setParameter("idEntrada", idEntrada);
+		q.setParameter("estado", estado);
+		return ((BigInteger) q.getSingleResult()).intValue();
 	}
 
 }

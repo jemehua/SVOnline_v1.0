@@ -8,7 +8,6 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import javax.faces.model.SelectItem;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,8 +48,8 @@ public class ClienteBean implements Serializable {
 
 	private List<Cliente> listaCliente = new ArrayList<Cliente>();
 	private List<Cliente> filteredListaCliente = new ArrayList<Cliente>();
-	private List<SelectItem> comboAgencia = new ArrayList<SelectItem>();
-	private String agenciaSelec;
+	/*private List<SelectItem> comboAgencia = new ArrayList<SelectItem>();
+	private String agenciaSelec;*/
 
 	// autocomplete
 	private Agencia agencia;
@@ -63,8 +62,8 @@ public class ClienteBean implements Serializable {
 	public void init() {
 		System.out.println("Init");
 		cliente = new Cliente();
-		agenciaSelec = "";
-		cargarComboAgencia();
+		//agenciaSelec = "";
+		//cargarComboAgencia();
 		cargarListaClientes();
 		// message = new Message();
 	}
@@ -86,9 +85,9 @@ public class ClienteBean implements Serializable {
 
 	public void limpiar() {
 		cliente = new Cliente();
-		agenciaSelec = "";
+		//agenciaSelec = "";
 		agencia = null;
-		cargarComboAgencia();
+		//cargarComboAgencia();
 		cargarListaClientes();
 	}
 
@@ -158,18 +157,18 @@ public class ClienteBean implements Serializable {
 		return true;
 	}
 
-	public void cargarComboAgencia() {
+	/*public void cargarComboAgencia() {
 		try {
 			setComboAgencia(agenciaService.getComboAgencia());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
+	}*/
 
 	public void cargarListaClientes() {
 		try {
-			listaCliente = clienteService.getListaCliente();
+			listaCliente = clienteService.getListaCliente(Constantes.VACIO, Constantes.VACIO);
 			filteredListaCliente = listaCliente;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -212,7 +211,7 @@ public class ClienteBean implements Serializable {
 		this.listaCliente = listaCliente;
 	}
 
-	public List<SelectItem> getComboAgencia() {
+	/*public List<SelectItem> getComboAgencia() {
 		return comboAgencia;
 	}
 
@@ -226,7 +225,7 @@ public class ClienteBean implements Serializable {
 
 	public void setAgenciaSelec(String agenciaSelec) {
 		this.agenciaSelec = agenciaSelec;
-	}
+	}*/
 
 	public List<Cliente> getFilteredListaCliente() {
 		return filteredListaCliente;

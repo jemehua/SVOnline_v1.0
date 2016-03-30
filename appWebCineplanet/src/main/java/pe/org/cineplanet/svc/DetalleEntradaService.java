@@ -23,5 +23,7 @@ public interface DetalleEntradaService {
 	public abstract List<DetalleEntrada> getListaByTipoEntrada(Long idTipoEntrada) throws Exception;
 	
 	public abstract boolean getCantidadDispobibleByIdTipoEntrada(Long idTipoEntrada, Integer cantidad);
+	
+	public abstract Integer getCountCodigoEntradasByEstado(Long idEntrada, String estado) throws Exception;
 
 }

@@ -1,10 +1,12 @@
 package pe.org.cineplanet.dao.impl;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -60,21 +62,21 @@ public class VentasDaoImpl implements VentasDao {
 			String usr) throws Exception {
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("SELECT v.idVenta, ");
-		sb.append("v.cliente.razonSocial, ");
-		sb.append("v.cliente.apellidos, ");
-		sb.append("v.cliente.agencia.idAgencia, ");
-		sb.append("v.fecRegistro, ");
-		sb.append("v.cliente.agencia.nombre, ");
-		sb.append("v.serie, ");
-		sb.append("v.numero, ");
-		sb.append("v.tipoDocumento.nombre ");
-		sb.append("FROM Venta v ");
+		sb.append("SELECT v.idventa, c.razonsocial, c.apellidos, v.fecRegistro, v.serie, ");
+		sb.append("v.numero, t.nombre as tipodocumento, t2.nombre as tipopago, ");
+		sb.append("a.idAgencia, a.nombre as nombreagencia, ");
+		sb.append("a.idagenciapadre, e.nombre as nombreempresa ");
+		sb.append("FROM venta v ");
+		sb.append("INNER JOIN cliente c on (c.idcliente = v.idcliente) ");
+		sb.append("INNER JOIN agencia a on (a.idagencia = c.idagencia) ");
+		sb.append("LEFT JOIN agencia e on (e.idagencia = a.idagenciapadre) ");
+		sb.append("INNER JOIN tipodocumento t ON (t.idtipodocumento = v.idtipodocumento) ");
+		sb.append("LEFT JOIN tipopago t2 ON (t2.idtipopago = v.idtipopago) ");
 		sb.append("WHERE v.estado =:estado ");
-		sb.append("AND v.fecRegistro BETWEEN  :fecInicio AND :fecFin ");
+		sb.append("AND v.fecregistro BETWEEN  :fecInicio AND :fecFin ");
 		if(!usr.equalsIgnoreCase(""))
-			sb.append("AND v.usuRegistra =:usr ");
-		sb.append("ORDER BY v.cliente.razonSocial ASC ");
+			sb.append("AND v.usuregistra =:usr ");
+		sb.append("ORDER BY c.razonsocial ASC ");
 
 		StringBuilder sb00 = new StringBuilder();
 		sb00.append("SELECT d.tipoEntrada.idTipoEntrada, ");
@@ -84,7 +86,7 @@ public class VentasDaoImpl implements VentasDao {
 		sb00.append("WHERE d.venta.idVenta =:idVenta ");
 		sb00.append("AND d.estado =:estado ");
 
-		Query q = em.createQuery(sb.toString());
+		Query q = em.createNativeQuery(sb.toString());
 		q.setParameter("estado", Constantes.ACTIVO);
 		q.setParameter("fecInicio", fecInicio);
 		q.setParameter("fecFin", fecFin);
@@ -92,31 +94,35 @@ public class VentasDaoImpl implements VentasDao {
 			q.setParameter("usr", usr);
 
 		List<Object[]> listaObjetos = new ArrayList<Object[]>();
-
 		listaObjetos = q.getResultList();
 
-		List<ReporteDTO> lista = new ArrayList<ReporteDTO>();
-
-		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-
-		
 		int count = 0;
+		List<ReporteDTO> lista = new ArrayList<ReporteDTO>();
 		for (Object[] row : listaObjetos) {
 			count++;
 			ReporteDTO reporteDTO = new ReporteDTO();
 
-			Long idVenta = (Long) row[0];
+			Long idVenta = ((BigInteger) row[0]).longValue();
 			reporteDTO.setContador(count);
 			reporteDTO.setNombres((String) row[1] +" "+ row[2]);
-			reporteDTO.setIdAgencia((String) row[3]);
-			reporteDTO.setNomAgencia((String) row[5]);
-			reporteDTO.setSerie((String) row[6]);
-			reporteDTO.setNumero((String) row[7]);
-			reporteDTO.setTipoDocumento((String) row[8]);
+			reporteDTO.setFechaPedido((Date) row[3]);
+			reporteDTO.setSerie((String) row[4]);
+			reporteDTO.setNumero((String) row[5]);
+			reporteDTO.setTipoDocumento((String) row[6]);
+			reporteDTO.setTipoPago((String) row[7]);
 			
-			String fechaInicio = sdf.format((Date) row[4]);
-			reporteDTO.setFechaPedido(fechaInicio);
-
+			if(row[10] != null && row[11] != null){
+				reporteDTO.setIdAgencia((String) row[8]);
+				reporteDTO.setNomAgencia((String) row[9]);
+				reporteDTO.setIdEmpresa((String) row[10]);
+				reporteDTO.setNomEmpresa((String) row[11]);
+			}else{
+				reporteDTO.setIdAgencia("");
+				reporteDTO.setNomAgencia("");
+				reporteDTO.setIdEmpresa((String) row[8]);
+				reporteDTO.setNomEmpresa((String) row[9]);
+			}
+			
 			Query q00 = em.createQuery(sb00.toString());
 			q00.setParameter("estado", Constantes.ACTIVO);
 			q00.setParameter("idVenta", idVenta);
@@ -184,6 +190,36 @@ public class VentasDaoImpl implements VentasDao {
 
 		return lista;
 
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Object[]> getListaVenta(Date fecInicio, Date fecFin, String usr)
+			throws Exception {
+		StringBuilder sb = new StringBuilder();
+		sb.append("SELECT v.idventa, c.razonsocial, c.apellidos, v.fecRegistro, v.serie, ");
+		sb.append("v.numero, t.nombre as tipodocumento, t2.nombre as tipopago, ");
+		sb.append("a.idAgencia, a.nombre as nombreagencia, ");
+		sb.append("a.idagenciapadre, e.nombre as nombreempresa ");
+		sb.append("FROM venta v ");
+		sb.append("INNER JOIN cliente c on (c.idcliente = v.idcliente) ");
+		sb.append("INNER JOIN agencia a on (a.idagencia = c.idagencia) ");
+		sb.append("LEFT JOIN agencia e on (e.idagencia = a.idagenciapadre) ");
+		sb.append("INNER JOIN tipodocumento t ON (t.idtipodocumento = v.idtipodocumento) ");
+		sb.append("LEFT JOIN tipopago t2 ON (t2.idtipopago = v.idtipopago) ");
+		sb.append("WHERE v.estado =:estado ");
+		sb.append("AND v.fecregistro BETWEEN  :fecInicio AND :fecFin ");
+		if(!usr.equalsIgnoreCase(""))
+			sb.append("AND v.usuregistra =:usr ");
+		sb.append("ORDER BY c.razonsocial ASC ");
+
+		Query q = em.createNativeQuery(sb.toString());
+		q.setParameter("estado", Constantes.ACTIVO);
+		q.setParameter("fecInicio", fecInicio);
+		q.setParameter("fecFin", fecFin);
+		if(!usr.equalsIgnoreCase(""))
+			q.setParameter("usr", usr);
+
+		return q.getResultList();
 	}
 
 }

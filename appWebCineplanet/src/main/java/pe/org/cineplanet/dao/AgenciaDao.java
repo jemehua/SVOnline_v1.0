@@ -18,5 +18,11 @@ public interface AgenciaDao {
 	public abstract Agencia edit(Agencia obj) throws Exception;
 
 	public abstract List<Agencia> getListaAgencia() throws Exception;
+	
+	public abstract List<Agencia> getListaAgencia(String codigoEmpresa) throws Exception;
+	
+	public abstract List<Agencia> getListaEmpresa() throws Exception;
+	
+	public abstract Integer getNextId(String tipo) throws Exception;
 
 }

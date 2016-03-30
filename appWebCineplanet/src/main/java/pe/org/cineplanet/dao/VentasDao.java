@@ -3,6 +3,7 @@ package pe.org.cineplanet.dao;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import pe.org.cineplanet.dto.ReporteDTO;
 import pe.org.cineplanet.model.jpa.Venta;
@@ -24,4 +25,6 @@ public interface VentasDao {
 	public abstract Long getMaxId() throws Exception;
 	
 	public abstract List<ReporteDTO> getListaReporte(Date fecInicio, Date fecFin, String usr) throws Exception;
+	
+	public abstract List<Object[]> getListaVenta(Date fecInicio, Date fecFin, String usr) throws Exception;
 }

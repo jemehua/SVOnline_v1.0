@@ -15,7 +15,7 @@ import javax.validation.constraints.Size;
  * @author Hever Pumallihua
  */
 @Entity
-@NamedQueries({ @NamedQuery(name = "TipoEntrada.getAll", query = "SELECT t FROM TipoEntrada t WHERE t.estado =:estado ORDER BY t.idTipoEntrada ASC") })
+@NamedQueries({ @NamedQuery(name = "TipoEntrada.getAll", query = "SELECT t FROM TipoEntrada t WHERE t.estado =:estado ORDER BY t.tipoVale ASC, t.precio DESC ") })
 public class TipoEntrada implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -29,6 +29,10 @@ public class TipoEntrada implements Serializable {
 	@Column(length = 200)
 	@Size(max = 200)
 	private String descripcion;
+
+	@Column(length = 500)
+	@Size(max = 500)
+	private String restricciones;
 
 	@Column
 	private Integer tipoVale;
@@ -89,6 +93,14 @@ public class TipoEntrada implements Serializable {
 
 	public void setPrecio(BigDecimal precio) {
 		this.precio = precio;
+	}
+
+	public String getRestricciones() {
+		return restricciones;
+	}
+
+	public void setRestricciones(String restricciones) {
+		this.restricciones = restricciones;
 	}
 
 	@Override

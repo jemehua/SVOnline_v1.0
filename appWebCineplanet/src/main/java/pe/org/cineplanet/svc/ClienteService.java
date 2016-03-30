@@ -19,9 +19,9 @@ public interface ClienteService {
 
 	public abstract Cliente edit(Cliente obj) throws Exception;
 
-	public abstract List<Cliente> getListaCliente() throws Exception;
+	public abstract List<Cliente> getListaCliente(String codigoEmpresa, String codigoAgencia) throws Exception;
 
-	public abstract List<SelectItem> getComboCliente() throws Exception;
+	//public abstract List<SelectItem> getComboCliente() throws Exception;
 	
 	public abstract Long getMaxId();
 

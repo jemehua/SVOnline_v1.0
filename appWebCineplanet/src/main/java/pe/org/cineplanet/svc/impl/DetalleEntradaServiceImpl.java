@@ -47,12 +47,10 @@ public class DetalleEntradaServiceImpl implements DetalleEntradaService {
 
 	public boolean getCantidadDispobibleByIdTipoEntrada(Long idTipoEntrada,
 			Integer cantidad) {
-		// TODO Auto-generated method stub
 		List<DetalleEntrada> listDetalle = new ArrayList<DetalleEntrada>();
 		 try {
 			 listDetalle = getListaByTipoEntrada(idTipoEntrada);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		 
@@ -60,6 +58,11 @@ public class DetalleEntradaServiceImpl implements DetalleEntradaService {
 			 return true;
 		 else
 			 return false;
+	}
+
+	public Integer getCountCodigoEntradasByEstado(Long idEntrada, String estado)
+			throws Exception {
+		return detalleEntradaDao.getCountCodigoEntradasByEstado(idEntrada, estado);
 	}
 
 }

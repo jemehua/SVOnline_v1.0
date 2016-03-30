@@ -69,6 +69,10 @@ public class Venta implements Serializable {
 	@ManyToOne
 	private TipoDocumento tipoDocumento;
 
+	@JoinColumn(name = "idTipoPago")
+	@ManyToOne
+	private TipoPago tipoPago;
+
 	public Venta() {
 	}
 
@@ -166,6 +170,14 @@ public class Venta implements Serializable {
 
 	public void setTotal(Integer total) {
 		this.total = total;
+	}
+
+	public TipoPago getTipoPago() {
+		return tipoPago;
+	}
+
+	public void setTipoPago(TipoPago tipoPago) {
+		this.tipoPago = tipoPago;
 	}
 
 	@Override

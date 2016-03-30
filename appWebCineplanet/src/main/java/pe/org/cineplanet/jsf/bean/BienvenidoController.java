@@ -21,7 +21,7 @@ public class BienvenidoController implements Serializable {
 			.getLogger(BienvenidoController.class);
 
 	public BienvenidoController() {
-
+		
 	}
 
 }

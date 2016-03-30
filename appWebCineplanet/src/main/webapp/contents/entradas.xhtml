@@ -41,7 +41,7 @@
 							</tr>
 							<tr>
 								<td>Hasta<h:outputText value="*" styleClass="obligatorio" /></td>
-								<td><p:calendar id="hasta" locale="es"
+								<td><p:calendar id="hasta" locale="es" 
 										value="#{entradaBean.entrada.fecFin}" showOn="button"
 										navigator="true" tabindex="4" pattern="dd/MM/yyyy" /></td>
 							</tr> 
@@ -52,7 +52,7 @@
 						<p:fileUpload fileUploadListener="#{entradaBean.handleFileUpload}"
 							mode="advanced" update="msgDoc" label="Cargar archivo"
 							dragDropSupport="true" auto="true" sizeLimit="100000"
-							allowTypes="/(\.|\/)(xlsx)$/" />
+							allowTypes="/(\.|\/)(xlsx)$/" disabled="#{entradaBean.editar}" /> 
 						<f:facet name="footer">
 							<h:outputText id="msgDoc" value="#{entradaBean.msgDoc}"
 								style="color:red;" />
@@ -79,12 +79,15 @@
 			emptyMessage="No hay datos">
 
 			<f:facet name="header">  
-            Lista de Clientes
+            Lista de Entradas
         </f:facet>
-			<p:column headerText="Id" style="width:8%">
+			<p:column headerText="Id" style="width:8%; text-align: right;">
 				<h:outputText value="#{e.idEntrada}" />
 			</p:column> 
-			<p:column headerText="Tipo de Entrada" style="width:36%">
+			<p:column headerText="Lote" style="width:8%">
+				<h:outputText value="#{e.lote}" />
+			</p:column> 
+			<p:column headerText="Tipo de Entrada" style="width:28%">
 				<h:outputText value="#{e.tipoEntrada.nombre}" />
 			</p:column> 
 			<p:column headerText="Fecha validez" style="width:18%">
@@ -95,23 +98,27 @@
 					<f:convertDateTime pattern="dd/MM/yyyy" locale="es" />
 				</h:outputText>
 			</p:column>
-			<p:column headerText="Fecha de carga" style="width:10%">
+			<p:column headerText="Fecha de carga" style="width:12%">
 				<h:outputText value="#{e.fecRegistro}">
 					<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="America/Lima"  />
 				</h:outputText>
 			</p:column>
-			<p:column headerText="Total" style="width:8%">
+			<p:column headerText="Cantidad" style="width:8%; text-align: right;">
 				<h:outputText value="#{e.cantidad}" />
 			</p:column> 
-			<p:column headerText="Estado" style="width:10%">
+			<p:column headerText="Estado" style="width:8%; text-align: center;">
 				<h:outputText value="#{e.estado.equals('A')?'Activo':'Inactivo'}" />
 			</p:column>
 			<p:column headerText="#{messages.lblOpciones}" style="width:10%">
-<!-- 				<p:commandButton value="" icon="ui-icon-pencil" -->
-<!-- 					update=":frm:pnlEntrada" title="Editar"> -->
-<!-- 					<f:setPropertyActionListener value="#{e}" -->
-<!-- 						target="#{entradaBean.entrada}" /> -->
-<!-- 				</p:commandButton> -->
+				<p:commandButton value="" icon="ui-icon-pencil"
+					update=":frm:pnlEntrada" title="Editar">
+					<f:setPropertyActionListener value="#{e}"
+						target="#{entradaBean.entrada}" />
+					<f:setPropertyActionListener value="#{e.tipoEntrada.idTipoEntrada}"
+						target="#{entradaBean.tipoEntradaSelec}" />
+					<f:setPropertyActionListener value="true"
+						target="#{entradaBean.editar}" />
+				</p:commandButton>
 			</p:column>
 		</p:dataTable>
 	</p:panel>

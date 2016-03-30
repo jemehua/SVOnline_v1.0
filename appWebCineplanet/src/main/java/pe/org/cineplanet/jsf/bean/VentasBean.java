@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import pe.org.cineplanet.dto.MovimientoDTO;
 import pe.org.cineplanet.dto.VentaDTO;
+import pe.org.cineplanet.model.jpa.Agencia;
 import pe.org.cineplanet.model.jpa.Cliente;
 import pe.org.cineplanet.model.jpa.DetalleEntrada;
 import pe.org.cineplanet.model.jpa.DetalleVenta;
@@ -41,6 +42,7 @@ import pe.org.cineplanet.svc.EntradaService;
 import pe.org.cineplanet.svc.MovimientoService;
 import pe.org.cineplanet.svc.TipoDocumentoService;
 import pe.org.cineplanet.svc.TipoEntradaService;
+import pe.org.cineplanet.svc.TipoPagoService;
 import pe.org.cineplanet.svc.VentasService;
 import pe.org.cineplanet.util.Constantes;
 
@@ -66,6 +68,8 @@ public class VentasBean implements Serializable {
 	@Autowired
 	private TipoDocumentoService tipoDocumentoService;
 	@Autowired
+	private TipoPagoService tipoPagoService;
+	@Autowired
 	private VentasService ventasService;
 	@Autowired
 	private DetalleVentaService detalleVentaService;
@@ -90,10 +94,16 @@ public class VentasBean implements Serializable {
 	private String descTipoEntrada;
 	private Integer cantidadDisponible;
 
+	private List<SelectItem> comboEmpresa = new ArrayList<SelectItem>();
+	private String empresaSelec = "";
+	private List<SelectItem> comboAgencia = new ArrayList<SelectItem>();
+	private String agenciaSelec;
 	private List<SelectItem> comboTipoEntrada = new ArrayList<SelectItem>();
 	private Long tipoEntradaSelec;
 	private List<SelectItem> comboTipoDocumento = new ArrayList<SelectItem>();
 	private Long tipoDocumentoSelec;
+	private List<SelectItem> comboTipoPago = new ArrayList<SelectItem>();
+	private Integer tipoPagoSelec;
 
 	private Long idVentaSelec;
 	private String nombreSelec;
@@ -108,6 +118,17 @@ public class VentasBean implements Serializable {
 
 	private BigDecimal totalVenta = new BigDecimal(0.00);
 
+	// agregar empresa
+	// private Agencia empresa;
+	private Agencia agencia;
+	private Integer esEmpresa;
+
+	// disabled add cliente
+	//private boolean disabledAddEmpresa;
+
+	// agregar cliente
+	private Cliente c;
+
 	public VentasBean() {
 		super();
 	}
@@ -116,17 +137,31 @@ public class VentasBean implements Serializable {
 	public void init() {
 		System.out.println("Init");
 		venta = new Venta();
+		venta.setSerie("001");
+		venta.setNumero("11");
+		// empresa = new Agencia();
+		agencia = new Agencia();
 		tipoEntradaSelec = 0L;
-		tipoDocumentoSelec = 0L;
+		tipoDocumentoSelec = 1L;
+		tipoPagoSelec = 1;
+		empresaSelec = "";
+		agenciaSelec = "";
 		cantidad = "";
 		descTipoEntrada = "";
 		cantidadDisponible = 0;
 		idVentaSelec = 0L;
 		listaDetalleVenta = new ArrayList<DetalleVenta>();
+		cargarComboEmpresa();
+		cargarComboAgencia();
 		cargarComboTipoEntrada();
 		cargarComboTipoDocumento();
+		cargarComboTipoPago();
 		cargarListaVentas();
 		// message = new Message();
+
+		esEmpresa = 1;
+		c = new Cliente();
+		//disabledAddEmpresa = true;
 	}
 
 	public void validarSesion() {
@@ -147,17 +182,29 @@ public class VentasBean implements Serializable {
 	public void limpiar() {
 		venta = new Venta();
 		tipoEntradaSelec = 0L;
-		tipoDocumentoSelec = 0L;
+		tipoDocumentoSelec = 1L;
+		tipoPagoSelec = 1;
+		empresaSelec = "";
+		agenciaSelec = "";
 		cantidad = "";
 		descTipoEntrada = "";
 		cantidadDisponible = 0;
 		idVentaSelec = 0L;
 		listaDetalleVenta = new ArrayList<DetalleVenta>();
+		cargarComboEmpresa();
+		cargarComboAgencia();
 		cargarComboTipoEntrada();
 		cargarComboTipoDocumento();
+		cargarComboTipoPago();
 		cargarListaVentas();
-
+		totalVenta = new BigDecimal(0.00);
 		cliente = new Cliente();
+		// empresa = new Agencia();
+		agencia = new Agencia();
+		esEmpresa = 1;
+		c = new Cliente();
+
+		//disabledAddEmpresa = true;
 	}
 
 	public void limpiarPedido() {
@@ -217,6 +264,24 @@ public class VentasBean implements Serializable {
 		limpiarPedido();
 	}
 
+	public void agregarEmpresa() {
+		try {
+			agencia = new Agencia();
+			if (esEmpresa == 0)
+				agencia.setIdAgenciaPadre(empresaSelec);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void agregarCliente() {
+		try {
+			c = new Cliente();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	public boolean validarAgregar() {
 		FacesContext ctx = FacesContext.getCurrentInstance();
 
@@ -262,6 +327,7 @@ public class VentasBean implements Serializable {
 			venta.setCliente(cliente);
 			venta.setTipoDocumento(tipoDocumentoService
 					.find(tipoDocumentoSelec));
+			venta.setTipoPago(tipoPagoService.find(tipoPagoSelec));
 
 			if (venta.getIdVenta() != null) {
 
@@ -306,7 +372,19 @@ public class VentasBean implements Serializable {
 			return false;
 		}
 
+		if (tipoPagoSelec == 0) {
+			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
+					"ADVERTENCIA", "Ingrese campos obligatorios"));
+			return false;
+		}
+
 		if (venta.getOtorgado().trim().length() == 0) {
+			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
+					"ADVERTENCIA", "Ingrese campos obligatorios"));
+			return false;
+		}
+
+		if (tipoDocumentoSelec == 0) {
 			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
 					"ADVERTENCIA", "Ingrese campos obligatorios"));
 			return false;
@@ -333,6 +411,31 @@ public class VentasBean implements Serializable {
 		return true;
 	}
 
+	public void handleItemSelectEmpresa() {
+		logger.info("empresaSelec: " + empresaSelec);
+		/*if (!empresaSelec.equals(Constantes.VACIO))
+			disabledAddEmpresa = false;*/
+
+		cargarComboAgencia();
+	}
+
+	public void cargarComboEmpresa() {
+		try {
+			comboEmpresa = agenciaService.getComboEmpresa();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void cargarComboAgencia() {
+		try {
+			setComboAgencia(agenciaService.getComboAgencia(empresaSelec));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	public void cargarComboTipoEntrada() {
 		try {
 			setComboTipoEntrada(tipoEntradaService.getComboTipoVale());
@@ -347,6 +450,14 @@ public class VentasBean implements Serializable {
 			setComboTipoDocumento(tipoDocumentoService.getComboTipoDocumento());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void cargarComboTipoPago() {
+		try {
+			setComboTipoPago(tipoPagoService.getComboTipoPago());
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -423,7 +534,7 @@ public class VentasBean implements Serializable {
 
 		SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
 
-		String fileName = nombreSelec+"_"+sdf.format(new Date())+".pdf";
+		String fileName = nombreSelec + "_" + sdf.format(new Date()) + ".pdf";
 		file = new DefaultStreamedContent(new ByteArrayInputStream(bytes),
 				"application/pdf", fileName);
 
@@ -439,13 +550,14 @@ public class VentasBean implements Serializable {
 	public List<Cliente> complete(String query) throws Exception {
 
 		System.out.println("query=" + query);
-		List<Cliente> allThemes = clienteService.getListaCliente();
+		List<Cliente> allThemes = clienteService.getListaCliente(empresaSelec, agenciaSelec);
 		List<Cliente> filteredThemes = new ArrayList<Cliente>();
 
+		String nombreCompleto = "";
 		for (int i = 0; i < allThemes.size(); i++) {
 			Cliente skin = allThemes.get(i);
-			if (skin.getRazonSocial().toLowerCase()
-					.startsWith(query.toLowerCase())) {
+			nombreCompleto = skin.getRazonSocial() + " " + skin.getApellidos();
+			if (nombreCompleto.trim().toLowerCase().startsWith(query.toLowerCase())) {
 				filteredThemes.add(skin);
 			}
 		}
@@ -510,6 +622,145 @@ public class VentasBean implements Serializable {
 					"ADVERTENCIA", "Error al anular pedido"));
 		}
 
+	}
+
+	public void guardarEmpresa() {
+		validarSesion();
+
+		if (!validarDatosEmpresa())
+			return;
+
+		try {
+			agencia.setNombre(agencia.getNombre().toUpperCase());
+			// Agencia a = agenciaService.find(agencia.getIdAgencia());
+
+			// if (a != null) {
+			if (agencia.getIdAgencia() != null
+					&& agencia.getIdAgencia().length() > 0) {
+				agenciaService.edit(agencia);
+				FacesContext.getCurrentInstance().addMessage(
+						null,
+						new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+								"Registro Modificado"));
+			} else {
+				agencia.setEstado(Constantes.ACTIVO);
+				if (esEmpresa == 1)
+					agenciaService.save(agencia, Constantes.TIPO_EMPRESA);
+				else
+					agenciaService.save(agencia, Constantes.TIPO_AGENCIA);
+				FacesContext.getCurrentInstance().addMessage(
+						null,
+						new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+								"Registro Exitoso"));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+							"Error al registrar"));
+		}
+		if (esEmpresa == 1)
+			cargarComboEmpresa();
+		else
+			cargarComboAgencia();
+	}
+
+	public boolean validarDatosEmpresa() {
+		FacesContext ctx = FacesContext.getCurrentInstance();
+
+		if (esEmpresa == 0) {
+			if (agencia.getIdAgenciaPadre().length() == 0) {
+				ctx.addMessage(null, new FacesMessage(
+						FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+						"Ingrese campos obligatorios"));
+				return false;
+			}
+		}
+
+		if (agencia.getNombre().trim().length() == 0) {
+			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
+					"ADVERTENCIA", "Ingrese campos obligatorios"));
+			return false;
+		}
+		return true;
+	}
+
+	public void guardarCliente() {
+		validarSesion();
+
+		if (!validarDatosCliente())
+			return;
+
+		try {
+
+			// Cliente e = clienteService.find(cliente.getNroDocumento());
+			// cliente.setAgencia(agenciaService.find(agenciaSelec));
+
+			if (agenciaSelec.equals(Constantes.VACIO)) {
+
+				if (!empresaSelec.equals(Constantes.VACIO))
+					c.setAgencia(agenciaService.find(empresaSelec));
+
+			} else {
+				c.setAgencia(agenciaService.find(agenciaSelec));
+			}
+
+			// cliente.setAgencia(agencia);
+
+			if (c.getIdCliente() != null) {
+				c.setUsuModifica(userSesion.getUsuario());
+				c.setFecModificacion(new Date());
+				clienteService.edit(c);
+				FacesContext.getCurrentInstance().addMessage(
+						null,
+						new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+								"Registro Modificado"));
+			} else {
+				c.setIdCliente(clienteService.getMaxId());
+				c.setEstado(Constantes.ACTIVO);
+				c.setUsuRegistra(userSesion.getUsuario());
+				c.setFecRegistro(new Date());
+				clienteService.save(c);
+				FacesContext.getCurrentInstance().addMessage(
+						null,
+						new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
+								"Registro Exitoso"));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "ERROR",
+							"Error al registrar"));
+		}
+	}
+
+	public boolean validarDatosCliente() {
+		FacesContext ctx = FacesContext.getCurrentInstance();
+
+		if (agenciaSelec.equals(Constantes.VACIO)) {
+			if (empresaSelec.equals(Constantes.VACIO)) {
+				ctx.addMessage(null, new FacesMessage(
+						FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+						"Seleccione una Empresa/Agencia"));
+				return false;
+			}
+		}
+
+		if (c.getRazonSocial().trim().length() == 0) {
+			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
+					"ADVERTENCIA", "Ingrese campos obligatorios"));
+			return false;
+		}
+
+		/*
+		 * if (agencia == null) { ctx.addMessage(null, new
+		 * FacesMessage(FacesMessage.SEVERITY_WARN, "ADVERTENCIA",
+		 * "Seleccion Agencia")); return false; }
+		 */
+
+		return true;
 	}
 
 	// GET - SET
@@ -649,5 +900,85 @@ public class VentasBean implements Serializable {
 	public void setNombreSelec(String nombreSelec) {
 		this.nombreSelec = nombreSelec;
 	}
+
+	public List<SelectItem> getComboTipoPago() {
+		return comboTipoPago;
+	}
+
+	public void setComboTipoPago(List<SelectItem> comboTipoPago) {
+		this.comboTipoPago = comboTipoPago;
+	}
+
+	public Integer getTipoPagoSelec() {
+		return tipoPagoSelec;
+	}
+
+	public void setTipoPagoSelec(Integer tipoPagoSelec) {
+		this.tipoPagoSelec = tipoPagoSelec;
+	}
+
+	public List<SelectItem> getComboEmpresa() {
+		return comboEmpresa;
+	}
+
+	public void setComboEmpresa(List<SelectItem> comboEmpresa) {
+		this.comboEmpresa = comboEmpresa;
+	}
+
+	public String getEmpresaSelec() {
+		return empresaSelec;
+	}
+
+	public void setEmpresaSelec(String empresaSelec) {
+		this.empresaSelec = empresaSelec;
+	}
+
+	public List<SelectItem> getComboAgencia() {
+		return comboAgencia;
+	}
+
+	public void setComboAgencia(List<SelectItem> comboAgencia) {
+		this.comboAgencia = comboAgencia;
+	}
+
+	public String getAgenciaSelec() {
+		return agenciaSelec;
+	}
+
+	public void setAgenciaSelec(String agenciaSelec) {
+		this.agenciaSelec = agenciaSelec;
+	}
+
+	public Agencia getAgencia() {
+		return agencia;
+	}
+
+	public void setAgencia(Agencia agencia) {
+		this.agencia = agencia;
+	}
+
+	public Integer getEsEmpresa() {
+		return esEmpresa;
+	}
+
+	public void setEsEmpresa(Integer esEmpresa) {
+		this.esEmpresa = esEmpresa;
+	}
+
+	public Cliente getC() {
+		return c;
+	}
+
+	public void setC(Cliente c) {
+		this.c = c;
+	}
+
+	/*public boolean isDisabledAddEmpresa() {
+		return disabledAddEmpresa;
+	}
+
+	public void setDisabledAddEmpresa(boolean disabledAddEmpresa) {
+		this.disabledAddEmpresa = disabledAddEmpresa;
+	}*/
 
 }

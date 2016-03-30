@@ -25,7 +25,7 @@ import javax.persistence.NamedQuery;
 				+ "FROM Permiso p WHERE p.rol.idRol =:idRol "),
 		@NamedQuery(name = "Permiso.getListaPermisoMenuAndRol", query = "SELECT p "
 				+ "FROM Permiso p "
-				+ "WHERE p.itemMenu.menu.idMenu =:idMenu AND p.rol.idRol =:idRol AND p.estado =:estado ORDER BY p.itemMenu.idItemMenu ASC") })
+				+ "WHERE p.itemMenu.menu.idMenu =:idMenu AND p.rol.idRol =:idRol AND p.estado =:estado ORDER BY p.itemMenu.orden ASC") })
 public class Permiso implements Serializable {
 	private static final long serialVersionUID = 1L;
 

@@ -15,16 +15,30 @@
 	<p:panel id="pnlAgencia" header="Agencia">
 		<p:focus context="pnlAgencia" /> 
 		<table cellpadding="2" cellspacing="2" style="width: 100%;">
+		 	<tr>
+				<td>
+					Empresa<h:outputText value="*" styleClass="obligatorio" />
+				</td>
+				<td colspan="3">
+					<p:selectOneMenu id="comboEmpresa"
+						value="#{agenciaBean.empresaSelec}" style="width:210px;"
+						tabindex="1">
+						<f:selectItems value="#{agenciaBean.comboEmpresa}" />
+						<p:ajax event="change" listener="#{agenciaBean.handleItemSelect}"
+								update="dtListAgencia" />
+					</p:selectOneMenu>
+				</td>
+			</tr>
 			<tr>
-				<td>Codigo<h:outputText value="*" styleClass="obligatorio" /></td>
-				<td><p:inputText id="codigo"
-						value="#{agenciaBean.agencia.idAgencia}" tabindex="1"
+				<td>Codigo</td>
+				<td><p:inputText id="codigo" disabled="true"
+						value="#{agenciaBean.agencia.idAgencia}" tabindex="2"
 						maxlength="16" styleClass="txt">
 
 					</p:inputText></td>
 				<td>Nombre<h:outputText value="*" styleClass="obligatorio" /></td>
 				<td><p:inputText id="nombre"
-						value="#{agenciaBean.agencia.nombre}" tabindex="2" maxlength="200"
+						value="#{agenciaBean.agencia.nombre}" tabindex="3" maxlength="200"
 						styleClass="txt" /></td>
 			</tr>
 		</table>
@@ -51,21 +65,23 @@
 			<f:facet name="header">   
             Lista de Agencias
         </f:facet>
-			<p:column headerText="Codigo" style="width:20%">
+			<p:column headerText="Codigo" style="width:10%">
 				<h:outputText value="#{a.idAgencia}" />
 			</p:column>
-			<p:column id="nombre" headerText="Nombre" style="width:50%"
+			<p:column id="nombre" headerText="Nombre" style="width:70%"
 				filterBy="#{a.nombre}">
 				<h:outputText value="#{a.nombre}" />
 			</p:column>
-			<p:column headerText="Estado" style="width:15%">
+			<p:column headerText="Estado" style="width:10%">
 				<h:outputText value="#{a.estado.equals('A')?'Activo':'Inactivo'}" />
 			</p:column>
-			<p:column headerText="#{messages.lblOpciones}" style="width:15%">
+			<p:column headerText="#{messages.lblOpciones}" style="width:10%">
 				<p:commandButton value="" icon="ui-icon-pencil"
 					update=":frm:pnlAgencia" title="Editar">
 					<f:setPropertyActionListener value="#{a}"
 						target="#{agenciaBean.agencia}" />
+					<f:setPropertyActionListener value="#{a.idAgenciaPadre}"
+						target="#{agenciaBean.empresaSelec}" />
 				</p:commandButton>
 			</p:column>
 		</p:dataTable>

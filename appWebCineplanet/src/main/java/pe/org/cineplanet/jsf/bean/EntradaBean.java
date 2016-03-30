@@ -26,6 +26,7 @@ import pe.org.cineplanet.model.jpa.DetalleEntrada;
 import pe.org.cineplanet.model.jpa.DetalleEntradaPK;
 import pe.org.cineplanet.model.jpa.Entrada;
 import pe.org.cineplanet.model.jpa.Usuario;
+import pe.org.cineplanet.svc.DetalleEntradaService;
 import pe.org.cineplanet.svc.EntradaService;
 import pe.org.cineplanet.svc.TipoEntradaService;
 import pe.org.cineplanet.util.Constantes;
@@ -46,9 +47,11 @@ public class EntradaBean implements Serializable {
 	@Autowired
 	private LoginController loginController;
 	@Autowired
-	private EntradaService entrdService;
+	private EntradaService entradaService;
 	@Autowired
 	private TipoEntradaService tipoEntradaService;
+	@Autowired
+	private DetalleEntradaService detalleEntradaService;
 
 	private Usuario userSesion = null;
 	// private Message message = new Message();
@@ -60,6 +63,7 @@ public class EntradaBean implements Serializable {
 	private byte[] bFile;
 	private Entrada entrada;
 	private String msgDoc;
+	private boolean editar = false;
 
 	public EntradaBean() {
 		super();
@@ -97,6 +101,9 @@ public class EntradaBean implements Serializable {
 		tipoEntradaSelec = 0L;
 		bFile = null;
 		msgDoc = "";
+
+		editar = false;
+
 		cargarComboTipoEntrada();
 		cargarListaEntradas();
 	}
@@ -104,24 +111,24 @@ public class EntradaBean implements Serializable {
 	public void guardar() {
 		validarSesion();
 
-		if (!validarDatos())
-			return;
-
 		try {
+			
+			if (!validarDatos())
+				return;
 
 			entrada.setTipoEntrada(tipoEntradaService.find(tipoEntradaSelec));
 
-			if (entrada.getIdEntrada() != null) {
+			if (editar == true && entrada.getIdEntrada() != null) {
 
 				entrada.setUsuModifica(userSesion.getUsuario());
 				entrada.setFecModificacion(new Date());
-				entrdService.edit(entrada);
+				entradaService.edit(entrada);
 				FacesContext.getCurrentInstance().addMessage(
 						null,
 						new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
 								"Registro Modificado"));
 			} else {
-				entrada.setIdEntrada(entrdService.getMaxId());
+				entrada.setIdEntrada(entradaService.getMaxId());
 				entrada.setEstado(Constantes.ACTIVO);
 				entrada.setUsuRegistra(userSesion.getUsuario());
 				entrada.setFecRegistro(new Date());
@@ -135,12 +142,14 @@ public class EntradaBean implements Serializable {
 				XSSFWorkbook wb = new XSSFWorkbook(byteArrayInputStream);
 				XSSFSheet sheet = wb.getSheetAt(0);
 
+				String lote = "";
 				for (int i = 0, z = sheet.getLastRowNum(); i <= z; i++) {
 					detalleEntrada = new DetalleEntrada();
 
 					XSSFRow row = sheet.getRow(i);
 					if (row != null) {
 						if (row.getCell(0) != null) {
+							lote = row.getCell(0).toString().trim().substring(0, 5);
 							id = new DetalleEntradaPK(row.getCell(0).toString()
 									.trim(), entrada.getIdEntrada());
 							detalleEntrada.setId(id);
@@ -150,15 +159,16 @@ public class EntradaBean implements Serializable {
 						}
 					}
 				}
+				entrada.setLote(lote);
+				// entrada.setCantidad(listaDetalle.size());
 
-				//entrada.setCantidad(listaDetalle.size());
-
-				Integer rpta = entrdService.save(entrada, listaDetalle);
+				Integer rpta = entradaService.save(entrada, listaDetalle);
 
 				FacesContext.getCurrentInstance().addMessage(
 						null,
 						new FacesMessage(FacesMessage.SEVERITY_INFO, "EXITO",
-								"Se ha registrado " +rpta+ " registros, por favor verifique"));
+								"Se ha registrado " + rpta
+										+ " registros, por favor verifique"));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -171,10 +181,10 @@ public class EntradaBean implements Serializable {
 		limpiar();
 	}
 
-	public boolean validarDatos() {
+	public boolean validarDatos() throws Exception {
 		FacesContext ctx = FacesContext.getCurrentInstance();
 
-		if (bFile == null) {
+		if (editar == false && bFile == null) {
 			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
 					"ADVERTENCIA", "Seleccione archivo (.xlsx)"));
 			return false;
@@ -197,6 +207,15 @@ public class EntradaBean implements Serializable {
 					"ADVERTENCIA", "Ingrese Fecha Fin"));
 			return false;
 		}
+		
+		if(editar){
+			Integer result = detalleEntradaService.getCountCodigoEntradasByEstado(entrada.getIdEntrada(), Constantes.VENDIDO);
+			if(result > 0){
+				ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
+						"ADVERTENCIA", result + " de un total de " + entrada.getCantidad() + " codigos de entrada ya han sido vendidos, por lo que no esta permitido realizar modificaciones"));
+				return false;
+			}
+		}
 
 		return true;
 	}
@@ -212,7 +231,7 @@ public class EntradaBean implements Serializable {
 
 	public void cargarListaEntradas() {
 		try {
-			setListaEntrada(entrdService.getListaEntrada());
+			setListaEntrada(entradaService.getListaEntrada());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -274,6 +293,14 @@ public class EntradaBean implements Serializable {
 
 	public void setMsgDoc(String msgDoc) {
 		this.msgDoc = msgDoc;
+	}
+
+	public boolean isEditar() {
+		return editar;
+	}
+
+	public void setEditar(boolean editar) {
+		this.editar = editar;
 	}
 
 }

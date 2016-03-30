@@ -21,7 +21,6 @@ import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.BaseFont;
-import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
@@ -43,7 +42,7 @@ public class ReporteEntradas {
 				document.setMarginMirroring(true);
 				document.open();
 
-				PdfContentByte canvas = writer.getDirectContent();
+				//PdfContentByte canvas = writer.getDirectContent();
 
 				String tipoVale = "VALE CORPORATIVO";
 				String tipoValeC = "VALE DE CONSUMO";
@@ -75,12 +74,12 @@ public class ReporteEntradas {
 				Font fontRest = FontFactory.getFont("Garamond", 5);
 				String restriccionTitulo = "Restricciones";
 
-				String phraseRC = "No válido en la primera semana de estreno. \nNo renovables / No ampliables. \n"
+				/*String phraseRC = "No válido en la primera semana de estreno. \nNo renovables / No ampliables. \n"
 						+ "No válido en salas 3D  (de acuerdo al tarifario). \nNo se aceptan cambios ni devoluciones. \n"
 						+ "No acumula puntos Premium. \nNo válido salas prime.";
 
-				String phraseRCC = "No renovables / No ampliables. \nNo acumula puntos Premium.";
-
+				String phraseRCC = "No renovables / No ampliables. \nNo acumula puntos Premium.";*/
+				
 				String nota = "Nota:";
 				String phraseN = "Prohibida su reventa y/o reproducción. \nUna vez canjeado este vale será inactivado.";
 
@@ -241,7 +240,24 @@ public class ReporteEntradas {
 					cellNota.setColspan(2);
 					cellNota.setBorder(Rectangle.NO_BORDER);
 					tablaContenido.addCell(cellNota);
-
+					
+					
+					String phraseRC = "";
+					if(ventaDTO.getRestricciones() != null){
+						
+						String newCad = ventaDTO.getRestricciones().replace(".", ",");
+						System.out.println("newCad"+newCad);
+						String[] arrayColores = newCad.split(",");
+						 
+						for (int i = 0; i < arrayColores.length; i++) {
+							if(i==0)
+								phraseRC += "";
+							else
+								phraseRC += ".\n";
+							phraseRC += arrayColores[i].trim();
+						}
+					}
+					System.out.println("phraseRC="+phraseRC);
 					if (ventaDTO.getTipoVale() == 1) {
 						PdfPCell cellRestriccionContenido = new PdfPCell(
 								new Phrase(phraseRC, fontRest));
@@ -252,7 +268,7 @@ public class ReporteEntradas {
 						tablaContenido.addCell(cellRestriccionContenido);
 					} else {
 						PdfPCell cellRestriccionContenido = new PdfPCell(
-								new Phrase(phraseRCC, fontRest));
+								new Phrase(phraseRC, fontRest));
 						cellRestriccionContenido.setColspan(2);
 						cellRestriccionContenido.setBorder(Rectangle.NO_BORDER);
 						cellRestriccionContenido

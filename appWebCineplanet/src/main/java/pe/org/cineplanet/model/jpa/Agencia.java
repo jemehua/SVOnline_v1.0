@@ -20,7 +20,7 @@ public class Agencia implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(length = 16)
+	@Column(name="idagencia", length = 16)
 	@Size(max = 16)
 	private String idAgencia;
 
@@ -34,6 +34,10 @@ public class Agencia implements Serializable {
 	@Column(length = 1)
 	@Size(max = 1)
 	private String estado;
+
+	@Column(name="idagenciapadre", length = 16)
+	@Size(max = 16)
+	private String idAgenciaPadre;
 
 	public Agencia() {
 	}
@@ -63,7 +67,7 @@ public class Agencia implements Serializable {
 	}
 
 	public String getLabel() {
-		if (idAgencia != null) 
+		if (idAgencia != null)
 			return idAgencia + "-" + nombre;
 		else
 			return "";
@@ -71,6 +75,14 @@ public class Agencia implements Serializable {
 
 	public void setLabel(String label) {
 		this.label = label;
+	}
+
+	public String getIdAgenciaPadre() {
+		return idAgenciaPadre;
+	}
+
+	public void setIdAgenciaPadre(String idAgenciaPadre) {
+		this.idAgenciaPadre = idAgenciaPadre;
 	}
 
 	@Override

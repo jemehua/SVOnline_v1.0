@@ -12,5 +12,16 @@ public interface Constantes {
 	// roles
 	public static final Long ROL_ADM = 1L;
 	public static final Long ROL_VEN = 2L;
+	
+	public static final Integer CERO = 0;
+	public static final String VACIO = "";
+	
+	public static final String TIPO_EMPRESA = "E";
+	public static final String TIPO_AGENCIA = "A";
+	
+	public static final Integer TIPO_VALE_ENTRADA = 1;
+	public static final Integer TIPO_VALE_COMBO = 2;
+	
+	
 
 }

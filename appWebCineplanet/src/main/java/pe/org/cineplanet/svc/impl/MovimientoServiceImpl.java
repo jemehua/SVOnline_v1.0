@@ -42,12 +42,10 @@ public class MovimientoServiceImpl implements MovimientoService {
 	@Autowired
 	private VentasDao ventasDao;
 
-	// @Transactional
 	public Movimiento find(MovimientoPK id) throws Exception {
 		return movimientoDao.find(id);
 	}
 
-	// @Transactional
 	public Movimiento find(String id) throws Exception {
 		return movimientoDao.find(id);
 	}

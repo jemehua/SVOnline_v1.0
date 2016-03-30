@@ -23,6 +23,8 @@ public interface DetalleEntradaDao {
 	public abstract List<DetalleEntrada> getListaByTipoEntrada(Long idTipoEntrada) throws Exception;
 	
 	public abstract DetalleEntrada getByIdCodigo(String idCodigo) throws Exception;
+	
+	public abstract Integer getCountCodigoEntradasByEstado(Long idEntrada, String estado) throws Exception;
 
 
 }

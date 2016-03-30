@@ -19,6 +19,10 @@ public interface ClienteDao {
 
 	public abstract List<Cliente> getListaCliente() throws Exception;
 	
+	public abstract List<Cliente> getListaClienteByAgencia(String codigoAgencia) throws Exception;
+	
+	public abstract List<Cliente> getListaClienteByEmpresa(String codigoEmpresa) throws Exception;
+	
 	public abstract Long getMaxId() throws Exception;
 
 }
